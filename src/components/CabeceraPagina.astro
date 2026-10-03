@@ -14,6 +14,12 @@ interface Props {
   migas?: string;
 }
 const { etiqueta, titulo, resaltar = [], descripcion, pose, migas } = Astro.props;
+// Medidas reales de cada pose (ancho × alto) para que el navegador reserve el espacio exacto
+const medidas: Record<string, [number, number]> = {
+  '01-saludando': [582, 900], '03-celebrando': [662, 900], '06-nube-brillante': [641, 900], '07-sentado-en-servidor': [737, 900],
+  '08-leyendo': [743, 900], '09-lupa': [762, 900], '10-pensando': [455, 900], '12-audifonos': [492, 900],
+};
+const [anchoPose, altoPose] = (pose && medidas[pose]) || [600, 900];
 ---
 <section class="relative isolate overflow-hidden pb-16 pt-40">
   <div class="rejilla absolute inset-0 -z-10 opacity-30 [mask-image:radial-gradient(ellipse_at_top,#000,transparent_70%)]"></div>
@@ -34,7 +40,7 @@ const { etiqueta, titulo, resaltar = [], descripcion, pose, migas } = Astro.prop
       <p class="entrada mt-6 text-lg leading-relaxed" style="--d:0.3s">{descripcion}</p>
     </div>
     {pose && site.usarMascota && (
-      <img src={`/img/mascota/${pose}.webp`} alt="" width="400" height="560" class="flotar hidden h-64 w-auto drop-shadow-[0_20px_50px_rgba(173,92,255,0.3)] md:block" />
+      <img src={`/img/mascota/${pose}.webp`} alt="" width={anchoPose} height={altoPose} class="flotar hidden h-64 w-auto drop-shadow-[0_20px_50px_rgba(173,92,255,0.3)] md:block" />
     )}
   </div>
 </section>
