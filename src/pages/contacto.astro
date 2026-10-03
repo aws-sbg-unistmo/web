@@ -113,12 +113,20 @@ const perfiles = [
 
   <script>
     // Los botones "Proponer…" eligen el motivo del formulario antes de llevarte a él
+    const select = document.querySelector<HTMLSelectElement>('#campo-tipo');
     document.querySelectorAll<HTMLAnchorElement>('[data-motivo]').forEach((a) =>
       a.addEventListener('click', () => {
-        const select = document.querySelector<HTMLSelectElement>('#campo-tipo');
         if (select) select.value = a.dataset.motivo ?? '';
       }),
     );
+    // Desde otras páginas: /contacto/?motivo=alianza (o charla, comunidad)
+    const motivos: Record<string, string> = {
+      alianza: 'Patrocinio o alianza',
+      charla: 'Quiero dar una charla o taller',
+      comunidad: 'Colaboración con otra comunidad',
+    };
+    const pedido = motivos[new URLSearchParams(location.search).get('motivo') ?? ''];
+    if (select && pedido) select.value = pedido;
   </script>
 
   <script>

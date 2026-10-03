@@ -1,0 +1,126 @@
+---
+// "Nuestra casa": la UNISTMO con fotos (licencia libre, con crédito), lema, datos, mapa del campus y cómo llegar.
+import Icono from './Icono.astro';
+import Palabras from './Palabras.astro';
+import { universidad } from '../data/contenido';
+
+const { lat, lon } = universidad.coordenadas;
+const mapa = `https://www.openstreetmap.org/export/embed.html?bbox=${lon - 0.014},${lat - 0.008},${lon + 0.014},${lat + 0.008}&layer=mapnik&marker=${lat},${lon}`;
+const comoLlegar = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
+const verOsm = `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=16/${lat}/${lon}`;
+const [principal, ...otras] = universidad.fotos;
+const tehuantepec = universidad.campus.find((c) => c.aqui)!;
+---
+<section id="universidad" class="mx-auto mt-28 max-w-7xl px-5">
+  <div class="max-w-3xl">
+    <p class="chip" data-reveal>// Nuestra casa</p>
+    <Palabras texto="La Universidad del Istmo" resaltar={['Istmo']} class="mt-5 text-4xl font-bold leading-tight md:text-5xl" />
+    <p class="mt-5 text-lg leading-relaxed" data-reveal>{universidad.texto}</p>
+  </div>
+
+  <div class="mt-12 grid gap-6 lg:grid-cols-[1.35fr_1fr]">
+    <figure class="tarjeta group overflow-hidden" data-reveal>
+      <div class="relative overflow-hidden">
+        <img src={principal.src} alt={principal.titulo} width={principal.ancho} height={principal.alto} loading="lazy" class="aspect-[16/8] w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
+        <span class="insignia absolute left-4 top-4 bg-marino/80! backdrop-blur" style="--color-insignia:var(--color-magenta)">Aquí estamos</span>
+      </div>
+      <figcaption class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 p-5">
+        <span class="titulo font-semibold">{principal.titulo}</span>
+        <span class="text-xs text-suave/70">
+          Foto: {principal.autor} · <a href={principal.licenciaUrl} target="_blank" rel="noopener license" class="underline-offset-2 hover:text-white hover:underline">{principal.licencia}</a> ·{' '}
+          <a href={principal.fuente} target="_blank" rel="noopener" class="underline-offset-2 hover:text-white hover:underline">Wikimedia Commons</a>
+        </span>
+      </figcaption>
+    </figure>
+
+    <div class="grid gap-6">
+      <div class="tarjeta relative overflow-hidden p-7" data-reveal>
+        <div class="absolute -right-10 -top-10 size-40 rounded-full bg-morado/20 blur-3xl" aria-hidden="true"></div>
+        <p class="relative text-xs font-semibold uppercase tracking-widest text-suave/70">Lema de la universidad</p>
+        <p class="titulo relative mt-3 text-2xl font-semibold italic" lang="la">«{universidad.lema.latin}»</p>
+        <p class="relative mt-1 text-sm italic text-magenta" lang="zap">{universidad.lema.zapoteco}</p>
+        <p class="relative mt-3 text-sm">Significa: <strong class="text-white">{universidad.lema.significado}</strong>, en latín y en zapoteco.</p>
+      </div>
+      <dl class="grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-linea bg-linea" data-reveal>
+        {universidad.datos.map((d) => (
+          <div class="bg-marino-2 p-5">
+            <dt class="sr-only">{d.texto}</dt>
+            <dd class="titulo text-3xl font-bold">{d.valor}</dd>
+            <dd class="mt-1 text-xs leading-snug text-suave/80">{d.texto}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </div>
+
+  <div class="mt-6 grid gap-6 md:grid-cols-2" data-stagger>
+    {otras.map((f) => (
+      <figure class="tarjeta group overflow-hidden">
+        <div class="overflow-hidden">
+          <img src={f.src} alt={f.titulo} width={f.ancho} height={f.alto} loading="lazy" class="aspect-video w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
+        </div>
+        <figcaption class="p-5">
+          <span class="titulo block font-semibold">{f.titulo}</span>
+          <span class="mt-1 block text-xs text-suave/70">
+            Foto: {f.autor} · <a href={f.licenciaUrl} target="_blank" rel="noopener license" class="underline-offset-2 hover:text-white hover:underline">{f.licencia}</a> ·{' '}
+            <a href={f.fuente} target="_blank" rel="noopener" class="underline-offset-2 hover:text-white hover:underline">Wikimedia Commons</a>
+          </span>
+        </figcaption>
+      </figure>
+    ))}
+  </div>
+
+  <!-- Mapa y cómo llegar -->
+  <div class="tarjeta mt-6 grid overflow-hidden lg:grid-cols-[1.4fr_1fr]" data-reveal>
+    <div class="relative min-h-80 border-b border-linea lg:border-b-0 lg:border-r">
+      <iframe
+        src={mapa}
+        title="Mapa del Campus Tehuantepec de la Universidad del Istmo"
+        loading="lazy"
+        referrerpolicy="no-referrer"
+        class="mapa absolute inset-0 size-full"
+      ></iframe>
+    </div>
+    <div class="p-7 md:p-8">
+      <p class="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-magenta"><Icono nombre="lugar" class="size-4" /> Campus Tehuantepec</p>
+      <address class="titulo mt-3 text-lg font-semibold not-italic leading-snug">{tehuantepec.direccion}</address>
+      <p class="mt-3 text-sm leading-relaxed">
+        Al sur de la ciudad de Tehuantepec, en la región del Istmo de Oaxaca. Nuestros eventos suelen ser aquí; el salón exacto
+        viene en cada evento de Meetup.
+      </p>
+      <div class="mt-6 flex flex-wrap gap-3">
+        <a href={comoLlegar} target="_blank" rel="noopener" class="boton boton-primario px-5! py-3! text-sm">Cómo llegar <Icono nombre="flecha" class="size-4" /></a>
+        <a href={verOsm} target="_blank" rel="noopener" class="boton boton-secundario px-5! py-3! text-sm">Mapa grande <Icono nombre="externo" class="size-4" /></a>
+      </div>
+
+      <p class="mt-8 text-xs font-semibold uppercase tracking-widest text-suave/70">Los 3 campus de la UNISTMO</p>
+      <ul class="mt-3 divide-y divide-linea">
+        {universidad.campus.map((c) => (
+          <li class="flex items-start gap-3 py-3">
+            <span class:list={['mt-0.5 grid size-8 shrink-0 place-items-center rounded-lg', c.aqui ? 'bg-magenta text-marino' : 'bg-linea text-suave']}><Icono nombre="lugar" class="size-4" /></span>
+            <span class="flex-1 text-sm">
+              <span class="titulo flex flex-wrap items-center gap-2 font-semibold">Campus {c.nombre} {c.aqui && <span class="insignia" style="--color-insignia:var(--color-magenta)">Nuestro grupo</span>}</span>
+              <span class="mt-0.5 block text-xs leading-relaxed text-suave/80">{c.direccion}</span>
+            </span>
+            <a href={c.mapa} target="_blank" rel="noopener" class="shrink-0 rounded-lg p-2 text-suave hover:bg-linea hover:text-white" aria-label={`Ver el Campus ${c.nombre} en Google Maps`}><Icono nombre="externo" class="size-4" /></a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+
+  <div class="mt-6 rounded-3xl border border-linea bg-marino-2/60 p-7" data-reveal>
+    <p class="text-xs font-semibold uppercase tracking-widest text-suave/70">Carreras del Campus Tehuantepec</p>
+    <ul class="mt-4 flex flex-wrap gap-2">
+      {universidad.carrerasTehuantepec.map((c) => (
+        <li class="rounded-full border border-linea bg-marino/60 px-3.5 py-1.5 text-sm text-white">{c}</li>
+      ))}
+    </ul>
+    <p class="mt-4 text-sm">Estudiantes de <strong class="text-white">todas las carreras y campus</strong> son bienvenidos al grupo.</p>
+  </div>
+</section>
+
+<style>
+  /* El mapa de OpenStreetMap es claro: se invierte para que combine con el tema oscuro */
+  .mapa { filter: invert(0.9) hue-rotate(180deg) saturate(0.7) brightness(0.95); }
+</style>

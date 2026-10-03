@@ -52,7 +52,7 @@ const niveles = [
 ];
 const quitarAcentos = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 ---
-<Layout titulo="Aprende" descripcion="Qué es la nube, servicios de AWS, ruta de aprendizaje, certificaciones, glosario y recursos gratuitos para estudiantes.">
+<Layout titulo="Aprende" precargar="/img/cabecera-aprende.jpg" descripcion="Qué es la nube, servicios de AWS, ruta de aprendizaje, certificaciones, glosario y recursos gratuitos para estudiantes.">
   <CabeceraPagina
     migas="Aprende"
     etiqueta="// Aprende"
@@ -60,6 +60,7 @@ const quitarAcentos = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').
     resaltar={['nube']}
     descripcion="Qué es la nube, los servicios de AWS que más vas a usar, una ruta paso a paso, certificaciones, un glosario y recursos gratuitos para seguir aprendiendo por tu cuenta."
     pose="07-sentado-en-servidor"
+    video="aprende"
   />
 
   <SubNav

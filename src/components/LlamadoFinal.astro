@@ -44,16 +44,5 @@ import { redes, site } from '../data/site';
 </section>
 
 <script>
-  // El video de esta sección solo se descarga cuando está por aparecer en pantalla
-  const reducir = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  document.querySelectorAll<HTMLVideoElement>('video.video-diferido').forEach((video) => {
-    if (reducir) return;
-    new IntersectionObserver((entradas, obs) => {
-      if (!entradas[0].isIntersecting) return;
-      video.querySelectorAll<HTMLSourceElement>('source[data-src]').forEach((s) => (s.src = s.dataset.src!));
-      video.load();
-      video.play().catch(() => {});
-      obs.disconnect();
-    }, { rootMargin: '300px' }).observe(video);
-  });
+  import '../scripts/videos';
 </script>

@@ -33,7 +33,8 @@ flowchart LR
 |---|---|
 | Sitio | [Astro](https://astro.build) (HTML estático) + Tailwind CSS |
 | Animaciones | GSAP + ScrollTrigger, Lenis (scroll suave), CSS y canvas |
-| Videos de fondo | Generados con Google Flow (Veo 3.1) a partir de la mascota del grupo |
+| Videos de fondo | Generados con Google Flow (Veo 3.1) a partir de la mascota del grupo: portada, llamado final y cabeceras de Aprende, Eventos y Nosotros |
+| Mapa | OpenStreetMap (iframe, se carga al acercarse) |
 | Hosting | Amazon S3 (privado) + Amazon CloudFront (OAC, HTTP/3, cabeceras de seguridad) |
 | Formularios | API Gateway (HTTP API, con límite de peticiones) → Lambda → DynamoDB + SES |
 | Anti-bots | Cloudflare Turnstile + campo trampa |
@@ -64,9 +65,12 @@ npm run build        # genera dist/
 
 | Qué | Dónde |
 |---|---|
-| Textos generales, redes, navegación, actividades, equipo | `src/data/site.ts` |
+| Textos generales, redes, navegación, actividades | `src/data/site.ts` |
+| Equipo (nombre, rol, carrera, LinkedIn y foto opcional en `public/img/equipo/`) | `equipo` en `src/data/site.ts` |
+| Alianzas (con la lista vacía se muestra cómo ser aliado) | `alianzas` en `src/data/site.ts` |
 | Barra de aviso de arriba (texto vacío = no se muestra) | `anuncio` en `src/data/site.ts` |
-| Servicios por categoría, beneficios, recursos, certificaciones, glosario, universidad y región de México | `src/data/contenido.ts` |
+| Servicios por categoría, beneficios, recursos, certificaciones, glosario y región de México | `src/data/contenido.ts` |
+| Universidad: datos, campus, mapa y fotos (con su crédito y licencia) | `universidad` en `src/data/contenido.ts` |
 | Preguntas frecuentes | `src/pages/index.astro` y `src/pages/eventos/index.astro` |
 | Ruta de aprendizaje | `src/components/Ruta.astro` |
 | Mascota en toda la página (sí / no) | `usarMascota` en `src/data/site.ts` |

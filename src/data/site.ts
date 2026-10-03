@@ -70,10 +70,17 @@ export const servicios = [
   'Amazon API Gateway', 'AWS IAM', 'Amazon RDS', 'Amazon SageMaker', 'Amazon VPC', 'AWS Amplify',
 ];
 
-export const equipo = [
+// Core Team. Para agregar a alguien basta con sumar un objeto. "foto" es opcional (una imagen cuadrada en public/img/equipo/).
+export type Integrante = { nombre: string; rol: string; carrera?: string; linkedin?: string; foto?: string };
+export const equipo: Integrante[] = [
   {
     nombre: 'Jean Paul Gallegos Cruz',
     rol: 'Group Leader',
     linkedin: 'https://www.linkedin.com/in/jeanpaulgc',
   },
 ];
+
+// Comunidades, empresas e instituciones aliadas. Con la lista vacía la página muestra cómo ser aliado.
+// Ejemplo: { nombre: 'Nombre', tipo: 'Comunidad', texto: 'Qué hacemos juntos', url: 'https://…', logo: '/img/alianzas/nombre.png' }
+export type Alianza = { nombre: string; tipo: 'Comunidad' | 'Empresa' | 'Institución' | 'Medio'; texto: string; url?: string; logo?: string };
+export const alianzas: Alianza[] = [];

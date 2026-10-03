@@ -111,17 +111,67 @@ export const glosario = [
   { t: 'CDN', d: 'Red de distribución de contenido: entrega archivos desde servidores cercanos al usuario, como Amazon CloudFront.' },
 ] as const;
 
+// Datos de la universidad: sitio oficial (unistmo.edu.mx) y Wikipedia, consultados en oct-2026.
 export const universidad = {
   nombre: 'Universidad del Istmo (UNISTMO)',
   texto:
-    'Universidad pública del Gobierno del Estado de Oaxaca, parte del Sistema de Universidades Estatales de Oaxaca (SUNEO). Inició actividades en 2002 y tiene campus en Santo Domingo Tehuantepec, Ciudad Ixtepec y Juchitán de Zaragoza.',
+    'Universidad pública del Gobierno del Estado de Oaxaca, parte del Sistema de Universidades Estatales de Oaxaca (SUNEO). Se creó por decreto el 18 de junio de 2002, empezó a dar clases en julio de ese año y tiene campus en Santo Domingo Tehuantepec, Ciudad Ixtepec y Juchitán de Zaragoza.',
+  lema: { latin: 'Voluntas totum potest', zapoteco: "Guiraa zanda ne guendaracala'dxi", significado: 'Todo lo puedes si tú lo quieres' },
+  datos: [
+    { valor: '2002', texto: 'año de fundación' },
+    { valor: '3', texto: 'campus en el Istmo de Tehuantepec' },
+    { valor: '13', texto: 'licenciaturas en total' },
+    { valor: '7', texto: 'ingenierías y licenciaturas en el Campus Tehuantepec' },
+  ],
   carrerasTehuantepec: [
     'Ingeniería en Computación',
     'Ingeniería en Diseño',
+    'Ingeniería en Energías Renovables',
     'Ingeniería Química',
     'Ingeniería de Petróleos',
     'Ingeniería Industrial',
     'Licenciatura en Matemáticas Aplicadas',
+  ],
+  campus: [
+    {
+      nombre: 'Tehuantepec',
+      direccion: 'Ciudad Universitaria s/n, Barrio Santa Cruz Tagolaba, C.P. 70760, Santo Domingo Tehuantepec, Oaxaca',
+      mapa: 'https://www.google.com/maps/search/?api=1&query=16.2910,-95.2390',
+      aqui: true,
+    },
+    {
+      nombre: 'Ixtepec',
+      direccion: 'Carretera Chihuitán–Ixtepec s/n, C.P. 70110, Ciudad Ixtepec, Oaxaca',
+      mapa: 'https://www.google.com/maps/search/?api=1&query=Universidad+del+Istmo+Campus+Ixtepec',
+    },
+    {
+      nombre: 'Juchitán',
+      direccion: 'Carretera Transístmica Juchitán–La Ventosa km 14, La Ventosa, Juchitán, Oaxaca',
+      mapa: 'https://www.google.com/maps/search/?api=1&query=Universidad+del+Istmo+Campus+Juchit%C3%A1n',
+    },
+  ],
+  // Punto central del Campus Tehuantepec (Circuito Universitario, OpenStreetMap)
+  coordenadas: { lat: 16.291, lon: -95.239 },
+  // Fotos con licencia libre de Wikimedia Commons. La licencia pide dar crédito y enlazarla.
+  fotos: [
+    {
+      src: '/img/unistmo/entrada-tehuantepec.webp', ancho: 724, alto: 347,
+      titulo: 'Entrada del Campus Tehuantepec',
+      autor: 'Universidad del Istmo', licencia: 'CC BY-SA 4.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/4.0/deed.es',
+      fuente: 'https://commons.wikimedia.org/wiki/File:Unistmo.jpg',
+    },
+    {
+      src: '/img/unistmo/entrada-ixtepec.webp', ancho: 800, alto: 450,
+      titulo: 'Entrada del Campus Ixtepec',
+      autor: 'Luixlaag', licencia: 'CC BY-SA 4.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/4.0/deed.es',
+      fuente: 'https://commons.wikimedia.org/wiki/File:Unistmo_Ixtepec.jpg',
+    },
+    {
+      src: '/img/unistmo/biblioteca-tehuantepec.webp', ancho: 960, alto: 720,
+      titulo: 'Biblioteca Pública de la UNISTMO en el centro de Tehuantepec',
+      autor: 'Adam Jones', licencia: 'CC BY-SA 2.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/2.0/deed.es',
+      fuente: 'https://commons.wikimedia.org/wiki/File:Facade_of_University_of_the_Isthmus_Library_-_Tehuantepec_-_Isthmus_Region_-_Oaxaca_-_Mexico_-_01_(6541222857).jpg',
+    },
   ],
 };
 

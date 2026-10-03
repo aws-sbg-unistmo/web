@@ -4,8 +4,9 @@ import CabeceraPagina from '../components/CabeceraPagina.astro';
 import SubNav from '../components/SubNav.astro';
 import Icono from '../components/Icono.astro';
 import Palabras from '../components/Palabras.astro';
+import Universidad from '../components/Universidad.astro';
+import Alianzas from '../components/Alianzas.astro';
 import { equipo, site } from '../data/site';
-import { universidad } from '../data/contenido';
 
 const valores = [
   { t: 'Aprender haciendo', d: 'Cada taller termina con algo construido por ti, no con diapositivas.' },
@@ -18,16 +19,11 @@ const pilares = [
   { icono: 'proyecto', t: 'Construir', d: 'Proyectos reales en equipo con servicios de AWS, de la idea a producción.', c: 'var(--color-morado)' },
   { icono: 'usuarios', t: 'Conectar', d: 'Charlas con profesionales y una red de grupos estudiantiles en todo el mundo.', c: 'var(--color-azul)' },
 ] as const;
-const campus = [
-  { nombre: 'Tehuantepec', lugar: 'Santo Domingo Tehuantepec', aqui: true },
-  { nombre: 'Ixtepec', lugar: 'Ciudad Ixtepec' },
-  { nombre: 'Juchitán', lugar: 'Juchitán de Zaragoza' },
-];
 const historia = [
   {
     cuando: 'Septiembre 2026',
     titulo: 'Nos unimos a AWS Student Builder Groups',
-    texto: 'La UNISTMO, Campus Tehuantepec, entra al programa global de AWS y nace nuestro grupo en Meetup.',
+    texto: 'La UNISTMO, Campus Tehuantepec, entra al programa global de AWS y nace nuestro grupo en Meetup: el primero del programa en Oaxaca.',
   },
   {
     cuando: 'Octubre 2026',
@@ -54,9 +50,13 @@ const codigo = [
   { t: 'Cuida las cuentas', d: 'Nunca compartas contraseñas ni llaves de acceso, y apaga lo que no uses para evitar cobros.' },
   { t: 'Da crédito', d: 'Si usas el código, las ideas o el trabajo de alguien más, menciónalo.' },
 ];
+const solo = equipo.length === 1;
+const descripcionRol: Record<string, string> = {
+  'Group Leader': 'Coordina el grupo y sus eventos, y es el enlace con el programa AWS Student Builder Groups.',
+};
 const iniciales = (n: string) => n.split(' ').filter(Boolean).slice(0, 2).map((p) => p[0]).join('');
 ---
-<Layout titulo="Nosotros" descripcion="Quiénes somos: el AWS Student Builder Group de la Universidad del Istmo, Campus Tehuantepec.">
+<Layout titulo="Nosotros" precargar="/img/cabecera-nosotros.jpg" descripcion="Quiénes somos: el AWS Student Builder Group de la Universidad del Istmo, Campus Tehuantepec.">
   <CabeceraPagina
     migas="Nosotros"
     etiqueta="// Nosotros"
@@ -64,6 +64,7 @@ const iniciales = (n: string) => n.split(' ').filter(Boolean).slice(0, 2).map((p
     resaltar={['construye']}
     descripcion="Somos el AWS Student Builder Group de la Universidad del Istmo, Campus Tehuantepec: un grupo dirigido por estudiantes para aprender cloud computing e inteligencia artificial con AWS."
     pose="10-pensando"
+    video="nosotros"
   />
 
   <SubNav
@@ -74,6 +75,7 @@ const iniciales = (n: string) => n.split(' ').filter(Boolean).slice(0, 2).map((p
       { id: 'universidad', texto: 'Universidad' },
       { id: 'historia', texto: 'Historia' },
       { id: 'equipo', texto: 'Equipo' },
+      { id: 'alianzas', texto: 'Alianzas' },
       { id: 'codigo', texto: 'Código de conducta' },
     ]}
   />
@@ -122,47 +124,23 @@ const iniciales = (n: string) => n.split(' ').filter(Boolean).slice(0, 2).map((p
         </article>
       ))}
     </div>
-  </section>
 
-  <!-- Universidad -->
-  <section id="universidad" class="mx-auto mt-28 max-w-7xl px-5">
-    <div class="tarjeta overflow-hidden" data-reveal>
-      <div class="grid lg:grid-cols-[1.1fr_1fr]">
-        <div class="p-8 md:p-12">
-          <p class="chip">// Nuestra casa</p>
-          <h2 class="titulo mt-5 text-3xl font-bold md:text-4xl">{universidad.nombre}</h2>
-          <p class="mt-5 leading-relaxed">{universidad.texto}</p>
-          <p class="mt-8 text-xs font-semibold uppercase tracking-widest text-suave/70">Carreras del Campus Tehuantepec</p>
-          <ul class="mt-3 flex flex-wrap gap-2">
-            {universidad.carrerasTehuantepec.map((c) => (
-              <li class="rounded-full border border-linea bg-marino/60 px-3.5 py-1.5 text-sm text-white">{c}</li>
-            ))}
-          </ul>
-          <p class="mt-4 text-sm">Estudiantes de <strong class="text-white">todas las carreras</strong> son bienvenidos al grupo.</p>
-        </div>
-        <div class="relative border-t border-linea bg-marino/40 p-8 md:p-12 lg:border-l lg:border-t-0">
-          <div class="rejilla absolute inset-0 opacity-20 [mask-image:radial-gradient(ellipse_at_center,#000,transparent_75%)]" aria-hidden="true"></div>
-          <p class="relative text-xs font-semibold uppercase tracking-widest text-suave/70">Campus en el Istmo de Tehuantepec</p>
-          <ul class="relative mt-6 space-y-4">
-            {campus.map((c) => (
-              <li class:list={['flex items-center gap-4 rounded-2xl border p-4', c.aqui ? 'border-magenta/60 bg-magenta/8' : 'border-linea bg-marino-2/80']}>
-                <span class:list={['grid size-11 shrink-0 place-items-center rounded-xl', c.aqui ? 'bg-magenta text-marino' : 'bg-linea text-suave']}>
-                  <Icono nombre="lugar" class="size-5" />
-                </span>
-                <span class="flex-1">
-                  <span class="titulo flex flex-wrap items-center gap-x-3 gap-y-1 font-semibold">
-                    Campus {c.nombre}
-                    {c.aqui && <span class="insignia" style="--color-insignia:var(--color-magenta)">Aquí estamos</span>}
-                  </span>
-                  <span class="mt-0.5 block text-sm text-suave/80">{c.lugar}, Oaxaca</span>
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
+    <div class="tarjeta relative mt-6 grid items-center gap-6 overflow-hidden p-7 md:grid-cols-[auto_1fr] md:p-10" data-reveal>
+      <div class="absolute -left-20 -top-20 size-64 rounded-full bg-magenta/15 blur-3xl" aria-hidden="true"></div>
+      <p class="titulo relative text-7xl font-bold md:text-8xl"><span class="degradado">1°</span></p>
+      <div class="relative">
+        <h3 class="titulo text-2xl font-semibold md:text-3xl">El primer AWS Student Builder Group de Oaxaca</h3>
+        <p class="mt-3 max-w-3xl leading-relaxed">
+          En México hay grupos del programa en universidades como la UNAM, el Tec de Monterrey, la UAEMex y la Universidad
+          Politécnica de Yucatán. En Oaxaca, el nuestro es el primero: traemos el programa al Istmo para que nadie tenga que
+          irse lejos para aprender cloud e IA.
+        </p>
+        <p class="mt-3 text-xs text-suave/60">Según los grupos publicados en Meetup y AWS Builder Center, octubre de 2026.</p>
       </div>
     </div>
   </section>
+
+  <Universidad />
 
   <section class="mx-auto mt-28 max-w-7xl px-5">
     <p class="chip" data-reveal>// Lo que nos mueve</p>
@@ -199,43 +177,80 @@ const iniciales = (n: string) => n.split(' ').filter(Boolean).slice(0, 2).map((p
     </div>
   </section>
 
-  <!-- Equipo: solo quien dirige el grupo, sin opción de agregarse desde aquí -->
+  <!-- Equipo: solo aparecen las personas de "equipo" en src/data/site.ts; desde la página nadie puede agregarse -->
   <section id="equipo" class="mx-auto mt-28 max-w-7xl px-5">
     <p class="chip" data-reveal>// Equipo</p>
     <Palabras texto="Quién está detrás" resaltar={['detrás']} class="mt-5 text-4xl font-bold md:text-5xl" />
-    <div class="mt-12 grid gap-6 lg:grid-cols-[1fr_1.4fr]">
-      {equipo.map((p) => (
-        <article class="tarjeta relative overflow-hidden p-8" data-tilt data-reveal>
-          <div class="absolute -right-16 -top-16 size-48 rounded-full bg-magenta/15 blur-3xl" aria-hidden="true"></div>
-          <span class="titulo relative grid size-20 place-items-center rounded-2xl bg-gradient-to-br from-magenta to-morado text-2xl font-bold text-marino">{iniciales(p.nombre)}</span>
-          <h3 class="titulo relative mt-6 text-2xl font-semibold">{p.nombre}</h3>
-          <p class="relative mt-1 font-medium text-magenta">{p.rol}</p>
-          <p class="relative mt-4 leading-relaxed">
-            Coordina el grupo y sus eventos, y es el enlace con el programa AWS Student Builder Groups.
-          </p>
-          {p.linkedin && (
-            <a href={p.linkedin} target="_blank" rel="noopener" class="enlace-aws relative mt-6 text-sm">
-              Ver perfil en LinkedIn <Icono nombre="externo" class="size-4" />
-            </a>
-          )}
-        </article>
-      ))}
-
-      <div class="tarjeta p-8" data-reveal>
-        <h3 class="titulo text-xl font-semibold">Cómo trabaja el grupo</h3>
-        <p class="mt-2 text-sm leading-relaxed">El trabajo del Core Team se reparte en cuatro áreas.</p>
-        <ul class="mt-6 grid gap-4 sm:grid-cols-2">
-          {areas.map((a) => (
-            <li class="rounded-2xl border border-linea bg-marino/60 p-5">
-              <span class="grid size-10 place-items-center rounded-lg bg-morado/15 text-morado"><Icono nombre={a.icono} class="size-5" /></span>
-              <p class="titulo mt-4 font-semibold">{a.t}</p>
-              <p class="mt-1 text-sm leading-relaxed">{a.d}</p>
+    {solo ? (
+      <div class="mt-12 grid gap-6 lg:grid-cols-[1fr_1.4fr]">
+        {equipo.map((p) => (
+          <article class="tarjeta relative overflow-hidden p-8" data-tilt data-reveal>
+            <div class="absolute -right-16 -top-16 size-48 rounded-full bg-magenta/15 blur-3xl" aria-hidden="true"></div>
+            <span class="titulo relative grid size-20 place-items-center rounded-2xl bg-gradient-to-br from-magenta to-morado text-2xl font-bold text-marino">{iniciales(p.nombre)}</span>
+            <h3 class="titulo relative mt-6 text-2xl font-semibold">{p.nombre}</h3>
+            <p class="relative mt-1 font-medium text-magenta">{p.rol}</p>
+            <p class="relative mt-4 leading-relaxed">{descripcionRol[p.rol] ?? ''}</p>
+            {p.linkedin && (
+              <a href={p.linkedin} target="_blank" rel="noopener" class="enlace-aws relative mt-6 text-sm">
+                Ver perfil en LinkedIn <Icono nombre="externo" class="size-4" />
+              </a>
+            )}
+          </article>
+        ))}
+        <div class="tarjeta p-8" data-reveal>
+          <h3 class="titulo text-xl font-semibold">Cómo trabaja el grupo</h3>
+          <p class="mt-2 text-sm leading-relaxed">El trabajo del Core Team se reparte en cuatro áreas.</p>
+          <ul class="mt-6 grid gap-4 sm:grid-cols-2">
+            {areas.map((a) => (
+              <li class="rounded-2xl border border-linea bg-marino/60 p-5">
+                <span class="grid size-10 place-items-center rounded-lg bg-morado/15 text-morado"><Icono nombre={a.icono} class="size-5" /></span>
+                <p class="titulo mt-4 font-semibold">{a.t}</p>
+                <p class="mt-1 text-sm leading-relaxed">{a.d}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    ) : (
+      <>
+        <p class="mt-5 max-w-2xl text-lg leading-relaxed" data-reveal>
+          Somos {equipo.length} estudiantes de la UNISTMO que organizamos el grupo, los talleres y los eventos.
+        </p>
+        <ul class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" data-stagger>
+          {equipo.map((p, i) => (
+            <li class:list={['tarjeta relative flex flex-col overflow-hidden p-7', i === 0 && 'sm:col-span-2 lg:col-span-1']} data-tilt>
+              {i === 0 && <div class="absolute -right-16 -top-16 size-48 rounded-full bg-magenta/15 blur-3xl" aria-hidden="true"></div>}
+              {p.foto ? (
+                <img src={p.foto} alt="" width="160" height="160" loading="lazy" class="relative size-20 rounded-2xl object-cover ring-2 ring-magenta/40" />
+              ) : (
+                <span class:list={['titulo relative grid size-20 place-items-center rounded-2xl text-2xl font-bold', i === 0 ? 'bg-gradient-to-br from-magenta to-morado text-marino' : 'bg-linea text-white']}>{iniciales(p.nombre)}</span>
+              )}
+              <h3 class="titulo relative mt-6 text-xl font-semibold">{p.nombre}</h3>
+              <p class="relative mt-1 font-medium text-magenta">{p.rol}</p>
+              {p.carrera && <p class="relative mt-1 text-sm text-suave/80">{p.carrera}</p>}
+              {descripcionRol[p.rol] && <p class="relative mt-4 text-sm leading-relaxed">{descripcionRol[p.rol]}</p>}
+              {p.linkedin && (
+                <a href={p.linkedin} target="_blank" rel="noopener" class="enlace-aws relative mt-auto pt-6 text-sm">
+                  LinkedIn <Icono nombre="externo" class="size-4" />
+                </a>
+              )}
             </li>
           ))}
         </ul>
-      </div>
-    </div>
+        <div class="mt-6 grid gap-px overflow-hidden rounded-3xl border border-linea bg-linea sm:grid-cols-2 lg:grid-cols-4" data-stagger>
+          {areas.map((a) => (
+            <div class="bg-marino-2 p-6">
+              <span class="grid size-10 place-items-center rounded-lg bg-morado/15 text-morado"><Icono nombre={a.icono} class="size-5" /></span>
+              <p class="titulo mt-4 font-semibold">{a.t}</p>
+              <p class="mt-1 text-sm leading-relaxed">{a.d}</p>
+            </div>
+          ))}
+        </div>
+      </>
+    )}
   </section>
+
+  <Alianzas />
 
   <!-- Código de conducta -->
   <section id="codigo" class="mx-auto mt-28 max-w-7xl px-5">
