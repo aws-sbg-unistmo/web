@@ -71,7 +71,7 @@ export const servicios = [
 ];
 
 // Core Team. Para agregar a alguien basta con sumar un objeto. "foto" es opcional (una imagen cuadrada en public/img/equipo/).
-export type Integrante = { nombre: string; rol: string; carrera?: string; linkedin?: string; instagram?: string; foto?: string };
+export type Integrante = { nombre: string; rol: string; carrera?: string; linkedin?: string; instagram?: string; github?: string; web?: string; foto?: string };
 export const equipo: Integrante[] = [
   {
     nombre: 'Jean Paul Gallegos Cruz',

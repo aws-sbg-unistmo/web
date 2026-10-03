@@ -1,0 +1,88 @@
+---
+// Equipo del grupo: tarjetas centradas con foto (o iniciales) sobre un marco inclinado, rol y redes.
+// Solo aparece quien está en "equipo" de src/data/site.ts; desde la página nadie puede agregarse.
+import Icono from './Icono.astro';
+import Palabras from './Palabras.astro';
+import { equipo } from '../data/site';
+
+const areas = [
+  { icono: 'evento', t: 'Eventos', d: 'Planea talleres y charlas, consigue los espacios y coordina cada evento.' },
+  { icono: 'taller', t: 'Talleres y proyectos', d: 'Prepara el contenido técnico y acompaña los proyectos del grupo.' },
+  { icono: 'globo', t: 'Contenido y redes', d: 'Cuenta lo que hacemos en Instagram, TikTok, LinkedIn y YouTube.' },
+  { icono: 'usuarios', t: 'Comunidad y alianzas', d: 'Conecta con ponentes, otras comunidades y organizaciones.' },
+] as const;
+const iniciales = (n: string) => n.split(' ').filter(Boolean).slice(0, 2).map((p) => p[0]).join('');
+const redesDe = (p: (typeof equipo)[number]) =>
+  [
+    p.web && { icono: 'globo', url: p.web, nombre: 'Sitio web' },
+    p.github && { icono: 'github', url: p.github, nombre: 'GitHub' },
+    p.linkedin && { icono: 'linkedin', url: p.linkedin, nombre: 'LinkedIn' },
+    p.instagram && { icono: 'instagram', url: p.instagram, nombre: 'Instagram' },
+  ].filter(Boolean) as { icono: 'globo' | 'github' | 'linkedin' | 'instagram'; url: string; nombre: string }[];
+---
+<section id="equipo" class="mx-auto mt-28 max-w-7xl px-5">
+  <div class="mx-auto max-w-2xl text-center">
+    <p class="chip" data-reveal>// Equipo</p>
+    <Palabras texto="Quién está detrás" resaltar={['detrás']} class="mt-5 text-4xl font-bold md:text-5xl" />
+    <p class="mt-5 text-lg leading-relaxed" data-reveal>
+      Estudiantes de la UNISTMO que organizamos el grupo, los talleres y los eventos.
+    </p>
+  </div>
+
+  <ul class="mt-12 flex flex-wrap justify-center gap-4 sm:gap-6" data-stagger>
+    {equipo.map((p, i) => (
+      <li class:list={['integrante tarjeta group relative overflow-hidden px-4 pb-6 pt-8 text-center sm:w-[calc(50%-0.75rem)] sm:px-6 sm:pb-8 sm:pt-10 lg:w-[calc(33.333%-1rem)]', i === 0 ? 'lider w-full' : 'w-[calc(50%-0.5rem)]']} data-tilt>
+        <span class="barra absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-magenta via-morado to-azul" aria-hidden="true"></span>
+
+        <div class="relative mx-auto size-20 sm:size-28">
+          <span class="marco absolute inset-0 rounded-[1.4rem] bg-gradient-to-br from-magenta to-morado opacity-80 sm:rounded-[1.75rem]" aria-hidden="true"></span>
+          {p.foto ? (
+            <img src={p.foto} alt={`Foto de ${p.nombre}`} width="224" height="224" loading="lazy" class="foto relative size-full rounded-[1.4rem] object-cover ring-4 ring-marino-2 sm:rounded-[1.75rem]" />
+          ) : (
+            <span class:list={['titulo relative grid size-full place-items-center rounded-[1.4rem] text-2xl font-bold ring-4 ring-marino-2 sm:rounded-[1.75rem] sm:text-3xl', i === 0 ? 'bg-gradient-to-br from-magenta to-morado text-marino' : 'bg-[#2a3441] text-white']} aria-hidden="true">
+              {iniciales(p.nombre)}
+            </span>
+          )}
+        </div>
+
+        <h3 class="titulo mt-6 text-base font-semibold leading-snug sm:mt-7 sm:text-xl">{p.nombre}</h3>
+        <p class="mt-1.5 text-[0.62rem] font-bold uppercase tracking-[0.16em] text-magenta sm:text-[0.7rem]">{p.rol}</p>
+        {p.carrera && <p class="mt-1.5 text-sm text-suave/80">{p.carrera}</p>}
+
+        {redesDe(p).length > 0 && (
+          <ul class="mt-4 flex justify-center gap-2 sm:mt-5">
+            {redesDe(p).map((r) => (
+              <li>
+                <a href={r.url} target="_blank" rel="noopener" aria-label={`${r.nombre} de ${p.nombre}`} class="grid size-10 place-items-center rounded-full border border-linea text-suave/80 transition-colors hover:border-magenta hover:bg-magenta/10 hover:text-white">
+                  <Icono nombre={r.icono} class="size-[1.15rem]" />
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </li>
+    ))}
+  </ul>
+
+  <div class="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-linea bg-linea lg:grid-cols-4" data-stagger>
+    {areas.map((a) => (
+      <div class="bg-marino-2 p-4 sm:p-6">
+        <span class="grid size-10 place-items-center rounded-lg bg-morado/15 text-morado"><Icono nombre={a.icono} class="size-5" /></span>
+        <p class="titulo mt-4 font-semibold">{a.t}</p>
+        <p class="mt-1 text-sm leading-relaxed">{a.d}</p>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  /* Barra de color arriba: fija en el líder, en los demás aparece al pasar el cursor */
+  .integrante .barra { transform: scaleX(0); transform-origin: left; transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1); }
+  .integrante.lider .barra,
+  .integrante:hover .barra { transform: scaleX(1); }
+  /* Marco inclinado detrás de la foto, como en un sello */
+  .integrante .marco { inset: -4px; rotate: 9deg; translate: 3px 3px; transition: rotate 0.5s cubic-bezier(0.2, 0.7, 0.2, 1), translate 0.5s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.3s ease; }
+  .integrante:hover .marco { rotate: 15deg; translate: 4px 2px; opacity: 1; }
+  .integrante .foto { filter: grayscale(1); transition: filter 0.5s ease; }
+  .integrante:hover .foto { filter: none; }
+</style>

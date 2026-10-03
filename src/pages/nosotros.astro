@@ -6,7 +6,8 @@ import Icono from '../components/Icono.astro';
 import Palabras from '../components/Palabras.astro';
 import Universidad from '../components/Universidad.astro';
 import Alianzas from '../components/Alianzas.astro';
-import { equipo, site } from '../data/site';
+import Equipo from '../components/Equipo.astro';
+import { site } from '../data/site';
 
 const valores = [
   { t: 'Aprender haciendo', d: 'Cada taller termina con algo construido por ti, no con diapositivas.' },
@@ -37,12 +38,6 @@ const historia = [
     futuro: true,
   },
 ];
-const areas = [
-  { icono: 'evento', t: 'Eventos', d: 'Planea talleres y charlas, consigue los espacios y coordina cada evento.' },
-  { icono: 'taller', t: 'Talleres y proyectos', d: 'Prepara el contenido técnico y acompaña los proyectos del grupo.' },
-  { icono: 'globo', t: 'Contenido y redes', d: 'Cuenta lo que hacemos en Instagram, TikTok, LinkedIn y YouTube.' },
-  { icono: 'usuarios', t: 'Comunidad y alianzas', d: 'Conecta con ponentes, otras comunidades y organizaciones.' },
-] as const;
 const codigo = [
   { t: 'Respeto para todas las personas', d: 'Sin importar carrera, nivel, género, origen o forma de pensar.' },
   { t: 'Cero acoso', d: 'No toleramos acoso, discriminación ni comentarios ofensivos, en persona ni en línea.' },
@@ -50,11 +45,6 @@ const codigo = [
   { t: 'Cuida las cuentas', d: 'Nunca compartas contraseñas ni llaves de acceso, y apaga lo que no uses para evitar cobros.' },
   { t: 'Da crédito', d: 'Si usas el código, las ideas o el trabajo de alguien más, menciónalo.' },
 ];
-const solo = equipo.length === 1;
-const descripcionRol: Record<string, string> = {
-  'Group Leader': 'Coordina el grupo y sus eventos, y es el enlace con el programa AWS Student Builder Groups.',
-};
-const iniciales = (n: string) => n.split(' ').filter(Boolean).slice(0, 2).map((p) => p[0]).join('');
 ---
 <Layout titulo="Nosotros" precargar="/img/cabecera-nosotros.jpg" descripcion="Quiénes somos: el AWS Student Builder Group de la Universidad del Istmo, Campus Tehuantepec.">
   <CabeceraPagina
@@ -177,79 +167,7 @@ const iniciales = (n: string) => n.split(' ').filter(Boolean).slice(0, 2).map((p
     </div>
   </section>
 
-  <!-- Equipo: solo aparecen las personas de "equipo" en src/data/site.ts; desde la página nadie puede agregarse -->
-  <section id="equipo" class="mx-auto mt-28 max-w-7xl px-5">
-    <p class="chip" data-reveal>// Equipo</p>
-    <Palabras texto="Quién está detrás" resaltar={['detrás']} class="mt-5 text-4xl font-bold md:text-5xl" />
-    {solo ? (
-      <div class="mt-12 grid gap-6 lg:grid-cols-[1fr_1.4fr]">
-        {equipo.map((p) => (
-          <article class="tarjeta relative overflow-hidden p-8" data-tilt data-reveal>
-            <div class="absolute -right-16 -top-16 size-48 rounded-full bg-magenta/15 blur-3xl" aria-hidden="true"></div>
-            <span class="titulo relative grid size-20 place-items-center rounded-2xl bg-gradient-to-br from-magenta to-morado text-2xl font-bold text-marino">{iniciales(p.nombre)}</span>
-            <h3 class="titulo relative mt-6 text-2xl font-semibold">{p.nombre}</h3>
-            <p class="relative mt-1 font-medium text-magenta">{p.rol}</p>
-            <p class="relative mt-4 leading-relaxed">{descripcionRol[p.rol] ?? ''}</p>
-            {p.linkedin && (
-              <a href={p.linkedin} target="_blank" rel="noopener" class="enlace-aws relative mt-6 text-sm">
-                Ver perfil en LinkedIn <Icono nombre="externo" class="size-4" />
-              </a>
-            )}
-          </article>
-        ))}
-        <div class="tarjeta p-8" data-reveal>
-          <h3 class="titulo text-xl font-semibold">Cómo trabaja el grupo</h3>
-          <p class="mt-2 text-sm leading-relaxed">El trabajo del Core Team se reparte en cuatro áreas.</p>
-          <ul class="mt-6 grid gap-4 sm:grid-cols-2">
-            {areas.map((a) => (
-              <li class="rounded-2xl border border-linea bg-marino/60 p-5">
-                <span class="grid size-10 place-items-center rounded-lg bg-morado/15 text-morado"><Icono nombre={a.icono} class="size-5" /></span>
-                <p class="titulo mt-4 font-semibold">{a.t}</p>
-                <p class="mt-1 text-sm leading-relaxed">{a.d}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    ) : (
-      <>
-        <p class="mt-5 max-w-2xl text-lg leading-relaxed" data-reveal>
-          Somos estudiantes de la UNISTMO que organizamos el grupo, los talleres y los eventos.
-        </p>
-        <ul class:list={['mt-12 grid gap-6 sm:grid-cols-2', equipo.length === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3']} data-stagger>
-          {equipo.map((p, i) => (
-            <li class:list={['tarjeta relative flex flex-col overflow-hidden p-7', i === 0 && equipo.length % 2 === 1 && 'sm:col-span-2', i === 0 && equipo.length === 5 && 'lg:col-span-2', i === 0 && equipo.length !== 5 && 'lg:col-span-1']} data-tilt>
-              {i === 0 && <div class="absolute -right-16 -top-16 size-48 rounded-full bg-magenta/15 blur-3xl" aria-hidden="true"></div>}
-              {p.foto ? (
-                <img src={p.foto} alt="" width="160" height="160" loading="lazy" class="relative size-20 rounded-2xl object-cover ring-2 ring-magenta/40" />
-              ) : (
-                <span class:list={['titulo relative grid size-20 place-items-center rounded-2xl text-2xl font-bold', i === 0 ? 'bg-gradient-to-br from-magenta to-morado text-marino' : 'bg-linea text-white']}>{iniciales(p.nombre)}</span>
-              )}
-              <h3 class="titulo relative mt-6 text-xl font-semibold">{p.nombre}</h3>
-              <p class="relative mt-1 font-medium text-magenta">{p.rol}</p>
-              {p.carrera && <p class="relative mt-1 text-sm text-suave/80">{p.carrera}</p>}
-              {descripcionRol[p.rol] && <p class="relative mt-4 text-sm leading-relaxed">{descripcionRol[p.rol]}</p>}
-              {(p.linkedin || p.instagram) && (
-                <span class="relative mt-auto flex flex-wrap gap-x-5 gap-y-1 pt-6">
-                  {p.linkedin && <a href={p.linkedin} target="_blank" rel="noopener" class="enlace-aws text-sm">LinkedIn <Icono nombre="externo" class="size-4" /></a>}
-                  {p.instagram && <a href={p.instagram} target="_blank" rel="noopener" class="enlace-aws text-sm">Instagram <Icono nombre="externo" class="size-4" /></a>}
-                </span>
-              )}
-            </li>
-          ))}
-        </ul>
-        <div class="mt-6 grid gap-px overflow-hidden rounded-3xl border border-linea bg-linea sm:grid-cols-2 lg:grid-cols-4" data-stagger>
-          {areas.map((a) => (
-            <div class="bg-marino-2 p-6">
-              <span class="grid size-10 place-items-center rounded-lg bg-morado/15 text-morado"><Icono nombre={a.icono} class="size-5" /></span>
-              <p class="titulo mt-4 font-semibold">{a.t}</p>
-              <p class="mt-1 text-sm leading-relaxed">{a.d}</p>
-            </div>
-          ))}
-        </div>
-      </>
-    )}
-  </section>
+  <Equipo />
 
   <Alianzas />
 

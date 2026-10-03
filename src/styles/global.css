@@ -251,15 +251,19 @@ html {
   .puntos-carrusel.lg { display: flex; }
 }
 [data-carrusel]::-webkit-scrollbar { display: none; }
-.puntos-carrusel { justify-content: center; gap: 0.4rem; margin-top: 0.75rem; }
-.puntos-carrusel button {
+/* Cada punto es un botón de 24px (área cómoda para el dedo); lo que se ve es el punto de ::before */
+.puntos-carrusel { justify-content: center; margin-top: 0.5rem; }
+.puntos-carrusel button { display: grid; place-items: center; min-width: 1.5rem; height: 1.5rem; }
+.puntos-carrusel button::before {
+  content: '';
   width: 0.5rem;
   height: 0.5rem;
   border-radius: 999px;
   background: var(--color-linea);
   transition: width 0.3s ease, background-color 0.3s ease;
 }
-.puntos-carrusel button[aria-current='true'] { width: 1.5rem; background: var(--color-magenta); }
+.puntos-carrusel button[aria-current='true'] { min-width: 2rem; }
+.puntos-carrusel button[aria-current='true']::before { width: 1.5rem; background: var(--color-magenta); }
 
 /* Las anclas no quedan debajo del header ni de la barra "En esta página" */
 main section[id] { scroll-margin-top: 8.5rem; }
