@@ -17,7 +17,10 @@ const { titulo, descripcion = site.descripcion, precargar } = Astro.props;
 const tituloCompleto = titulo ? `${titulo} · ${site.corto}` : `${site.corto} · ${site.lema}`;
 // En las páginas con formulario el botón fijo de celular taparía el botón de enviar
 const conCtaMovil = !['/unete', '/contacto'].some((p) => Astro.url.pathname.startsWith(p));
-const imagenSocial = new URL('/img/og.jpg', Astro.site ?? Astro.url).href;
+// Base pública del sitio (con diagonal final), respetando subcarpetas como /web/ en la vista previa
+const base = Astro.site ? new URL(Astro.site.href.replace(/\/?$/, '/')) : null;
+const canonica = base ? new URL(Astro.url.pathname.replace(/^\//, ''), base).href : null;
+const imagenSocial = new URL('img/og.jpg', base ?? Astro.url).href;
 ---
 <!doctype html>
 <html lang="es-MX">
@@ -30,7 +33,9 @@ const imagenSocial = new URL('/img/og.jpg', Astro.site ?? Astro.url).href;
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" href="/img/logo-192.png" type="image/png" />
     <link rel="apple-touch-icon" href="/img/logo-192.png" />
-    {Astro.site && <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site).href} />}
+    {canonica && <link rel="canonical" href={canonica} />}
+    {canonica && <meta property="og:url" content={canonica} />}
+    <meta name="color-scheme" content="dark" />
 
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="es_MX" />

@@ -31,6 +31,10 @@ for await (const ruta of archivos(dist)) {
     );
   } else if (ruta.endsWith('.css')) {
     texto = (await readFile(ruta, 'utf8')).replace(/url\(\/(?!\/)/g, `url(${base}/`);
+  } else if (ruta.endsWith('.xml')) {
+    // Sitemap: https://host/pagina/ -> https://host/<base>/pagina/
+    texto = (await readFile(ruta, 'utf8')).replace(/<loc>(https?:\/\/[^/<]+)\/(?!sitemap)/g, (m, host) => `<loc>${host}${base}/`);
+    texto = texto.replace(/<loc>(https?:\/\/[^/<]+)\/sitemap/g, `<loc>$1${base}/sitemap`);
   } else if (ruta.endsWith('.js')) {
     // Rutas de imágenes y videos escritas dentro de los scripts
     texto = (await readFile(ruta, 'utf8')).replace(/(["'`])\/(img|video|_astro)\//g, `$1${base}/$2/`);
