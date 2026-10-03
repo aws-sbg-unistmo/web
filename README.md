@@ -123,4 +123,4 @@ media-fuente/   Videos originales generados en Google Flow
 - Con *reducir movimiento* activado en el sistema, la página se muestra sin animaciones.
 - Los videos no tienen audio y el segundo solo se descarga cuando está por aparecer en pantalla.
 - Las fuentes se sirven desde el mismo sitio y se precargan para evitar saltos de diseño.
-- Lighthouse en escritorio: rendimiento 97, accesibilidad 100, SEO 100.
+- Lighthouse (vista previa, oct-2026): escritorio 99 / 100 / 100 / 100 y celular 89 / 100 / 100 / 100 (rendimiento / accesibilidad / buenas prácticas / SEO), con CLS 0.
