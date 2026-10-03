@@ -106,11 +106,21 @@ export const equipo: Integrante[] = [
     ],
   },
   { nombre: 'Joan Garfias', rol: 'Core Team', redes: [{ tipo: 'instagram', url: 'https://www.instagram.com/joangarfias_/' }] },
-  { nombre: 'Jeovani Pacheco Bautista', rol: 'Core Team', redes: [{ tipo: 'instagram', url: 'https://www.instagram.com/jeovanipachecobautista/' }] },
+  { nombre: 'Jeovani Pacheco Rueda', rol: 'Core Team', redes: [{ tipo: 'instagram', url: 'https://www.instagram.com/jeovanipachecobautista/' }] },
   { nombre: 'Gerónimo', rol: 'Core Team' },
 ];
 
 // Comunidades, empresas e instituciones aliadas. Con la lista vacía la página muestra cómo ser aliado.
 // Ejemplo: { nombre: 'Nombre', tipo: 'Comunidad', texto: 'Qué hacemos juntos', url: 'https://…', logo: '/img/alianzas/nombre.png' }
-export type Alianza = { nombre: string; tipo: 'Comunidad' | 'Empresa' | 'Institución' | 'Medio'; texto: string; url?: string; logo?: string };
-export const alianzas: Alianza[] = [];
+export type Alianza = { nombre: string; tipo: 'Comunidad' | 'Empresa' | 'Institución' | 'Medio'; texto: string; lema?: string; url?: string; logo?: string };
+export const alianzas: Alianza[] = [
+  {
+    nombre: 'Nexis Oaxaca Tech',
+    tipo: 'Comunidad',
+    lema: 'Aprende · Conecta · Construye',
+    texto:
+      'Comunidad de Oaxaca que conecta a estudiantes, desarrolladores y personas apasionadas por la tecnología para aprender, compartir conocimiento y crear proyectos reales.',
+    url: 'https://nexisoaxaca.tech/',
+    logo: '/img/alianzas/nexis.webp',
+  },
+];
