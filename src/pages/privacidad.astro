@@ -1,0 +1,56 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { site } from '../data/site';
+---
+<Layout titulo="Aviso de privacidad" descripcion="Cómo usamos los datos que nos compartes en los formularios de la página.">
+  <article class="prosa mx-auto max-w-3xl px-5 pt-36">
+    <p class="chip">// Aviso de privacidad</p>
+    <h1 class="titulo mt-5 text-4xl font-bold md:text-5xl">Aviso de privacidad</h1>
+    <p class="mt-4 text-sm text-suave/70">Última actualización: octubre de 2026.</p>
+
+    <h2>Quiénes somos</h2>
+    <p>
+      {site.nombre} es una comunidad estudiantil de la Universidad del Istmo, Campus Tehuantepec. Somos responsables de los datos
+      que nos compartes en esta página. Para cualquier tema de privacidad escríbenos a <a href={`mailto:${site.correo}`}>{site.correo}</a>.
+    </p>
+
+    <h2>Qué datos pedimos</h2>
+    <p>
+      En los formularios pedimos tu nombre, correo, carrera, semestre, intereses y el mensaje que nos escribas.
+      No pedimos datos sensibles ni financieros.
+    </p>
+
+    <h2>Para qué los usamos</h2>
+    <ul>
+      <li>Responder tus mensajes y contactarte sobre los eventos y actividades del grupo.</li>
+      <li>Organizar talleres según los temas que más interesan.</li>
+      <li>Invitarte a participar en el Core Team si así lo indicaste.</li>
+    </ul>
+    <p>No vendemos ni compartimos tus datos con terceros para fines comerciales.</p>
+
+    <h2>Dónde se guardan y por cuánto tiempo</h2>
+    <p>
+      Los formularios se guardan en Amazon DynamoDB, un servicio de Amazon Web Services, y se borran automáticamente a los 18 meses.
+      Para registrarte a eventos usamos Meetup, que tiene su propio aviso de privacidad.
+    </p>
+
+    <h2>Tus derechos</h2>
+    <p>
+      Puedes pedirnos en cualquier momento acceder, corregir o eliminar tus datos, u oponerte a que los usemos, escribiendo a
+      <a href={`mailto:${site.correo}`}>{site.correo}</a>. Te responderemos en un plazo máximo de 20 días hábiles.
+    </p>
+
+    <h2>Protección contra bots</h2>
+    <p>
+      Los formularios usan Cloudflare Turnstile para evitar spam. Turnstile puede procesar datos técnicos de tu navegador
+      para verificar que eres una persona.
+    </p>
+  </article>
+</Layout>
+
+<style>
+  .prosa :global(h2) { font-family: var(--font-display); color: #fff; font-size: 1.5rem; font-weight: 600; margin-top: 2.5rem; }
+  .prosa :global(p), .prosa :global(li) { margin-top: 0.9rem; line-height: 1.75; }
+  .prosa :global(ul) { list-style: disc; padding-left: 1.25rem; }
+  .prosa :global(a) { color: #fff; text-decoration: underline; text-underline-offset: 4px; }
+</style>

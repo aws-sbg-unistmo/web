@@ -1,0 +1,108 @@
+---
+import Icono from './Icono.astro';
+import { navegacion, site } from '../data/site';
+
+const ruta = Astro.url.pathname;
+const activo = (url: string) => (url === '/' ? ruta === '/' : ruta.startsWith(url));
+---
+<header id="cabecera" class="fixed inset-x-0 top-0 z-50">
+  <div class="mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 py-4">
+    <a href="/" class="group flex items-center gap-3" aria-label={`${site.corto}, inicio`}>
+      <img src="/img/logo-192.png" alt="" width="40" height="40" class="size-10 rounded-xl ring-1 ring-white/15 transition-transform duration-500 group-hover:rotate-[-6deg] group-hover:scale-105" />
+      <span class="titulo text-lg font-semibold leading-none">
+        AWS SBG <span class="text-magenta">UNISTMO</span>
+      </span>
+    </a>
+
+    <nav class="hidden items-center gap-1 md:flex" aria-label="Principal">
+      {navegacion.map((item) => (
+        <a
+          href={item.url}
+          aria-current={activo(item.url) ? 'page' : undefined}
+          class="enlace-nav relative rounded-full px-4 py-2 text-sm font-medium text-suave transition-colors hover:text-white aria-[current=page]:text-white"
+        >
+          {item.texto}
+        </a>
+      ))}
+    </nav>
+
+    <a
+      href={site.meetup}
+      target="_blank"
+      rel="noopener"
+      data-magnetico
+      class="hidden items-center gap-2 rounded-full bg-magenta px-5 py-2.5 text-sm font-semibold text-marino shadow-[0_0_30px_-6px_var(--color-magenta)] transition-shadow hover:shadow-[0_0_44px_-4px_var(--color-magenta)] md:inline-flex"
+    >
+      Únete en Meetup <Icono nombre="externo" class="size-4" />
+    </a>
+
+    <button id="boton-menu" class="rounded-lg p-2 text-white md:hidden" aria-expanded="false" aria-controls="menu-movil" aria-label="Abrir menú">
+      <Icono nombre="menu" class="size-7" />
+    </button>
+  </div>
+
+  <div id="menu-movil" class="pointer-events-none fixed inset-0 z-40 flex flex-col bg-marino/95 px-6 pt-24 opacity-0 backdrop-blur-xl transition-opacity duration-300 md:hidden" hidden>
+    <button id="cerrar-menu" class="absolute right-5 top-4 rounded-lg p-2 text-white" aria-label="Cerrar menú">
+      <Icono nombre="cerrar" class="size-7" />
+    </button>
+    {navegacion.map((item, i) => (
+      <a href={item.url} class="titulo border-b border-linea py-5 text-3xl font-semibold" style={`transition-delay:${i * 40}ms`}>
+        {item.texto}
+      </a>
+    ))}
+    <a href={site.meetup} target="_blank" rel="noopener" class="mt-8 inline-flex items-center justify-center gap-2 rounded-full bg-magenta py-4 font-semibold text-marino">
+      Únete en Meetup <Icono nombre="externo" class="size-4" />
+    </a>
+  </div>
+</header>
+
+<style>
+  /* Subrayado animado que crece desde el centro */
+  .enlace-nav::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 4px;
+    height: 2px;
+    width: 0;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--color-magenta), var(--color-morado));
+    transition: width 0.35s ease, left 0.35s ease;
+  }
+  .enlace-nav:hover::after,
+  .enlace-nav[aria-current='page']::after {
+    width: 40%;
+    left: 30%;
+  }
+  #cabecera { transition: background-color 0.2s ease, box-shadow 0.2s ease, backdrop-filter 0.2s ease; }
+  #cabecera.con-fondo {
+    background: color-mix(in srgb, var(--color-marino) 88%, transparent);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 1px 0 0 var(--color-linea);
+  }
+  #menu-movil.abierto {
+    opacity: 1;
+    pointer-events: auto;
+  }
+</style>
+
+<script>
+  const cabecera = document.getElementById('cabecera')!;
+  const actualizar = () => cabecera.classList.toggle('con-fondo', window.scrollY > 24);
+  actualizar();
+  window.addEventListener('scroll', actualizar, { passive: true });
+
+  const menu = document.getElementById('menu-movil')!;
+  const boton = document.getElementById('boton-menu')!;
+  const abrir = (si: boolean) => {
+    if (si) menu.hidden = false;
+    requestAnimationFrame(() => menu.classList.toggle('abierto', si));
+    boton.setAttribute('aria-expanded', String(si));
+    document.documentElement.style.overflow = si ? 'hidden' : '';
+    if (!si) setTimeout(() => (menu.hidden = true), 300);
+  };
+  boton.addEventListener('click', () => abrir(true));
+  document.getElementById('cerrar-menu')!.addEventListener('click', () => abrir(false));
+  menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => abrir(false)));
+  document.addEventListener('keydown', (e) => e.key === 'Escape' && abrir(false));
+</script>

@@ -1,0 +1,120 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Permite que GitHub Actions (solo el repositorio de la página, rama main) despliegue en esta cuenta de AWS
+  sin guardar llaves de acceso: usa un rol temporal mediante OpenID Connect (OIDC).
+  Se crea UNA sola vez desde la consola de CloudFormation.
+
+Parameters:
+  GitHubOrg:
+    Type: String
+    Default: aws-sbg-unistmo
+  RepoName:
+    Type: String
+    Default: web
+  StackPrefix:
+    Type: String
+    Default: aws-sbg-web
+    Description: Prefijo del stack de la página (el rol solo puede tocar recursos con este nombre).
+  CreateOIDCProvider:
+    Type: String
+    AllowedValues: ['true', 'false']
+    Default: 'true'
+    Description: Ponlo en false si la cuenta ya tiene el proveedor token.actions.githubusercontent.com.
+
+Conditions:
+  CreateProvider: !Equals [!Ref CreateOIDCProvider, 'true']
+
+Resources:
+  GitHubOIDCProvider:
+    Type: AWS::IAM::OIDCProvider
+    Condition: CreateProvider
+    Properties:
+      Url: https://token.actions.githubusercontent.com
+      ClientIdList: [sts.amazonaws.com]
+      ThumbprintList:
+        - 6938fd4d98bab03faadb97b34396831e3780aea1
+        - 1c58a3a8518e8759bf075b76b750d4f2df264fcd
+
+  GitHubDeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${StackPrefix}-github-deploy'
+      Description: Rol que asume GitHub Actions para desplegar la página
+      MaxSessionDuration: 3600
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Sub 'arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com'
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: sts.amazonaws.com
+                token.actions.githubusercontent.com:sub: !Sub 'repo:${GitHubOrg}/${RepoName}:ref:refs/heads/main'
+      Policies:
+        - PolicyName: desplegar-pagina
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: CloudFormationDelStack
+                Effect: Allow
+                Action: cloudformation:*
+                Resource:
+                  - !Sub 'arn:aws:cloudformation:*:${AWS::AccountId}:stack/${StackPrefix}*/*'
+                  - !Sub 'arn:aws:cloudformation:*:${AWS::AccountId}:stack/aws-sam-cli-managed-default/*'
+                  - arn:aws:cloudformation:*:aws:transform/Serverless-2016-10-31
+              - Sid: CloudFormationLectura
+                Effect: Allow
+                Action: [cloudformation:ValidateTemplate, cloudformation:ListStacks, cloudformation:GetTemplateSummary]
+                Resource: '*'
+              - Sid: Buckets
+                Effect: Allow
+                Action: s3:*
+                Resource:
+                  - !Sub 'arn:aws:s3:::${StackPrefix}*'
+                  - !Sub 'arn:aws:s3:::${StackPrefix}*/*'
+                  - arn:aws:s3:::aws-sam-cli-managed-default*
+                  - arn:aws:s3:::aws-sam-cli-managed-default*/*
+              - Sid: Lambda
+                Effect: Allow
+                Action: lambda:*
+                Resource: !Sub 'arn:aws:lambda:*:${AWS::AccountId}:function:${StackPrefix}*'
+              - Sid: TablaDynamo
+                Effect: Allow
+                Action: dynamodb:*
+                Resource: !Sub 'arn:aws:dynamodb:*:${AWS::AccountId}:table/${StackPrefix}*'
+              - Sid: Logs
+                Effect: Allow
+                Action: logs:*
+                Resource: !Sub 'arn:aws:logs:*:${AWS::AccountId}:log-group:/aws/lambda/${StackPrefix}*'
+              - Sid: RolesDeLaLambda
+                Effect: Allow
+                Action:
+                  - iam:CreateRole
+                  - iam:DeleteRole
+                  - iam:GetRole
+                  - iam:PassRole
+                  - iam:TagRole
+                  - iam:UntagRole
+                  - iam:AttachRolePolicy
+                  - iam:DetachRolePolicy
+                  - iam:PutRolePolicy
+                  - iam:GetRolePolicy
+                  - iam:DeleteRolePolicy
+                Resource: !Sub 'arn:aws:iam::${AWS::AccountId}:role/${StackPrefix}*'
+              - Sid: ServiciosSinArnPropio
+                Effect: Allow
+                Action:
+                  - apigateway:*
+                  - cloudfront:*
+                  - ses:CreateEmailIdentity
+                  - ses:DeleteEmailIdentity
+                  - ses:GetEmailIdentity
+                  - ses:TagResource
+                Resource: '*'
+
+Outputs:
+  RoleArn:
+    Description: Copia este valor a la variable AWS_ROLE_ARN del repositorio en GitHub
+    Value: !GetAtt GitHubDeployRole.Arn

@@ -1,0 +1,45 @@
+---
+// Campo de formulario con etiqueta, brillo al enfocar y validación nativa del navegador.
+interface Props {
+  nombre: string;
+  etiqueta: string;
+  tipo?: 'text' | 'email' | 'textarea' | 'select';
+  requerido?: boolean;
+  opciones?: string[];
+  ayuda?: string;
+  max?: number;
+  min?: number;
+  autocompletar?: string;
+  marcador?: string;
+}
+const { nombre, etiqueta, tipo = 'text', requerido = false, opciones = [], ayuda, max, min, autocompletar, marcador } = Astro.props;
+const id = `campo-${nombre}`;
+const clases = 'campo w-full rounded-xl border border-linea bg-marino/80 px-4 py-3.5 text-white placeholder:text-suave/40 transition focus:border-magenta focus:outline-none';
+---
+<div>
+  <label for={id} class="mb-2 block text-sm font-medium text-white">
+    {etiqueta} {requerido ? <span class="text-magenta" aria-hidden="true">*</span> : <span class="text-suave/50">(opcional)</span>}
+  </label>
+  {tipo === 'textarea' ? (
+    <textarea id={id} name={nombre} required={requerido} maxlength={max} minlength={min} rows="5" placeholder={marcador} class={clases}></textarea>
+  ) : tipo === 'select' ? (
+    <select id={id} name={nombre} required={requerido} class={`${clases} appearance-none`}>
+      <option value="" disabled selected>Elige una opción</option>
+      {opciones.map((o) => <option value={o}>{o}</option>)}
+    </select>
+  ) : (
+    <input id={id} name={nombre} type={tipo} required={requerido} maxlength={max} minlength={min} autocomplete={autocompletar} placeholder={marcador} class={clases} />
+  )}
+  {ayuda && <p class="mt-1.5 text-xs text-suave/60">{ayuda}</p>}
+</div>
+
+<style>
+  .campo:focus { box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-magenta) 18%, transparent); }
+  .campo:user-invalid { border-color: #fca5a5; }
+  select.campo {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FF57E9' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.1rem;
+  }
+</style>

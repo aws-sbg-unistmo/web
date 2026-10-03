@@ -1,0 +1,229 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Página web de AWS SBG UNISTMO. Sitio estático (S3 privado + CloudFront) y formularios
+  (API Gateway HTTP API + Lambda + DynamoDB + SES). Todo cabe en el nivel gratuito de AWS.
+
+Parameters:
+  NotifyEmail:
+    Type: String
+    Default: aws.unistmo@gmail.com
+    Description: Correo que recibe los avisos de los formularios (y desde el que se envían).
+  CreateEmailIdentity:
+    Type: String
+    AllowedValues: ['true', 'false']
+    Default: 'true'
+    Description: Crea la identidad de SES para NotifyEmail. Ponlo en false si ya existe en la cuenta.
+  TurnstileSecret:
+    Type: String
+    NoEcho: true
+    Default: 1x0000000000000000000000000000000AA
+    Description: Llave secreta de Cloudflare Turnstile. La de ejemplo es de pruebas y siempre aprueba.
+  DomainName:
+    Type: String
+    Default: ''
+    Description: (Opcional) Dominio propio, por ejemplo www.ejemplo.org. Requiere CertificateArn.
+  CertificateArn:
+    Type: String
+    Default: ''
+    Description: (Opcional) Certificado de ACM en us-east-1 para DomainName.
+
+Conditions:
+  CreateIdentity: !Equals [!Ref CreateEmailIdentity, 'true']
+  HasDomain: !And
+    - !Not [!Equals [!Ref DomainName, '']]
+    - !Not [!Equals [!Ref CertificateArn, '']]
+
+Globals:
+  Function:
+    Runtime: nodejs22.x
+    Architectures: [arm64]
+    MemorySize: 256
+    Timeout: 10
+
+Resources:
+  # ---------------------------------------------------------------- sitio estático
+  SiteBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      OwnershipControls:
+        Rules: [{ ObjectOwnership: BucketOwnerEnforced }]
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault: { SSEAlgorithm: AES256 }
+
+  SiteOAC:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub '${AWS::StackName}-oac'
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  # /eventos/ -> /eventos/index.html (Astro genera una carpeta por página)
+  IndexRewriteFunction:
+    Type: AWS::CloudFront::Function
+    Properties:
+      Name: !Sub '${AWS::StackName}-index'
+      AutoPublish: true
+      FunctionConfig:
+        Comment: Agrega index.html a las rutas de carpeta
+        Runtime: cloudfront-js-2.0
+      FunctionCode: |
+        function handler(event) {
+          var request = event.request;
+          var uri = request.uri;
+          if (uri.endsWith('/')) {
+            request.uri += 'index.html';
+          } else if (uri.split('/').pop().indexOf('.') === -1) {
+            request.uri += '/index.html';
+          }
+          return request;
+        }
+
+  SiteDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        Comment: !Sub '${AWS::StackName} - sitio'
+        DefaultRootObject: index.html
+        HttpVersion: http2and3
+        IPV6Enabled: true
+        PriceClass: PriceClass_100
+        Aliases: !If [HasDomain, [!Ref DomainName], !Ref AWS::NoValue]
+        ViewerCertificate: !If
+          - HasDomain
+          - AcmCertificateArn: !Ref CertificateArn
+            SslSupportMethod: sni-only
+            MinimumProtocolVersion: TLSv1.2_2021
+          - CloudFrontDefaultCertificate: true
+        Origins:
+          - Id: s3-sitio
+            DomainName: !GetAtt SiteBucket.RegionalDomainName
+            OriginAccessControlId: !GetAtt SiteOAC.Id
+            S3OriginConfig:
+              OriginAccessIdentity: ''
+        DefaultCacheBehavior:
+          TargetOriginId: s3-sitio
+          ViewerProtocolPolicy: redirect-to-https
+          Compress: true
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6          # Managed-CachingOptimized
+          ResponseHeadersPolicyId: 67f7725c-6f97-4210-82d7-5512b31e9d03 # Managed-SecurityHeadersPolicy
+          FunctionAssociations:
+            - EventType: viewer-request
+              FunctionARN: !GetAtt IndexRewriteFunction.FunctionMetadata.FunctionARN
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 404
+            ResponsePagePath: /404.html
+            ErrorCachingMinTTL: 60
+          - ErrorCode: 404
+            ResponseCode: 404
+            ResponsePagePath: /404.html
+            ErrorCachingMinTTL: 60
+
+  SiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SiteBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: SoloCloudFront
+            Effect: Allow
+            Principal: { Service: cloudfront.amazonaws.com }
+            Action: s3:GetObject
+            Resource: !Sub '${SiteBucket.Arn}/*'
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${SiteDistribution}'
+
+  # ---------------------------------------------------------------- formularios
+  FormsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - { AttributeName: id, AttributeType: S }
+      KeySchema:
+        - { AttributeName: id, KeyType: HASH }
+      TimeToLiveSpecification:
+        AttributeName: expira
+        Enabled: true
+
+  FormsApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        AllowOrigins: !If
+          - HasDomain
+          - [!Sub 'https://${SiteDistribution.DomainName}', !Sub 'https://${DomainName}', 'http://localhost:4321']
+          - [!Sub 'https://${SiteDistribution.DomainName}', 'http://localhost:4321']
+        AllowMethods: [POST, OPTIONS]
+        AllowHeaders: [content-type]
+        MaxAge: 3600
+      DefaultRouteSettings:
+        ThrottlingBurstLimit: 10
+        ThrottlingRateLimit: 2
+
+  FormsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: Recibe los formularios de la página web
+      CodeUri: src/forms/
+      Handler: index.handler
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref FormsTable
+          NOTIFY_EMAIL: !Ref NotifyEmail
+          FROM_EMAIL: !Ref NotifyEmail
+          TURNSTILE_SECRET: !Ref TurnstileSecret
+      Policies:
+        - DynamoDBWritePolicy:
+            TableName: !Ref FormsTable
+        - Statement:
+            - Effect: Allow
+              Action: ses:SendEmail
+              Resource: !Sub 'arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/*'
+      Events:
+        Unete:
+          Type: HttpApi
+          Properties: { ApiId: !Ref FormsApi, Path: /unete, Method: POST }
+        Contacto:
+          Type: HttpApi
+          Properties: { ApiId: !Ref FormsApi, Path: /contacto, Method: POST }
+
+  FormsFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${FormsFunction}'
+      RetentionInDays: 14
+
+  NotifyIdentity:
+    Type: AWS::SES::EmailIdentity
+    Condition: CreateIdentity
+    Properties:
+      EmailIdentity: !Ref NotifyEmail
+
+Outputs:
+  SiteBucketName:
+    Description: Bucket donde GitHub Actions sube el sitio
+    Value: !Ref SiteBucket
+  DistributionId:
+    Description: Distribución de CloudFront (para invalidar la caché)
+    Value: !Ref SiteDistribution
+  SiteUrl:
+    Description: Dirección pública de la página
+    Value: !If [HasDomain, !Sub 'https://${DomainName}', !Sub 'https://${SiteDistribution.DomainName}']
+  ApiUrl:
+    Description: URL base de la API de formularios (PUBLIC_API_URL)
+    Value: !Sub 'https://${FormsApi}.execute-api.${AWS::Region}.amazonaws.com'

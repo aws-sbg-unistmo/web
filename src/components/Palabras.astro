@@ -1,0 +1,23 @@
+---
+// Título que entra palabra por palabra. Las palabras de "resaltar" llevan el degradado magenta-morado.
+// - inmediato (portada y encabezados): animación CSS desde el primer cuadro.
+// - normal: lo anima GSAP al aparecer en pantalla (data-palabras en scripts/animaciones.ts).
+interface Props {
+  texto: string;
+  resaltar?: string[];
+  como?: 'h1' | 'h2' | 'h3';
+  class?: string;
+  inmediato?: boolean;
+}
+const { texto, resaltar = [], como: Etiqueta = 'h2', class: clase = '', inmediato = false } = Astro.props;
+const palabras = texto.split(' ');
+---
+<Etiqueta class:list={['titulo', clase]} data-palabras={inmediato ? undefined : ''} aria-label={texto}>
+  {palabras.map((p, i) => (
+    <span class="palabra inline-block overflow-hidden pb-[0.08em] align-bottom" aria-hidden="true">
+      <span class:list={['inline-block', inmediato && 'palabra-css']} style={inmediato ? `--i:${i}` : undefined}>
+        {resaltar.includes(p) ? <span class="degradado">{p}</span> : p}
+      </span>
+    </span>
+  )).reduce((acc: any[], el, i) => (i ? [...acc, ' ', el] : [el]), [])}
+</Etiqueta>

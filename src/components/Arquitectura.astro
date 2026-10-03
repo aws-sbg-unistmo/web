@@ -1,0 +1,91 @@
+---
+// Diagrama de cómo funciona esta misma página, al estilo de los diagramas de arquitectura de AWS.
+// Las líneas tienen un pulso de luz que viaja de un servicio al siguiente.
+import Icono from './Icono.astro';
+
+type Nodo = { icono: Parameters<typeof Icono>[0]['nombre']; nombre: string; rol: string };
+const flujos: { titulo: string; color: string; nodos: Nodo[] }[] = [
+  {
+    titulo: 'Cuando visitas la página',
+    color: 'var(--color-magenta)',
+    nodos: [
+      { icono: 'usuarios', nombre: 'Tú', rol: 'Abres la página' },
+      { icono: 'globo', nombre: 'Amazon CloudFront', rol: 'La entrega rápido y con HTTPS' },
+      { icono: 'nube', nombre: 'Amazon S3', rol: 'Guarda los archivos del sitio' },
+    ],
+  },
+  {
+    titulo: 'Cuando llenas un formulario',
+    color: 'var(--color-morado)',
+    nodos: [
+      { icono: 'usuarios', nombre: 'Formulario', rol: 'Únete o contacto' },
+      { icono: 'flecha', nombre: 'Amazon API Gateway', rol: 'Recibe tu solicitud' },
+      { icono: 'rayo', nombre: 'AWS Lambda', rol: 'Valida y procesa' },
+      { icono: 'base', nombre: 'DynamoDB + SES', rol: 'Guarda y nos avisa' },
+    ],
+  },
+  {
+    titulo: 'Cada 6 horas, sin que nadie lo toque',
+    color: 'var(--color-azul)',
+    nodos: [
+      { icono: 'evento', nombre: 'Meetup', rol: 'Publicamos un evento' },
+      { icono: 'proyecto', nombre: 'GitHub Actions', rol: 'Recompila la página' },
+      { icono: 'nube', nombre: 'Amazon S3', rol: 'Sube la versión nueva' },
+    ],
+  },
+];
+---
+<div class="space-y-6" data-stagger>
+  {flujos.map((flujo) => (
+    <div class="tarjeta p-6 md:p-8" style={`--acento:${flujo.color}`}>
+      <p class="font-mono text-xs uppercase tracking-[0.2em]" style="color:var(--acento)">{flujo.titulo}</p>
+      <ol class="mt-6 flex flex-col items-stretch gap-0 md:flex-row md:items-center">
+        {flujo.nodos.map((n, i) => (
+          <>
+            {i > 0 && <li class="conector" aria-hidden="true"><span></span></li>}
+            <li class="nodo flex flex-1 items-center gap-3 rounded-2xl border border-linea bg-marino/70 p-4 md:flex-col md:text-center">
+              <span class="grid size-12 shrink-0 place-items-center rounded-xl" style="background:color-mix(in srgb,var(--acento) 16%,transparent);color:var(--acento)">
+                <Icono nombre={n.icono} class="size-6" />
+              </span>
+              <span>
+                <span class="titulo block text-sm font-semibold">{n.nombre}</span>
+                <span class="block text-xs text-suave/80">{n.rol}</span>
+              </span>
+            </li>
+          </>
+        ))}
+      </ol>
+    </div>
+  ))}
+</div>
+
+<style>
+  .conector {
+    position: relative;
+    flex: 0 0 auto;
+    align-self: center;
+    width: 2px;
+    height: 28px;
+    background: var(--color-linea);
+    overflow: hidden;
+  }
+  @media (min-width: 768px) {
+    .conector { width: 48px; height: 2px; }
+  }
+  .conector span {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent, var(--acento), transparent);
+    animation: pulso-v 1.6s linear infinite;
+  }
+  @media (min-width: 768px) {
+    .conector span {
+      background: linear-gradient(90deg, transparent, var(--acento), transparent);
+      animation-name: pulso-h;
+    }
+  }
+  @keyframes pulso-h { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+  @keyframes pulso-v { from { transform: translateY(-100%); } to { transform: translateY(100%); } }
+  .nodo { transition: border-color 0.3s ease, transform 0.3s ease; }
+  .nodo:hover { border-color: var(--acento); transform: translateY(-2px); }
+</style>

@@ -1,0 +1,33 @@
+---
+// Preguntas frecuentes con acordeón animado (details/summary nativo, accesible sin JavaScript).
+interface Props {
+  preguntas: { p: string; r: string }[];
+}
+const { preguntas } = Astro.props;
+---
+<div class="divide-y divide-linea rounded-3xl border border-linea bg-marino-2/50" data-reveal>
+  {preguntas.map(({ p, r }) => (
+    <details class="pregunta group px-6 py-5 md:px-8">
+      <summary class="flex cursor-pointer list-none items-center justify-between gap-6 text-left">
+        <span class="titulo text-lg font-semibold">{p}</span>
+        <span class="relative grid size-8 shrink-0 place-items-center rounded-full border border-linea transition-colors group-open:border-magenta group-open:bg-magenta/10" aria-hidden="true">
+          <span class="absolute h-0.5 w-3 bg-white"></span>
+          <span class="absolute h-3 w-0.5 bg-white transition-transform duration-300 group-open:rotate-90"></span>
+        </span>
+      </summary>
+      <p class="pt-3 leading-relaxed">{r}</p>
+    </details>
+  ))}
+</div>
+
+<style>
+  /* Apertura animada en navegadores que lo soportan (Chrome/Edge); en los demás abre al instante */
+  .pregunta { interpolate-size: allow-keywords; }
+  .pregunta::details-content {
+    block-size: 0;
+    overflow: hidden;
+    transition: block-size 0.4s ease, content-visibility 0.4s allow-discrete;
+  }
+  .pregunta[open]::details-content { block-size: auto; }
+  .pregunta summary::-webkit-details-marker { display: none; }
+</style>

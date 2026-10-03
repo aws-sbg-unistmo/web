@@ -1,0 +1,210 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Hero from '../components/Hero.astro';
+import Cinta from '../components/Cinta.astro';
+import Palabras from '../components/Palabras.astro';
+import Icono from '../components/Icono.astro';
+import EventoTarjeta from '../components/EventoTarjeta.astro';
+import Arquitectura from '../components/Arquitectura.astro';
+import Preguntas from '../components/Preguntas.astro';
+import LlamadoFinal from '../components/LlamadoFinal.astro';
+import Ruta from '../components/Ruta.astro';
+import { actividades, site } from '../data/site';
+import { proximos } from '../lib/eventos';
+
+const preguntas = [
+  {
+    p: '¿Necesito saber programar o tener experiencia en la nube?',
+    r: 'No. Empezamos desde cero y aprendemos haciendo. Si ya sabes, también hay retos y proyectos para ti.',
+  },
+  {
+    p: '¿Tiene algún costo?',
+    r: 'No. Los talleres y eventos del grupo son gratuitos para estudiantes.',
+  },
+  {
+    p: '¿Tengo que ser de una carrera de computación?',
+    r: 'Para nada. La nube y la IA se usan en todas las áreas: ingeniería, administración, diseño, ciencias. Cualquier estudiante de la UNISTMO es bienvenido.',
+  },
+  {
+    p: '¿Cómo me entero de los eventos?',
+    r: 'Únete a nuestro grupo en Meetup: ahí publicamos cada evento y te llega el aviso. También los verás en esta página y en nuestras redes.',
+  },
+  {
+    p: '¿Puedo ayudar a organizar?',
+    r: 'Sí. Estamos formando el Core Team del grupo. Llena el formulario de "Únete" y marca que quieres participar en la organización.',
+  },
+];
+---
+<Layout precargar="/img/portada.jpg">
+  <Hero />
+
+  <!-- Respaldo: el grupo es parte de una red global (datos públicos de AWS Builder Center) -->
+  <section class="relative mx-auto -mt-10 max-w-7xl px-5" aria-label="Parte de AWS Student Builder Groups">
+    <div class="grid gap-px overflow-hidden rounded-2xl border border-linea bg-linea sm:grid-cols-3" data-stagger>
+      <div class="bg-marino-2/90 px-6 py-5 backdrop-blur">
+        <p class="titulo text-3xl font-bold"><span data-contar="600">600</span><span class="text-magenta">+</span></p>
+        <p class="text-sm">universidades con un Student Builder Group</p>
+      </div>
+      <div class="bg-marino-2/90 px-6 py-5 backdrop-blur">
+        <p class="titulo text-3xl font-bold"><span data-contar="60">60</span><span class="text-magenta">+</span></p>
+        <p class="text-sm">países en la red de AWS</p>
+      </div>
+      <div class="bg-marino-2/90 px-6 py-5 backdrop-blur">
+        <p class="titulo text-3xl font-bold">1<span class="text-magenta"> Istmo</span></p>
+        <p class="text-sm">y aquí también estamos construyendo</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="mt-16"><Cinta /></div>
+
+  <!-- Qué hacemos -->
+  <section id="que-hacemos" class="mx-auto max-w-7xl px-5 pt-28">
+    <div class="max-w-3xl">
+      <p class="chip" data-reveal>// Qué hacemos</p>
+      <Palabras texto="Aprendemos cloud construyendo cosas reales" resaltar={['construyendo']} class="mt-5 text-4xl font-bold leading-tight md:text-5xl" />
+      <p class="mt-5 text-lg leading-relaxed" data-reveal>
+        Somos una comunidad dirigida por estudiantes. Nos juntamos para aprender Amazon Web Services con la práctica,
+        compartir lo que sabemos y crear proyectos que suman a tu portafolio.
+      </p>
+    </div>
+
+    <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4" data-stagger>
+      {actividades.map((a, i) => (
+        <article class="tarjeta flex flex-col p-7" data-tilt>
+          <div class="flex items-center justify-between">
+            <span class="grid size-12 place-items-center rounded-xl bg-magenta/12 text-magenta ring-1 ring-magenta/30">
+              <Icono nombre={a.icono as any} class="size-6" />
+            </span>
+            <span class="font-mono text-sm text-suave/50">0{i + 1}</span>
+          </div>
+          <h3 class="titulo mt-8 text-xl font-semibold">{a.titulo}</h3>
+          <p class="mt-3 text-sm leading-relaxed">{a.texto}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <Ruta />
+
+  <!-- Para quién -->
+  <section class="relative mx-auto mt-32 max-w-7xl px-5">
+    <div class="grid items-center gap-14 lg:grid-cols-[1fr_1.1fr]">
+      <div class="relative order-2 mx-auto w-full max-w-md lg:order-1">
+        <div class="absolute inset-[12%] rounded-full bg-magenta/25 blur-3xl" aria-hidden="true"></div>
+        <div class="absolute inset-[6%] rounded-full border border-magenta/30 girar" aria-hidden="true"></div>
+        {site.usarMascota ? (
+          <img src="/img/mascota/06-nube-brillante.webp" alt="El jaguar del grupo sostiene una nube brillante" width="641" height="900" loading="lazy" class="flotar relative mx-auto h-[26rem] w-auto drop-shadow-[0_30px_60px_rgba(255,87,233,0.25)]" data-parallax="0.12" />
+        ) : (
+          <img src="/img/logo-512.png" alt="" width="512" height="512" loading="lazy" class="relative mx-auto size-80 rounded-3xl" />
+        )}
+      </div>
+
+      <div class="order-1 lg:order-2">
+        <p class="chip" data-reveal>// Para quién es</p>
+        <Palabras texto="Si tienes curiosidad, ya tienes lo necesario" resaltar={['curiosidad,']} class="mt-5 text-4xl font-bold leading-tight md:text-5xl" />
+        <ul class="mt-8 space-y-4" data-stagger>
+          {[
+            ['Sin experiencia previa', 'Te explicamos todo desde el principio, paso a paso.'],
+            ['De cualquier carrera', 'La nube y la IA sirven en todas las áreas.'],
+            ['Gratis', 'Talleres, eventos y materiales sin costo para estudiantes.'],
+            ['Con la comunidad de AWS', 'Charlas con profesionales y acceso a recursos de aprendizaje de AWS.'],
+          ].map(([t, d]) => (
+            <li class="flex gap-4">
+              <span class="mt-1 grid size-6 shrink-0 place-items-center rounded-full bg-menta/15 text-menta"><Icono nombre="check" class="size-4" /></span>
+              <span><strong class="font-semibold text-white">{t}.</strong> {d}</span>
+            </li>
+          ))}
+        </ul>
+
+        <dl class="mt-10 grid grid-cols-3 gap-4 border-t border-linea pt-8" data-stagger>
+          <div>
+            <dt class="text-xs uppercase tracking-widest text-suave/70">Eventos</dt>
+            <dd class="titulo mt-1 text-4xl font-bold"><span data-contar="6">6</span><span class="text-magenta">+</span></dd>
+          </div>
+          <div>
+            <dt class="text-xs uppercase tracking-widest text-suave/70">Artículos</dt>
+            <dd class="titulo mt-1 text-4xl font-bold"><span data-contar="4">4</span><span class="text-magenta">+</span></dd>
+          </div>
+          <div>
+            <dt class="text-xs uppercase tracking-widest text-suave/70">Meses</dt>
+            <dd class="titulo mt-1 text-4xl font-bold"><span data-contar="12">12</span></dd>
+          </div>
+        </dl>
+        <p class="mt-4 text-xs text-suave/60">Nuestras metas para este ciclo.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Eventos -->
+  <section class="mx-auto mt-32 max-w-7xl px-5">
+    <div class="flex flex-wrap items-end justify-between gap-6">
+      <div>
+        <p class="chip" data-reveal>// Próximos eventos</p>
+        <Palabras texto="Nos vemos en el siguiente" resaltar={['siguiente']} class="mt-5 text-4xl font-bold md:text-5xl" />
+      </div>
+      <a href="/eventos/" class="group inline-flex items-center gap-2 font-semibold text-white hover:text-magenta" data-reveal>
+        Todos los eventos <Icono nombre="flecha" class="size-5 transition-transform group-hover:translate-x-1" />
+      </a>
+    </div>
+
+    {proximos.length > 0 ? (
+      <div class="mt-12 grid gap-6 lg:grid-cols-2" data-stagger>
+        {proximos.slice(0, 4).map((e) => <EventoTarjeta evento={e} />)}
+      </div>
+    ) : (
+      <div class="tarjeta mt-12 grid items-center gap-8 overflow-hidden p-8 md:grid-cols-[1fr_auto] md:p-12" data-reveal>
+        <div>
+          <h3 class="titulo text-2xl font-semibold md:text-3xl">Estamos preparando nuestro primer evento</h3>
+          <p class="mt-3 max-w-xl leading-relaxed">
+            Únete al grupo en Meetup y serás de los primeros en enterarte. En cuanto lo publiquemos, aparecerá aquí automáticamente.
+          </p>
+          <a href={site.meetup} target="_blank" rel="noopener" class="boton boton-primario mt-8" data-magnetico>
+            Avísame en Meetup <Icono nombre="flecha" class="size-5" />
+          </a>
+        </div>
+        {site.usarMascota && (
+          <img src="/img/mascota/08-leyendo.webp" alt="" width="743" height="900" loading="lazy" class="mx-auto h-56 w-auto md:h-64" />
+        )}
+      </div>
+    )}
+  </section>
+
+  <!-- Arquitectura -->
+  <section class="mx-auto mt-32 max-w-7xl px-5">
+    <div class="grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
+      <div class="lg:sticky lg:top-28 lg:self-start">
+        <p class="chip" data-reveal>// Hecho en AWS</p>
+        <Palabras texto="Esta página también es un proyecto del grupo" resaltar={['proyecto']} class="mt-5 text-4xl font-bold leading-tight md:text-5xl" />
+        <p class="mt-5 leading-relaxed" data-reveal>
+          No usamos plantillas ni hosting tradicional: corre sobre servicios de AWS, se actualiza sola y su código es abierto.
+          Así se ve lo que pasa por detrás.
+        </p>
+        <a href={site.github} target="_blank" rel="noopener" class="boton boton-secundario mt-8" data-reveal data-magnetico>
+          Ver el código en GitHub <Icono nombre="externo" class="size-4" />
+        </a>
+      </div>
+      <Arquitectura />
+    </div>
+  </section>
+
+  <!-- Preguntas -->
+  <section class="mx-auto mt-32 max-w-4xl px-5">
+    <div class="text-center">
+      <p class="chip" data-reveal>// Preguntas frecuentes</p>
+      <Palabras texto="Lo que más nos preguntan" resaltar={['preguntan']} class="mt-5 text-4xl font-bold md:text-5xl" />
+    </div>
+    <div class="mt-12">
+      <Preguntas preguntas={preguntas} />
+    </div>
+  </section>
+
+  <LlamadoFinal />
+</Layout>
+
+<style>
+  .girar { animation: girar 30s linear infinite; border-style: dashed; }
+  @keyframes girar { to { transform: rotate(360deg); } }
+  .flotar { animation: flotar 6s ease-in-out infinite; }
+  @keyframes flotar { 50% { translate: 0 -14px; } }
+</style>

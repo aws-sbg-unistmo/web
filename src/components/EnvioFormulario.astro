@@ -1,0 +1,39 @@
+---
+// Parte final común de los formularios: trampa anti-bots, Turnstile, aviso de privacidad y botón.
+import Icono from './Icono.astro';
+interface Props {
+  texto: string;
+}
+const { texto } = Astro.props;
+// Llave pública de Cloudflare Turnstile. La de pruebas (1x000…AA) siempre pasa; en producción la pone GitHub Actions.
+const llave = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA';
+---
+<!-- Trampa: los bots llenan todos los campos; las personas no ven este -->
+<div class="absolute -left-[9999px]" aria-hidden="true">
+  <label>Empresa <input type="text" name="empresa" tabindex="-1" autocomplete="off" /></label>
+</div>
+
+<label class="flex items-start gap-3 text-sm">
+  <input type="checkbox" name="privacidad" value="si" required class="mt-0.5 size-5 shrink-0 accent-[#FF57E9]" />
+  <span>He leído el <a href="/privacidad/" class="text-white underline underline-offset-4 hover:text-magenta">aviso de privacidad</a> y acepto que usen mis datos para contactarme.</span>
+</label>
+
+<div class="cf-turnstile" data-sitekey={llave} data-theme="dark" data-language="es"></div>
+
+<div class="flex flex-wrap items-center gap-4">
+  <button type="submit" class="boton boton-primario enviar disabled:cursor-wait disabled:opacity-70" data-magnetico>
+    <span class="etiqueta">{texto}</span>
+    <Icono nombre="flecha" class="flecha size-5" />
+    <span class="giro size-5 rounded-full border-2 border-marino/30 border-t-marino" aria-hidden="true"></span>
+  </button>
+  <p data-aviso role="alert" class="text-sm" hidden></p>
+</div>
+
+<script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+<style>
+  .enviar .giro { display: none; animation: girar 0.8s linear infinite; }
+  .enviar[data-estado='enviando'] .giro { display: block; }
+  .enviar[data-estado='enviando'] .flecha { display: none; }
+  @keyframes girar { to { transform: rotate(360deg); } }
+</style>

@@ -1,0 +1,42 @@
+---
+// "Tu ruta en la nube": en escritorio la sección se fija y las tarjetas avanzan de lado con el scroll.
+// En celular se muestran una debajo de otra. La lógica está en data-horizontal (scripts/animaciones.ts).
+import Palabras from './Palabras.astro';
+
+const pasos = [
+  { n: '01', t: 'Fundamentos de la nube', d: 'Qué es AWS, regiones, tu cuenta con seguridad (IAM) y alertas de presupuesto para no gastar de más.', s: ['IAM', 'Regiones', 'Budgets'], c: 'var(--color-naranja)' },
+  { n: '02', t: 'Tu primer sitio en la nube', d: 'Publicas una página web en minutos con almacenamiento y distribución global, igual que esta.', s: ['Amazon S3', 'CloudFront'], c: 'var(--color-magenta)' },
+  { n: '03', t: 'Apps sin servidores', d: 'Creas APIs y funciones que escalan solas y solo cobran cuando se usan.', s: ['Lambda', 'API Gateway', 'DynamoDB'], c: 'var(--color-morado)' },
+  { n: '04', t: 'IA generativa', d: 'Usas modelos fundacionales para crear asistentes y agentes que resuelven problemas reales.', s: ['Amazon Bedrock', 'Agentes'], c: 'var(--color-azul)' },
+  { n: '05', t: 'Certifícate', d: 'Preparamos juntos tu primera certificación de AWS para que lo aprendido cuente en tu CV.', s: ['Cloud Practitioner', 'AI Practitioner'], c: 'var(--color-menta)' },
+];
+---
+<section id="ruta" class="relative mt-16 overflow-hidden" data-horizontal>
+  <div class="contenedor-ruta flex flex-col justify-center py-16 lg:min-h-screen">
+    <div class="mx-auto w-full max-w-7xl px-5">
+      <div class="flex flex-wrap items-end justify-between gap-6">
+        <div class="max-w-2xl">
+          <p class="chip" data-reveal>// Tu ruta en la nube</p>
+          <Palabras texto="De cero a certificarte, paso a paso" resaltar={['certificarte,']} class="mt-5 text-4xl font-bold leading-tight md:text-5xl" />
+        </div>
+        <div class="hidden w-56 lg:block" aria-hidden="true">
+          <div class="h-1 overflow-hidden rounded-full bg-linea"><div class="barra-ruta h-full w-full origin-left scale-x-0 rounded-full bg-gradient-to-r from-magenta via-morado to-azul"></div></div>
+          <p class="mt-2 text-right font-mono text-xs text-suave/60">Sigue bajando →</p>
+        </div>
+      </div>
+    </div>
+
+    <ol class="pista-ruta mt-12 flex flex-col gap-6 px-5 lg:w-max lg:flex-row lg:pl-[max(1.25rem,calc((100vw-80rem)/2+1.25rem))] lg:pr-[20vw]">
+      {pasos.map((p) => (
+        <li class="tarjeta flex flex-col p-8 lg:w-[26rem]" style={`--acento:${p.c}`} data-tilt>
+          <span class="titulo text-6xl font-bold" style="color:var(--acento);opacity:.9">{p.n}</span>
+          <h3 class="titulo mt-6 text-2xl font-semibold">{p.t}</h3>
+          <p class="mt-3 leading-relaxed">{p.d}</p>
+          <ul class="mt-auto flex flex-wrap gap-2 pt-8">
+            {p.s.map((s) => <li class="rounded-full border px-3 py-1 font-mono text-xs" style="border-color:color-mix(in srgb,var(--acento) 50%,transparent);color:var(--acento)">{s}</li>)}
+          </ul>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>

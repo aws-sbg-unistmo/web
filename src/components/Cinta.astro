@@ -1,0 +1,23 @@
+---
+// Cinta infinita con nombres de servicios de AWS. Se detiene al pasar el cursor.
+import { servicios } from '../data/site';
+const fila = [...servicios, ...servicios];
+---
+<div class="cinta relative overflow-hidden border-y border-linea bg-marino-2/60 py-5" aria-label="Servicios de AWS que aprendemos">
+  <div class="pointer-events-none absolute inset-y-0 left-0 z-10 w-32 bg-gradient-to-r from-marino to-transparent"></div>
+  <div class="pointer-events-none absolute inset-y-0 right-0 z-10 w-32 bg-gradient-to-l from-marino to-transparent"></div>
+  <ul class="pista flex w-max gap-10" role="list">
+    {fila.map((s, i) => (
+      <li class="flex items-center gap-10 whitespace-nowrap font-mono text-sm uppercase tracking-[0.2em] text-suave/80" aria-hidden={i >= servicios.length ? 'true' : undefined}>
+        <span>{s}</span>
+        <span class="size-1.5 rotate-45 bg-magenta"></span>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style>
+  .pista { animation: desplazar 40s linear infinite; }
+  .cinta:hover .pista { animation-play-state: paused; }
+  @keyframes desplazar { to { transform: translateX(-50%); } }
+</style>

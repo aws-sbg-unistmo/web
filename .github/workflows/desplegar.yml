@@ -1,0 +1,147 @@
+name: Desplegar página
+
+# Cuándo corre:
+#  - push a main: compila, actualiza la infraestructura (si cambió) y publica.
+#  - cada 6 horas: vuelve a leer los eventos de Meetup y publica la versión nueva.
+#  - a mano desde la pestaña Actions.
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: desplegar
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write   # para entrar a AWS con OIDC (sin llaves guardadas)
+  pages: write      # para la vista previa en GitHub Pages
+  actions: read
+
+env:
+  STACK: aws-sbg-web
+  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+
+jobs:
+  # ------------------------------------------------------------------ compilación y pruebas
+  compilar:
+    runs-on: ubuntu-latest
+    outputs:
+      con_aws: ${{ steps.aws.outputs.listo }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Leer eventos de Meetup
+        run: node scripts/fetch-meetup-events.mjs
+      - name: Compilar
+        run: npm run build
+      - name: ¿AWS ya está configurado?
+        id: aws
+        run: echo "listo=${{ vars.AWS_ROLE_ARN != '' }}" >> "$GITHUB_OUTPUT"
+
+  # ------------------------------------------------------------------ infraestructura (SAM)
+  infraestructura:
+    needs: compilar
+    if: needs.compilar.outputs.con_aws == 'true' && github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Desplegar stack
+        working-directory: backend
+        run: |
+          sam build
+          sam deploy \
+            --stack-name "$STACK" \
+            --resolve-s3 \
+            --capabilities CAPABILITY_IAM \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset \
+            --parameter-overrides \
+              "TurnstileSecret=${{ secrets.TURNSTILE_SECRET_KEY || '1x0000000000000000000000000000000AA' }}" \
+              "NotifyEmail=${{ vars.NOTIFY_EMAIL || 'aws.unistmo@gmail.com' }}" \
+              "CreateEmailIdentity=${{ vars.CREATE_EMAIL_IDENTITY || 'true' }}" \
+              "DomainName=${{ vars.DOMAIN_NAME }}" \
+              "CertificateArn=${{ vars.CERTIFICATE_ARN }}"
+
+  # ------------------------------------------------------------------ publicar en AWS
+  publicar-aws:
+    needs: [compilar, infraestructura]
+    if: always() && needs.compilar.outputs.con_aws == 'true' && needs.compilar.result == 'success' && (needs.infraestructura.result == 'success' || needs.infraestructura.result == 'skipped')
+    runs-on: ubuntu-latest
+    environment:
+      name: produccion
+      url: ${{ steps.salidas.outputs.SiteUrl }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Leer salidas del stack
+        id: salidas
+        run: |
+          aws cloudformation describe-stacks --stack-name "$STACK" \
+            --query 'Stacks[0].Outputs[].[OutputKey,OutputValue]' --output text |
+            while read -r k v; do echo "$k=$v" >> "$GITHUB_OUTPUT"; done
+      - run: npm ci
+      - run: node scripts/fetch-meetup-events.mjs
+      - name: Compilar con la API real
+        run: npm run build
+        env:
+          PUBLIC_API_URL: ${{ steps.salidas.outputs.ApiUrl }}
+          PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.PUBLIC_TURNSTILE_SITE_KEY }}
+          SITE_URL: ${{ steps.salidas.outputs.SiteUrl }}
+      - name: Subir a S3
+        run: |
+          BUCKET="${{ steps.salidas.outputs.SiteBucketName }}"
+          # Archivos con huella en el nombre (_astro, video, img): caché de un año
+          aws s3 sync dist "s3://$BUCKET" --delete --exclude "*.html" --cache-control "public,max-age=31536000,immutable"
+          # HTML: siempre se revalida para que los cambios se vean al instante
+          aws s3 sync dist "s3://$BUCKET" --exclude "*" --include "*.html" --cache-control "public,max-age=0,must-revalidate"
+      - name: Limpiar la caché de CloudFront
+        run: aws cloudfront create-invalidation --distribution-id "${{ steps.salidas.outputs.DistributionId }}" --paths "/*" > /dev/null
+
+  # ------------------------------------------------------------------ vista previa (GitHub Pages)
+  vista-previa:
+    needs: compilar
+    if: github.event_name != 'schedule' || needs.compilar.outputs.con_aws != 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.pages.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: node scripts/fetch-meetup-events.mjs
+      - run: npm run build
+        env:
+          SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+      - run: node scripts/prefijar-base.mjs "/${{ github.event.repository.name }}"
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: pages
+        uses: actions/deploy-pages@v4

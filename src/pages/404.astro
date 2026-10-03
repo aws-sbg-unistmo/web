@@ -1,0 +1,15 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icono from '../components/Icono.astro';
+import { site } from '../data/site';
+---
+<Layout titulo="Página no encontrada">
+  <section class="relative isolate mx-auto flex min-h-[80vh] max-w-4xl flex-col items-center justify-center px-5 pt-28 text-center">
+    <div class="rejilla absolute inset-0 -z-10 opacity-30 [mask-image:radial-gradient(circle,#000,transparent_70%)]"></div>
+    {site.usarMascota && <img src="/img/mascota/09-lupa.webp" alt="" width="381" height="450" class="h-56 w-auto" data-reveal />}
+    <p class="titulo degradado mt-6 text-8xl font-bold" data-reveal>404</p>
+    <h1 class="titulo mt-2 text-3xl font-semibold" data-reveal>Esta página no está en ningún bucket</h1>
+    <p class="mt-4 max-w-md" data-reveal>Buscamos por toda la región y no la encontramos. Puede que el enlace haya cambiado.</p>
+    <a href="/" class="boton boton-primario mt-8" data-reveal data-magnetico>Volver al inicio <Icono nombre="flecha" class="size-5" /></a>
+  </section>
+</Layout>

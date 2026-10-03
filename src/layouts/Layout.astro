@@ -1,0 +1,94 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../data/site';
+// Las dos fuentes se precargan para que el texto no "salte" cuando terminan de llegar (CLS)
+import fuenteTexto from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+import fuenteTitulos from '@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url';
+
+interface Props {
+  titulo?: string;
+  descripcion?: string;
+  /** Imagen principal de la página: se descarga primero para que se vea cuanto antes */
+  precargar?: string;
+}
+const { titulo, descripcion = site.descripcion, precargar } = Astro.props;
+const tituloCompleto = titulo ? `${titulo} · ${site.corto}` : `${site.corto} · ${site.lema}`;
+// En las páginas con formulario el botón fijo de celular taparía el botón de enviar
+const conCtaMovil = !['/unete', '/contacto'].some((p) => Astro.url.pathname.startsWith(p));
+const imagenSocial = new URL('/img/og.jpg', Astro.site ?? Astro.url).href;
+---
+<!doctype html>
+<html lang="es-MX">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{tituloCompleto}</title>
+    <meta name="description" content={descripcion} />
+    <meta name="theme-color" content="#161D26" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" href="/img/logo-192.png" type="image/png" />
+    <link rel="apple-touch-icon" href="/img/logo-192.png" />
+    {Astro.site && <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site).href} />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_MX" />
+    <meta property="og:title" content={tituloCompleto} />
+    <meta property="og:description" content={descripcion} />
+    <meta property="og:image" content={imagenSocial} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preload" as="font" type="font/woff2" href={fuenteTitulos} crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href={fuenteTexto} crossorigin />
+    {precargar && <link rel="preload" as="image" href={precargar} fetchpriority="high" />}
+  </head>
+  <body class="min-h-dvh overflow-x-clip font-sans antialiased selection:bg-magenta selection:text-marino">
+    <!-- Barra de progreso de lectura y luz que sigue al cursor -->
+    <div id="progreso" aria-hidden="true" class="fixed inset-x-0 top-0 z-[60] h-0.5 origin-left scale-x-0 bg-gradient-to-r from-magenta via-morado to-azul"></div>
+    <div id="foco" aria-hidden="true" class="pointer-events-none fixed inset-0 z-30 hidden md:block"></div>
+    <a href="#contenido" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-lg focus:bg-magenta focus:px-4 focus:py-2 focus:text-marino">
+      Saltar al contenido
+    </a>
+    <Header />
+    <main id="contenido">
+      <slot />
+    </main>
+    <Footer />
+
+    <!-- En celular, botón fijo para unirse que aparece al bajar y se oculta al llegar al pie -->
+    {conCtaMovil && <a
+      id="cta-movil"
+      href={site.meetup}
+      target="_blank"
+      rel="noopener"
+      class="fixed inset-x-4 bottom-4 z-40 flex translate-y-24 items-center justify-center gap-2 rounded-full bg-magenta py-4 font-semibold text-marino shadow-[0_10px_40px_-8px_var(--color-magenta)] transition-transform duration-500 md:hidden"
+    >
+      Únete en Meetup
+      <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9" /></svg>
+    </a>}
+
+    <script>
+      const cta = document.getElementById('cta-movil');
+      if (cta) {
+        let cercaDelPie = false;
+        const mover = () => {
+          const mostrar = window.scrollY > window.innerHeight * 0.7 && !cercaDelPie;
+          cta.classList.toggle('translate-y-24', !mostrar);
+        };
+        const pie = document.querySelector('footer');
+        if (pie) new IntersectionObserver(([e]) => { cercaDelPie = e.isIntersecting; mover(); }).observe(pie);
+        window.addEventListener('scroll', mover, { passive: true });
+      }
+    </script>
+
+    <script>
+      import '../scripts/animaciones';
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  #foco {
+    background: radial-gradient(600px circle at var(--mx, 50%) var(--my, -20%), color-mix(in srgb, var(--color-magenta) 7%, transparent), transparent 60%);
+  }
+</style>

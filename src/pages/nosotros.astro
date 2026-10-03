@@ -1,0 +1,95 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CabeceraPagina from '../components/CabeceraPagina.astro';
+import Icono from '../components/Icono.astro';
+import Palabras from '../components/Palabras.astro';
+import { equipo, site } from '../data/site';
+
+const valores = [
+  { t: 'Aprender haciendo', d: 'Cada taller termina con algo construido por ti, no con diapositivas.' },
+  { t: 'Compartir lo que sabes', d: 'Quien aprende algo, lo enseña. Así crecemos todos más rápido.' },
+  { t: 'Abiertos a todos', d: 'Sin importar tu carrera, semestre o experiencia previa.' },
+  { t: 'Del Istmo al mundo', d: 'Conectamos a la UNISTMO con la comunidad global de AWS.' },
+];
+const iniciales = (n: string) => n.split(' ').filter(Boolean).slice(0, 2).map((p) => p[0]).join('');
+---
+<Layout titulo="Nosotros" descripcion="Quiénes somos: el AWS Student Builder Group de la Universidad del Istmo, Campus Tehuantepec.">
+  <CabeceraPagina
+    etiqueta="// Nosotros"
+    titulo="Una comunidad de estudiantes que construye"
+    resaltar={['construye']}
+    descripcion="Somos el AWS Student Builder Group de la Universidad del Istmo, Campus Tehuantepec: un grupo dirigido por estudiantes para aprender cloud computing e inteligencia artificial con AWS."
+    pose="10-pensando"
+  />
+
+  <section class="mx-auto grid max-w-7xl gap-6 px-5 md:grid-cols-2" data-stagger>
+    <article class="tarjeta p-8" data-tilt>
+      <p class="font-mono text-xs uppercase tracking-[0.2em] text-magenta">Misión</p>
+      <p class="titulo mt-4 text-2xl font-semibold leading-snug">
+        Que cualquier estudiante del Istmo pueda dar sus primeros pasos en la nube con acompañamiento y en comunidad.
+      </p>
+    </article>
+    <article class="tarjeta p-8" data-tilt>
+      <p class="font-mono text-xs uppercase tracking-[0.2em] text-morado">Visión</p>
+      <p class="titulo mt-4 text-2xl font-semibold leading-snug">
+        Ser la comunidad tech estudiantil de referencia en Oaxaca, formando builders que crean soluciones reales.
+      </p>
+    </article>
+  </section>
+
+  <section class="mx-auto mt-28 max-w-7xl px-5">
+    <p class="chip" data-reveal>// Lo que nos mueve</p>
+    <Palabras texto="Nuestros valores" resaltar={['valores']} class="mt-5 text-4xl font-bold md:text-5xl" />
+    <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4" data-stagger>
+      {valores.map((v, i) => (
+        <article class="tarjeta p-7" data-tilt>
+          <span class="font-mono text-sm text-magenta">0{i + 1}</span>
+          <h3 class="titulo mt-4 text-xl font-semibold">{v.t}</h3>
+          <p class="mt-3 text-sm leading-relaxed">{v.d}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="mx-auto mt-28 max-w-7xl px-5">
+    <p class="chip" data-reveal>// Equipo</p>
+    <Palabras texto="Quién está detrás" resaltar={['detrás']} class="mt-5 text-4xl font-bold md:text-5xl" />
+    <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" data-stagger>
+      {equipo.map((p) => (
+        <article class="tarjeta flex items-center gap-5 p-6" data-tilt>
+          <span class="titulo grid size-16 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-magenta to-morado text-xl font-bold text-marino">{iniciales(p.nombre)}</span>
+          <div>
+            <h3 class="titulo text-lg font-semibold">{p.nombre}</h3>
+            <p class="text-sm text-magenta">{p.rol}</p>
+            {p.linkedin && <a href={p.linkedin} target="_blank" rel="noopener" class="mt-1 inline-flex items-center gap-1 text-sm hover:text-white">LinkedIn <Icono nombre="externo" class="size-3.5" /></a>}
+          </div>
+        </article>
+      ))}
+      <a href="/unete/" class="tarjeta group flex items-center gap-5 border-dashed p-6" data-tilt>
+        <span class="grid size-16 shrink-0 place-items-center rounded-2xl border border-dashed border-magenta/60 text-magenta transition-transform group-hover:rotate-90">
+          <span class="text-3xl leading-none">+</span>
+        </span>
+        <div>
+          <h3 class="titulo text-lg font-semibold">Tu lugar en el Core Team</h3>
+          <p class="text-sm">Buscamos estudiantes para organizar eventos y talleres.</p>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section class="mx-auto mt-28 max-w-7xl px-5">
+    <div class="tarjeta grid gap-8 p-8 md:grid-cols-[auto_1fr] md:p-12" data-reveal>
+      <span class="grid size-16 place-items-center rounded-2xl bg-naranja/15 text-naranja"><Icono nombre="globo" class="size-8" /></span>
+      <div>
+        <h2 class="titulo text-2xl font-semibold md:text-3xl">Parte de AWS Student Builder Groups</h2>
+        <p class="mt-4 max-w-3xl leading-relaxed">
+          Somos parte del programa global de AWS Student Builder Groups: comunidades dirigidas por estudiantes en cientos de
+          universidades de todo el mundo, con apoyo de Amazon Web Services para aprender, construir y conectar con la industria.
+        </p>
+        <a href="https://builder.aws.com/community/student-builder-groups" target="_blank" rel="noopener" class="mt-6 inline-flex items-center gap-2 font-semibold text-white hover:text-magenta">
+          Conoce el programa <Icono nombre="externo" class="size-4" />
+        </a>
+      </div>
+    </div>
+  </section>
+</Layout>

@@ -1,0 +1,33 @@
+---
+// Encabezado de las páginas internas: etiqueta, título animado, descripción y una pose del jaguar.
+import Palabras from './Palabras.astro';
+import { site } from '../data/site';
+
+interface Props {
+  etiqueta: string;
+  titulo: string;
+  resaltar?: string[];
+  descripcion: string;
+  pose?: string;
+}
+const { etiqueta, titulo, resaltar = [], descripcion, pose } = Astro.props;
+---
+<section class="relative isolate overflow-hidden pt-36 pb-16">
+  <div class="rejilla absolute inset-0 -z-10 opacity-30 [mask-image:radial-gradient(ellipse_at_top,#000,transparent_70%)]"></div>
+  <div class="absolute -top-40 left-1/2 -z-10 h-96 w-[56rem] -translate-x-1/2 rounded-full bg-morado/20 blur-3xl"></div>
+  <div class="mx-auto grid max-w-7xl items-end gap-10 px-5 md:grid-cols-[1fr_auto]">
+    <div class="max-w-3xl">
+      <p class="chip entrada">{etiqueta}</p>
+      <Palabras como="h1" texto={titulo} resaltar={resaltar} inmediato class="mt-5 text-5xl font-bold leading-[1.05] md:text-6xl" />
+      <p class="entrada mt-6 text-lg leading-relaxed" style="--d:0.3s">{descripcion}</p>
+    </div>
+    {pose && site.usarMascota && (
+      <img src={`/img/mascota/${pose}.webp`} alt="" width="400" height="560" class="flotar hidden h-64 w-auto drop-shadow-[0_20px_50px_rgba(173,92,255,0.3)] md:block" />
+    )}
+  </div>
+</section>
+
+<style>
+  .flotar { animation: flotar 6s ease-in-out infinite; }
+  @keyframes flotar { 50% { translate: 0 -12px; } }
+</style>

@@ -1,0 +1,40 @@
+---
+// Iconos de trazo simple (estilo lineal). Se dibujan en línea para no cargar archivos extra.
+interface Props {
+  nombre: keyof typeof trazos;
+  class?: string;
+}
+const { nombre, class: clase = 'size-6' } = Astro.props;
+
+const trazos = {
+  taller: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/>',
+  evento: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 15h3"/>',
+  proyecto: '<path d="m16 18 6-6-6-6M8 6l-6 6 6 6M14 4l-4 16"/>',
+  certificado: '<circle cx="12" cy="8" r="6"/><path d="M8.2 13.4 7 22l5-3 5 3-1.2-8.6"/>',
+  flecha: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+  externo: '<path d="M7 17 17 7M8 7h9v9"/>',
+  menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+  cerrar: '<path d="M6 6l12 12M18 6 6 18"/>',
+  lugar: '<path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/>',
+  reloj: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  correo: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
+  nube: '<path d="M7 18a5 5 0 0 1-.6-9.96A6 6 0 0 1 18 9a4.5 4.5 0 0 1-.5 9z"/>',
+  rayo: '<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
+  base: '<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/>',
+  globo: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+  usuarios: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18.5 20a6.5 6.5 0 0 0-3-5.5"/>',
+  check: '<path d="m5 12 5 5L20 7"/>',
+  alerta: '<path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>',
+};
+---
+<svg
+  class={clase}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.8"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  set:html={trazos[nombre]}
+/>
