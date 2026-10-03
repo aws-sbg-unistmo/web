@@ -316,6 +316,28 @@ const dos = (n: number) => String(n).padStart(2, '0');
       botones.forEach((b) => b.addEventListener('click', alClic));
       activar(0);
 
+      // Entrada del primer integrante al llegar a la sección (se revierte al volver a subir)
+      const m0 = miembros[0];
+      const riel = seccion.querySelector('.riel');
+      const entrada = gsap.timeline({ defaults: { ease: 'power3.out' } })
+        .fromTo(m0.querySelector('.lienzo'), { clipPath: 'inset(100% 0% 0% 0% round 2rem)' }, { clipPath: 'inset(0% 0% 0% 0% round 2rem)', duration: 1.1, ease: 'expo.out' })
+        .fromTo(m0.querySelector('.capa'), { scale: 1.45, rotation: -8 }, { scale: 1, rotation: 0, duration: 1.4 }, 0)
+        .fromTo(m0.querySelector('.marco'), { rotation: -80, scale: 0.4, autoAlpha: 0 }, { rotation: 9, scale: 1, autoAlpha: 0.85, duration: 1.1, ease: 'back.out(1.6)' }, 0.1)
+        .fromTo(m0.querySelector('.numero'), { yPercent: 70, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 0.6, duration: 0.9 }, 0.15)
+        .fromTo(m0.querySelector('.orbita'), { scale: 0.5, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, duration: 1 }, 0.15)
+        .fromTo(m0.querySelectorAll('.t-linea'), { y: 60, autoAlpha: 0 }, { y: 0, autoAlpha: 1, stagger: 0.07, duration: 0.8 }, 0.25)
+        .fromTo(m0.querySelectorAll('.flotante'), { y: 120, autoAlpha: 0, scale: 0.6 }, { y: 0, autoAlpha: 1, scale: 1, stagger: 0.12, duration: 0.9, ease: 'back.out(1.5)' }, 0.45);
+      if (riel) entrada.fromTo(riel, { x: 40, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: 0.8 }, 0.3);
+      // La animación va ligada a su ScrollTrigger para que su estado inicial (oculto) se respete al recalcular
+      ScrollTrigger.create({
+        trigger: escenario,
+        start: 'top 72%',
+        animation: entrada,
+        toggleActions: 'play none none reverse',
+        // Nombre que se descifra y glitch justo cuando aparece
+        onEnter: () => setTimeout(() => { if (activo === 0) { activo = -1; activar(0); } }, 300),
+      });
+
       return () => {
         seccion.classList.remove('modo-pin');
         botones.forEach((b) => b.removeEventListener('click', alClic));
