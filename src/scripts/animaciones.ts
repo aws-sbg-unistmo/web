@@ -122,7 +122,9 @@ if (reducir) {
 
   // Etiquetas tipo terminal: el texto se "descifra" al aparecer
   const signos = '!<>-_\\/[]{}=+*^?#01';
-  todos('.chip').forEach((chip) => {
+  // Las de los encabezados ya entran con CSS (.entrada): si cambiaran su texto tarde, el navegador las tomaría como
+  // el elemento más grande pintado al final y empeoraría el LCP.
+  todos('.chip:not(.entrada)').forEach((chip) => {
     if (chip.children.length) return;
     const final = chip.textContent ?? '';
     ScrollTrigger.create({
