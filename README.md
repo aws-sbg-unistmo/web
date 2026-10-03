@@ -66,6 +66,7 @@ npm run build        # genera dist/
 | Qué | Dónde |
 |---|---|
 | Textos generales, redes, navegación, actividades | `src/data/site.ts` |
+| Equipo, eventos propios y alianzas (con el CMS activado) | Panel de Strapi (`cms/`) |
 | Equipo (nombre, rol, carrera, LinkedIn y foto opcional en `public/img/equipo/`) | `equipo` en `src/data/site.ts` |
 | Alianzas (con la lista vacía se muestra cómo ser aliado) | `alianzas` en `src/data/site.ts` |
 | Barra de aviso de arriba (texto vacío = no se muestra) | `anuncio` en `src/data/site.ts` |
@@ -104,6 +105,33 @@ La dirección pública aparece en la salida **SiteUrl** del stack y en el entorn
 > Las *AWS Trademark Guidelines* no permiten registrar dominios que contengan "AWS" sin permiso escrito.
 > Consulta con el Account Manager antes de comprar uno.
 
+## CMS (Strapi): editar equipo, eventos y alianzas
+
+En `cms/` hay un Strapi para editar sin código las tarjetas del equipo, los eventos y las alianzas.
+Cada integrante entra con su propia cuenta (rol **Author**) y solo puede editar y publicar su tarjeta.
+Al publicar, Strapi lanza este flujo y la página se actualiza sola en 2–3 minutos.
+Mientras el CMS no esté activado, la página usa los datos de `src/data/site.ts`.
+Detalles y trabajo en local: [cms/README.md](cms/README.md).
+
+### Activarlo en AWS (una sola vez, después de «Publicar en AWS»)
+
+1. **Permisos.** En CloudFormation, actualiza el stack del rol de GitHub con la versión nueva de `infra/github-oidc.yaml`.
+   Ahora puede crear la instancia, la imagen y la distribución del CMS.
+2. **Encenderlo.** Agrega la variable de repositorio `CMS_ACTIVO` = `true` y corre el flujo «Desplegar página».
+   Se crea el stack `aws-sbg-web-cms` y, en el resumen del flujo, aparece la dirección del panel (`…cloudfront.net/admin`).
+3. **Tu cuenta.** Abre esa dirección **de inmediato** y crea la cuenta de Super Admin: la primera persona que entra la crea.
+4. **Conectar la página.** En el panel, ve a Ajustes → Tokens de API → `web` → Ver token.
+   - Cópialo al secreto `STRAPI_TOKEN`.
+   - Pon la dirección del CMS, sin `/admin`, en la variable `STRAPI_URL`.
+5. **Actualización inmediata (opcional).**
+   - Crea en GitHub un token *fine-grained* solo del repo `web` con permiso **Actions: Read and write**.
+   - Guárdalo en Systems Manager → Parameter Store como `SecureString` con el nombre `/aws-sbg-web/cms/github-token`.
+   - Vuelve a correr el flujo.
+   - Sin este token, los cambios del CMS se ven en la compilación programada (cada 6 h).
+6. **Tu equipo.** Ajustes → Usuarios → Invitar con rol Author, y pon el mismo correo en «Correo del editor» de su tarjeta.
+
+Costo aproximado: ~US$11 al mes (EC2 t4g.micro, IP pública y disco). CloudFront entra en la capa gratuita.
+
 ## Vista previa
 
 Mientras AWS no esté configurado, cada push publica una vista previa en GitHub Pages, sin formularios conectados:
@@ -119,7 +147,8 @@ src/
   pages/        inicio, aprende, eventos, nosotros, contacto, privacidad, 404
   scripts/      animaciones.ts, red.ts (partículas), formulario.ts
 backend/        Plantilla SAM y código de la Lambda de formularios
-infra/          Rol OIDC para GitHub Actions
+cms/            Strapi: equipo, eventos y alianzas editables
+infra/          Rol OIDC para GitHub Actions y la instancia del CMS
 scripts/        Lectura de Meetup y ajuste de rutas para GitHub Pages
 media-fuente/   Videos originales generados en Google Flow
 ```

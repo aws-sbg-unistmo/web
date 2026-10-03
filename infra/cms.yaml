@@ -1,0 +1,210 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  CMS del grupo (Strapi) para editar el equipo, los eventos y las alianzas de la página.
+  Una instancia EC2 pequeña (ARM) corre Strapi en Docker con SQLite; CloudFront le da HTTPS.
+  La imagen se compila en GitHub Actions y se guarda en ECR. Se administra con SSM (sin SSH).
+
+Parameters:
+  StackPrefix:
+    Type: String
+    Default: aws-sbg-web
+  InstanceType:
+    Type: String
+    Default: t4g.micro
+    AllowedValues: [t4g.micro, t4g.small, t4g.medium]
+    Description: t4g.micro (1 GB + swap) basta para Strapi; la imagen se compila fuera de la instancia.
+  AmiId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-arm64
+  CloudFrontPrefixList:
+    Type: String
+    Default: pl-3b927c52
+    Description: >
+      Lista de prefijos de CloudFront (com.amazonaws.global.cloudfront.origin-facing) de tu región.
+      pl-3b927c52 es la de us-east-1; en otra región búscala en VPC → Managed prefix lists.
+  ParametroToken:
+    Type: String
+    Default: /aws-sbg-web/cms/github-token
+    Description: >
+      Nombre del parámetro SecureString (Parameter Store) con un token de GitHub fine-grained del repo web con permiso
+      "Actions: Read and write". Strapi lo usa para pedir que se recompile la página al publicar. Es opcional:
+      sin él, la página se actualiza en la compilación programada (cada 6 h).
+  GitHubRepo:
+    Type: String
+    Default: aws-sbg-unistmo/web
+
+Conditions:
+  EsVirginia: !Equals [!Ref 'AWS::Region', us-east-1]
+
+Resources:
+  Repositorio:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub '${StackPrefix}-cms'
+      ImageScanningConfiguration:
+        ScanOnPush: true
+      LifecyclePolicy:
+        LifecyclePolicyText: |
+          {"rules":[{"rulePriority":1,"description":"Conservar las 5 imágenes más recientes",
+            "selection":{"tagStatus":"any","countType":"imageCountMoreThan","countNumber":5},"action":{"type":"expire"}}]}
+
+  # Solo CloudFront puede hablar con Strapi
+  GrupoSeguridad:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: CMS - solo trafico desde CloudFront al puerto de Strapi
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 1337
+          ToPort: 1337
+          SourcePrefixListId: !Ref CloudFrontPrefixList
+      Tags:
+        - Key: Name
+          Value: !Sub '${StackPrefix}-cms'
+
+  RolInstancia:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${StackPrefix}-cms-instancia'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+      Policies:
+        - PolicyName: leer-token-github
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: ssm:GetParameter
+                Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${StackPrefix}/cms/*'
+
+  PerfilInstancia:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub '${StackPrefix}-cms'
+      Roles: [!Ref RolInstancia]
+
+  Instancia:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref AmiId
+      InstanceType: !Ref InstanceType
+      IamInstanceProfile: !Ref PerfilInstancia
+      SecurityGroupIds: [!GetAtt GrupoSeguridad.GroupId]
+      MetadataOptions:
+        HttpTokens: required
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeType: gp3
+            VolumeSize: 20
+            Encrypted: true
+            DeleteOnTermination: false
+      Tags:
+        - Key: Name
+          Value: !Sub '${StackPrefix}-cms'
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -euxo pipefail
+          dnf install -y docker
+          systemctl enable --now docker
+          # 1 GB de memoria de intercambio para que Strapi no se quede sin memoria en la t4g.micro
+          if [ ! -f /swapfile ]; then
+            fallocate -l 1G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile
+            echo '/swapfile swap swap defaults 0 0' >> /etc/fstab
+          fi
+          mkdir -p /opt/cms/datos /opt/cms/uploads
+          # Secretos de Strapi: se generan una sola vez y se quedan en la instancia
+          if [ ! -f /opt/cms/.env ]; then
+            r() { openssl rand -base64 32 | tr -d '\n'; }
+            umask 077
+            cat > /opt/cms/.env <<EOF
+          HOST=0.0.0.0
+          PORT=1337
+          NODE_ENV=production
+          IS_PROXIED=true
+          APP_KEYS=$(r),$(r)
+          API_TOKEN_SALT=$(r)
+          ADMIN_JWT_SECRET=$(r)
+          TRANSFER_TOKEN_SALT=$(r)
+          JWT_SECRET=$(r)
+          ENCRYPTION_KEY=$(r)
+          DATABASE_CLIENT=sqlite
+          DATABASE_FILENAME=.tmp/data.db
+          GITHUB_REPO=${GitHubRepo}
+          EOF
+          fi
+          # Descarga la última imagen de ECR y (re)inicia Strapi. GitHub Actions lo llama tras cada despliegue.
+          cat > /usr/local/bin/cms-actualizar <<'EOF'
+          #!/bin/bash
+          set -e
+          REGISTRO=${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com
+          aws ecr get-login-password --region ${AWS::Region} | docker login --username AWS --password-stdin "$REGISTRO"
+          docker pull "${Repositorio.RepositoryUri}:latest" || { echo "Aún no hay imagen en ECR"; exit 0; }
+          # El token de GitHub (opcional) se lee de Parameter Store; no se guarda en disco
+          TOKEN=$(aws ssm get-parameter --region ${AWS::Region} --name "${ParametroToken}" --with-decryption --query Parameter.Value --output text 2>/dev/null || true)
+          docker rm -f cms 2>/dev/null || true
+          docker run -d --name cms --restart always -p 1337:1337 --env-file /opt/cms/.env -e GITHUB_TOKEN_DESPLIEGUE="$TOKEN" \
+            -v /opt/cms/datos:/opt/app/.tmp -v /opt/cms/uploads:/opt/app/public/uploads \
+            "${Repositorio.RepositoryUri}:latest"
+          docker image prune -f
+          EOF
+          chmod +x /usr/local/bin/cms-actualizar
+          /usr/local/bin/cms-actualizar
+
+  IpFija:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId: !Ref Instancia
+      Tags:
+        - Key: Name
+          Value: !Sub '${StackPrefix}-cms'
+
+  # HTTPS para el panel y la API (dominio *.cloudfront.net). No guarda caché: todo pasa directo a Strapi.
+  Distribucion:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        Comment: !Sub '${StackPrefix} CMS (Strapi)'
+        HttpVersion: http2and3
+        PriceClass: PriceClass_100
+        Origins:
+          - Id: strapi
+            DomainName: !Join
+              - ''
+              - - ec2-
+                - !Join ['-', !Split ['.', !Ref IpFija]]
+                - !If [EsVirginia, '.compute-1', !Sub '.${AWS::Region}.compute']
+                - .amazonaws.com
+            CustomOriginConfig:
+              HTTPPort: 1337
+              OriginProtocolPolicy: http-only
+              OriginReadTimeout: 60
+            OriginCustomHeaders:
+              - HeaderName: X-Forwarded-Proto
+                HeaderValue: https
+        DefaultCacheBehavior:
+          TargetOriginId: strapi
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods: [GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE]
+          CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # Managed-CachingDisabled
+          OriginRequestPolicyId: 216adef6-5c7f-47e4-b989-5492eafa07d3 # Managed-AllViewer
+          Compress: true
+
+Outputs:
+  CmsUrl:
+    Description: Dirección del CMS. Copia este valor a la variable STRAPI_URL del repositorio; el panel está en /admin
+    Value: !Sub 'https://${Distribucion.DomainName}'
+  RepositoryUri:
+    Value: !GetAtt Repositorio.RepositoryUri
+  InstanceId:
+    Value: !Ref Instancia

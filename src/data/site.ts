@@ -1,4 +1,7 @@
 // Datos generales del grupo. Si cambia un enlace o un texto, se cambia aquí y se actualiza en toda la página.
+// El equipo, las alianzas y los eventos también se pueden editar desde Strapi (cms/): si Strapi tiene contenido,
+// scripts/fetch-cms.mjs lo guarda en cms.json al compilar y tiene prioridad sobre lo que está escrito aquí.
+import cms from './cms.json';
 export const site = {
   nombre: 'AWS Student Builder Group UNISTMO',
   corto: 'AWS SBG UNISTMO',
@@ -82,7 +85,7 @@ export type Integrante = {
   fotos?: string[];
   redes?: Red[];
 };
-export const equipo: Integrante[] = [
+const equipoLocal: Integrante[] = [
   {
     nombre: 'Jean Paul Gallegos Cruz',
     rol: 'Student Builder Group Leader',
@@ -135,7 +138,7 @@ export const equipo: Integrante[] = [
 // Ejemplo: { nombre: 'Nombre', tipo: 'Comunidad', texto: 'Qué hacemos juntos', url: 'https://…', logo: '/img/alianzas/nombre.png' }
 // "redes": todas sus redes; se muestran en una ventana al tocar su tarjeta.
 export type Alianza = { nombre: string; tipo: 'Comunidad' | 'Empresa' | 'Institución' | 'Medio'; texto: string; lema?: string; url?: string; logo?: string; redes?: Red[] };
-export const alianzas: Alianza[] = [
+const alianzasLocal: Alianza[] = [
   {
     nombre: 'Nexis Oaxaca Tech',
     tipo: 'Comunidad',
@@ -154,3 +157,7 @@ export const alianzas: Alianza[] = [
     ],
   },
 ];
+
+// Lo que viene de Strapi tiene prioridad; si está vacío, se usa lo escrito arriba
+export const equipo: Integrante[] = cms.equipo.length ? (cms.equipo as Integrante[]) : equipoLocal;
+export const alianzas: Alianza[] = cms.alianzas.length ? (cms.alianzas as Alianza[]) : alianzasLocal;

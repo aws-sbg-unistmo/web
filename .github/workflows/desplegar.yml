@@ -3,6 +3,7 @@ name: Desplegar página
 # Cuándo corre:
 #  - push a main: compila, actualiza la infraestructura (si cambió) y publica.
 #  - cada 6 horas: vuelve a leer los eventos de Meetup y publica la versión nueva.
+#  - cuando alguien publica o cambia algo en Strapi (Strapi lanza este flujo con workflow_dispatch).
 #  - a mano desde la pestaña Actions.
 on:
   push:
@@ -10,6 +11,10 @@ on:
   schedule:
     - cron: '17 */6 * * *'
   workflow_dispatch:
+    inputs:
+      origen:
+        description: Quién lanza el flujo (Strapi manda "cms" para solo recompilar la página)
+        default: manual
 
 concurrency:
   group: desplegar
@@ -40,6 +45,11 @@ jobs:
       - run: npm ci
       - name: Leer eventos de Meetup
         run: node scripts/fetch-meetup-events.mjs
+      - name: Leer contenido de Strapi
+        run: node scripts/fetch-cms.mjs
+        env:
+          STRAPI_URL: ${{ vars.STRAPI_URL }}
+          STRAPI_TOKEN: ${{ secrets.STRAPI_TOKEN }}
       - name: Compilar
         run: npm run build
       - name: ¿AWS ya está configurado?
@@ -49,7 +59,7 @@ jobs:
   # ------------------------------------------------------------------ infraestructura (SAM)
   infraestructura:
     needs: compilar
-    if: needs.compilar.outputs.con_aws == 'true' && github.event_name != 'schedule'
+    if: needs.compilar.outputs.con_aws == 'true' && github.event_name != 'schedule' && inputs.origen != 'cms'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -103,6 +113,11 @@ jobs:
             while read -r k v; do echo "$k=$v" >> "$GITHUB_OUTPUT"; done
       - run: npm ci
       - run: node scripts/fetch-meetup-events.mjs
+      - name: Leer contenido de Strapi
+        run: node scripts/fetch-cms.mjs
+        env:
+          STRAPI_URL: ${{ vars.STRAPI_URL }}
+          STRAPI_TOKEN: ${{ secrets.STRAPI_TOKEN }}
       - name: Compilar con la API real
         run: npm run build
         env:
@@ -118,6 +133,70 @@ jobs:
           aws s3 sync dist "s3://$BUCKET" --exclude "*" --include "*.html" --cache-control "public,max-age=0,must-revalidate"
       - name: Limpiar la caché de CloudFront
         run: aws cloudfront create-invalidation --distribution-id "${{ steps.salidas.outputs.DistributionId }}" --paths "/*" > /dev/null
+
+  # ------------------------------------------------------------------ prueba de la imagen del CMS
+  # Compila la imagen de Strapi (sin publicarla) cuando cambia cms/, aunque AWS no esté configurado.
+  probar-cms:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+      - name: ¿Cambió el CMS?
+        id: cambio
+        run: git diff --name-only HEAD~1 HEAD | grep -q '^cms/' && echo "si=true" >> "$GITHUB_OUTPUT" || true
+      - name: Compilar la imagen
+        if: steps.cambio.outputs.si == 'true'
+        run: docker build -t cms-prueba cms
+      - name: Arrancar Strapi y comprobar que responde
+        if: steps.cambio.outputs.si == 'true'
+        run: |
+          r() { openssl rand -hex 24; }
+          docker run -d --name cms -p 1337:1337 -e APP_KEYS="$(r),$(r)" -e API_TOKEN_SALT="$(r)" -e ADMIN_JWT_SECRET="$(r)"             -e TRANSFER_TOKEN_SALT="$(r)" -e JWT_SECRET="$(r)" -e ENCRYPTION_KEY="$(r)" -e DATABASE_FILENAME=.tmp/data.db cms-prueba
+          for i in $(seq 1 60); do curl -sf http://localhost:1337/_health && break; sleep 3; done
+          docker logs cms | grep -E "Datos iniciales|Token|started" || true
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:1337/admin)" = "200"
+
+  # ------------------------------------------------------------------ CMS (Strapi) en AWS
+  # Se activa con la variable CMS_ACTIVO=true. Crea la instancia y compila la imagen solo si cambió cms/.
+  cms:
+    needs: compilar
+    if: needs.compilar.outputs.con_aws == 'true' && vars.CMS_ACTIVO == 'true' && github.event_name != 'schedule' && inputs.origen != 'cms'
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Infraestructura del CMS
+        run: |
+          aws cloudformation deploy --stack-name "$STACK-cms" --template-file infra/cms.yaml             --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset
+      - name: Leer salidas del CMS
+        id: cms
+        run: |
+          aws cloudformation describe-stacks --stack-name "$STACK-cms"             --query 'Stacks[0].Outputs[].[OutputKey,OutputValue]' --output text |
+            while read -r k v; do echo "$k=$v" >> "$GITHUB_OUTPUT"; done
+      - name: ¿Hay que compilar la imagen?
+        id: imagen
+        run: |
+          REPO="${{ steps.cms.outputs.RepositoryUri }}"
+          if ! aws ecr describe-images --repository-name "${REPO##*/}" --image-ids imageTag=latest > /dev/null 2>&1              || git diff --name-only HEAD~1 HEAD | grep -q '^cms/'; then echo "si=true" >> "$GITHUB_OUTPUT"; fi
+      - name: Compilar y subir la imagen (arm64)
+        if: steps.imagen.outputs.si == 'true'
+        run: |
+          REPO="${{ steps.cms.outputs.RepositoryUri }}"
+          aws ecr get-login-password | docker login --username AWS --password-stdin "${REPO%%/*}"
+          docker build -t "$REPO:latest" -t "$REPO:${{ github.sha }}" cms
+          docker push --all-tags "$REPO"
+      - name: Reiniciar Strapi con la imagen nueva
+        if: steps.imagen.outputs.si == 'true'
+        run: |
+          aws ssm send-command --instance-ids "${{ steps.cms.outputs.InstanceId }}" --document-name AWS-RunShellScript             --parameters 'commands=["/usr/local/bin/cms-actualizar"]' --comment "Actualizar CMS" > /dev/null
+          echo "CMS: ${{ steps.cms.outputs.CmsUrl }}/admin" >> "$GITHUB_STEP_SUMMARY"
 
   # ------------------------------------------------------------------ vista previa (GitHub Pages)
   vista-previa:
@@ -135,6 +214,11 @@ jobs:
           cache: npm
       - run: npm ci
       - run: node scripts/fetch-meetup-events.mjs
+      - name: Leer contenido de Strapi
+        run: node scripts/fetch-cms.mjs
+        env:
+          STRAPI_URL: ${{ vars.STRAPI_URL }}
+          STRAPI_TOKEN: ${{ secrets.STRAPI_TOKEN }}
       - run: npm run build
         env:
           SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}

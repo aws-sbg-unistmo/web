@@ -1,0 +1,180 @@
+{
+  "equipo": [
+    {
+      "nombre": "Jean Paul Gallegos Cruz",
+      "rol": "Student Builder Group Leader",
+      "carrera": "Ingeniería en Computación",
+      "descripcion": "Fundé el AWS Student Builder Group de la UNISTMO. Me enfoco en la seguridad en la nube —AWS, Google Cloud y Azure— y en backend con Python y Laravel, con la IA como hilo que lo une todo. Soy Google Student Ambassador ’26, de la primera generación en México, y organizo eventos con Nexis Oaxaca Tech.",
+      "ficha": [
+        {
+          "titulo": "Especialidad",
+          "items": [
+            "Cloud Security",
+            "Ciberseguridad multinube",
+            "Backend"
+          ]
+        },
+        {
+          "titulo": "Me apasiona",
+          "items": [
+            "IA",
+            "Cloud",
+            "Ciberseguridad",
+            "Automatización",
+            "Robótica"
+          ]
+        },
+        {
+          "titulo": "Credenciales",
+          "items": [
+            "Google Student Ambassador ’26",
+            "Google Cloud Cybersecurity",
+            "Google Cloud Computing Foundations",
+            "Cédula técnica en programación"
+          ]
+        },
+        {
+          "titulo": "Stack",
+          "items": [
+            "Python",
+            "PHP · Laravel",
+            "C",
+            "Dart",
+            "Docker",
+            "Bash",
+            "AWS",
+            "Google Cloud"
+          ]
+        }
+      ],
+      "fotos": [
+        "datos-iniciales/jean-paul.webp",
+        "datos-iniciales/jean-paul-2.webp",
+        "datos-iniciales/jean-paul-3.webp"
+      ],
+      "redes": [
+        {
+          "tipo": "linkedin",
+          "url": "https://www.linkedin.com/in/jeanpaulgc"
+        },
+        {
+          "tipo": "github",
+          "url": "https://github.com/Jean1722343"
+        },
+        {
+          "tipo": "instagram",
+          "url": "https://www.instagram.com/jpgallegosc"
+        },
+        {
+          "tipo": "tiktok",
+          "url": "https://www.tiktok.com/@jpgallegosc"
+        },
+        {
+          "tipo": "facebook",
+          "url": "https://www.facebook.com/profile.php?id=61593415306721"
+        }
+      ]
+    },
+    {
+      "nombre": "Joan Garfias",
+      "rol": "Core Team",
+      "descripcion": "Desarrollador backend y cofundador de Nexis Oaxaca Tech. Hoy está aprendiendo cloud computing.",
+      "ficha": [
+        {
+          "titulo": "Especialidad",
+          "items": [
+            "Backend",
+            "Cloud computing"
+          ]
+        }
+      ],
+      "fotos": [
+        "datos-iniciales/joan.webp"
+      ],
+      "redes": [
+        {
+          "tipo": "linkedin",
+          "url": "https://www.linkedin.com/in/joangarfias/"
+        },
+        {
+          "tipo": "github",
+          "url": "https://github.com/JoanGarfias"
+        },
+        {
+          "tipo": "instagram",
+          "url": "https://www.instagram.com/joangarfias_/"
+        }
+      ]
+    },
+    {
+      "nombre": "Jeovani Pacheco Rueda",
+      "rol": "Core Team",
+      "descripcion": "Programador full stack en Onexo y estudiante de la UNISTMO en Tehuantepec.",
+      "ficha": [
+        {
+          "titulo": "Especialidad",
+          "items": [
+            "Full stack"
+          ]
+        }
+      ],
+      "fotos": [
+        "datos-iniciales/jeovani.webp"
+      ],
+      "redes": [
+        {
+          "tipo": "linkedin",
+          "url": "https://www.linkedin.com/in/jeovanipacheco/"
+        },
+        {
+          "tipo": "github",
+          "url": "https://github.com/JeovaniPacheco"
+        },
+        {
+          "tipo": "instagram",
+          "url": "https://www.instagram.com/jeovanipachecobautista/"
+        }
+      ]
+    },
+    {
+      "nombre": "Gerónimo",
+      "rol": "Core Team"
+    }
+  ],
+  "alianzas": [
+    {
+      "nombre": "Nexis Oaxaca Tech",
+      "tipo": "Comunidad",
+      "lema": "Aprende · Conecta · Construye",
+      "texto": "Comunidad de Oaxaca que conecta a estudiantes, desarrolladores y personas apasionadas por la tecnología para aprender, compartir conocimiento y crear proyectos reales.",
+      "url": "https://nexisoaxaca.tech/",
+      "logo": "datos-iniciales/nexis.webp",
+      "redes": [
+        {
+          "tipo": "web",
+          "url": "https://nexisoaxaca.tech/"
+        },
+        {
+          "tipo": "instagram",
+          "url": "https://www.instagram.com/nexis.oaxaca"
+        },
+        {
+          "tipo": "facebook",
+          "url": "https://www.facebook.com/nexisoaxaca"
+        },
+        {
+          "tipo": "linkedin",
+          "url": "https://www.linkedin.com/company/nexis-oaxaca/"
+        },
+        {
+          "tipo": "youtube",
+          "url": "https://www.youtube.com/@NexisOaxaca"
+        },
+        {
+          "tipo": "github",
+          "url": "https://github.com/Nexis-Oaxaca"
+        }
+      ]
+    }
+  ]
+}

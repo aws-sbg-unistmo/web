@@ -29,3 +29,6 @@ pnpm-debug.log*
 !.env.example
 backend/.aws-sam/
 samconfig.toml
+
+# imágenes que se descargan de Strapi al compilar
+public/cms/

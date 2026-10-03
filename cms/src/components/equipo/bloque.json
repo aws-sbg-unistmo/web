@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_equipo_bloques",
+  "info": {
+    "displayName": "Bloque de ficha",
+    "icon": "bulletList",
+    "description": "Por ejemplo «Especialidad» con un elemento por línea"
+  },
+  "options": {},
+  "attributes": {
+    "titulo": {
+      "type": "string",
+      "required": true,
+      "maxLength": 40
+    },
+    "elementos": {
+      "type": "text",
+      "required": true,
+      "maxLength": 600
+    }
+  }
+}

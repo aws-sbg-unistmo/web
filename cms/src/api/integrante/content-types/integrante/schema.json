@@ -1,0 +1,67 @@
+{
+  "kind": "collectionType",
+  "collectionName": "integrantes",
+  "info": {
+    "singularName": "integrante",
+    "pluralName": "integrantes",
+    "displayName": "Integrante del equipo",
+    "description": "Personas del Core Team. Cada quien edita su propia tarjeta."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "nombre": {
+      "type": "string",
+      "required": true,
+      "maxLength": 80
+    },
+    "rol": {
+      "type": "string",
+      "required": true,
+      "maxLength": 60,
+      "default": "Core Team"
+    },
+    "carrera": {
+      "type": "string",
+      "maxLength": 80
+    },
+    "descripcion": {
+      "type": "text",
+      "maxLength": 420
+    },
+    "correoEditor": {
+      "type": "email",
+      "private": true
+    },
+    "foto": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "fotosExtra": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "ficha": {
+      "type": "component",
+      "repeatable": true,
+      "component": "equipo.bloque"
+    },
+    "redes": {
+      "type": "component",
+      "repeatable": true,
+      "component": "equipo.red"
+    },
+    "orden": {
+      "type": "integer",
+      "default": 10
+    }
+  }
+}

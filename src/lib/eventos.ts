@@ -1,6 +1,9 @@
 import datos from '../data/events.json';
+import cms from '../data/cms.json';
 
 // events.json lo genera scripts/fetch-meetup-events.mjs a partir del calendario del Meetup del grupo.
+// cms.json trae los eventos creados en Strapi (scripts/fetch-cms.mjs). Se juntan ambos; si un evento de Strapi
+// enlaza al mismo Meetup que uno del calendario, se queda el de Strapi (que puede traer imagen y más datos).
 export interface Evento {
   id: string;
   titulo: string;
@@ -9,9 +12,13 @@ export interface Evento {
   lugar?: string;
   url?: string;
   descripcion?: string;
+  imagen?: string;
 }
 
-const eventos = (datos as Evento[]).slice().sort((a, b) => a.inicio.localeCompare(b.inicio));
+const deStrapi = cms.eventos as Evento[];
+const enlaces = new Set(deStrapi.map((e) => e.url).filter(Boolean));
+const eventos = [...(datos as Evento[]).filter((e) => !e.url || !enlaces.has(e.url)), ...deStrapi]
+  .sort((a, b) => a.inicio.localeCompare(b.inicio));
 const ahora = new Date().toISOString();
 
 // "Ahora" es el momento de la compilación: la página se recompila cada 6 h con GitHub Actions.

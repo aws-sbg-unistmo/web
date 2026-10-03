@@ -1,0 +1,30 @@
+{
+  "collectionName": "components_equipo_redes",
+  "info": {
+    "displayName": "Red social",
+    "icon": "link",
+    "description": "Enlace a una red social o sitio web"
+  },
+  "options": {},
+  "attributes": {
+    "tipo": {
+      "type": "enumeration",
+      "enum": [
+        "linkedin",
+        "instagram",
+        "github",
+        "youtube",
+        "tiktok",
+        "x",
+        "facebook",
+        "web"
+      ],
+      "required": true
+    },
+    "url": {
+      "type": "string",
+      "required": true,
+      "regex": "^https://"
+    }
+  }
+}
