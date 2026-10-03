@@ -284,6 +284,4 @@ main section[id] { scroll-margin-top: 8.5rem; }
   html { scroll-behavior: auto; }
   * { animation: none !important; transition: none !important; }
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
-  /* Sin animación, la ruta se recorre deslizando de lado */
-  .pista-ruta { width: auto !important; overflow-x: auto; }
 }

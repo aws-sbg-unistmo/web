@@ -170,3 +170,42 @@ export const regionMexico = {
   apertura: 'enero de 2025',
   zonas: 3,
 };
+
+// Ruta de aprendizaje: la usan el roadmap del inicio y la página Aprende
+export const niveles = [
+  {
+    n: '01', t: 'Fundamentos de la nube', nivel: 'Principiante', c: 'var(--color-naranja)',
+    resumen: 'Qué es AWS, regiones, tu cuenta con seguridad (IAM) y alertas de presupuesto para no gastar de más.',
+    aprendes: ['Qué es la nube y cómo se organiza AWS', 'Crear tu cuenta y protegerla con MFA', 'Usuarios y permisos con IAM', 'Alertas de presupuesto para no gastar de más'],
+    servicios: ['AWS IAM', 'AWS Budgets', 'Consola de AWS'],
+    proyecto: 'Deja lista una cuenta segura: MFA, un usuario con permisos mínimos y una alerta de gasto.',
+  },
+  {
+    n: '02', t: 'Tu primer sitio en la nube', nivel: 'Principiante', c: 'var(--color-magenta)',
+    resumen: 'Publicas una página web en minutos con almacenamiento y distribución global, igual que esta.',
+    aprendes: ['Guardar archivos en buckets de S3', 'Publicar un sitio web estático', 'Entregarlo rápido y con HTTPS desde una CDN'],
+    servicios: ['Amazon S3', 'Amazon CloudFront'],
+    proyecto: 'Publica tu portafolio personal en la nube, con tu propio enlace.',
+  },
+  {
+    n: '03', t: 'Apps sin servidores', nivel: 'Intermedio', c: 'var(--color-morado)',
+    resumen: 'Creas APIs y funciones que escalan solas y solo cobran cuando se usan.',
+    aprendes: ['Funciones que corren solo cuando se necesitan', 'Crear y proteger una API', 'Guardar datos en una base NoSQL', 'Describir tu infraestructura como código'],
+    servicios: ['AWS Lambda', 'Amazon API Gateway', 'Amazon DynamoDB', 'AWS SAM'],
+    proyecto: 'Un formulario que guarda registros y avisa por correo, como el de esta página.',
+  },
+  {
+    n: '04', t: 'IA generativa', nivel: 'Intermedio', c: 'var(--color-azul)',
+    resumen: 'Usas modelos fundacionales para crear asistentes y agentes que resuelven problemas reales.',
+    aprendes: ['Qué es un modelo fundacional', 'Escribir buenas instrucciones (prompts)', 'Responder con tus propios documentos (RAG)', 'Agentes que usan herramientas'],
+    servicios: ['Amazon Bedrock', 'Bedrock Knowledge Bases', 'Agentes de IA'],
+    proyecto: 'Un asistente que responde dudas sobre los trámites de tu carrera usando sus documentos.',
+  },
+  {
+    n: '05', t: 'Certifícate', nivel: 'Meta', c: 'var(--color-menta)',
+    resumen: 'Preparamos juntos tu primera certificación de AWS para que lo aprendido cuente en tu CV.',
+    aprendes: ['Repasar los temas oficiales del examen', 'Practicar con preguntas tipo examen', 'Estudiar en grupo y resolver dudas'],
+    servicios: ['Cloud Practitioner', 'AI Practitioner'],
+    proyecto: 'Un plan de estudio en grupo de varias semanas, hasta el día del examen.',
+  },
+];

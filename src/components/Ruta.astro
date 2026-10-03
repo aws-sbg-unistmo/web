@@ -1,42 +1,301 @@
 ---
-// "Tu ruta en la nube": en escritorio la sección se fija y las tarjetas avanzan de lado con el scroll.
-// En celular se muestran una debajo de otra. La lógica está en data-horizontal (scripts/animaciones.ts).
+// "Tu ruta en la nube" como roadmap interactivo.
+// - Computadora: la sección se queda fija; al bajar se dibuja un camino, el jaguar del grupo viaja por él, cada nivel
+//   se enciende al llegar y abajo cambia el panel con lo que aprendes, los servicios y el proyecto. Se puede tocar
+//   cualquier nivel para ir directo.
+// - Celular, "reducir movimiento" o sin JavaScript: línea vertical con los cinco niveles.
+// Los datos vienen de "niveles" en src/data/contenido.ts (los mismos de la página Aprende).
+import Icono from './Icono.astro';
 import Palabras from './Palabras.astro';
+import { niveles } from '../data/contenido';
 
-const pasos = [
-  { n: '01', t: 'Fundamentos de la nube', d: 'Qué es AWS, regiones, tu cuenta con seguridad (IAM) y alertas de presupuesto para no gastar de más.', s: ['IAM', 'Regiones', 'Budgets'], c: 'var(--color-naranja)' },
-  { n: '02', t: 'Tu primer sitio en la nube', d: 'Publicas una página web en minutos con almacenamiento y distribución global, igual que esta.', s: ['Amazon S3', 'CloudFront'], c: 'var(--color-magenta)' },
-  { n: '03', t: 'Apps sin servidores', d: 'Creas APIs y funciones que escalan solas y solo cobran cuando se usan.', s: ['Lambda', 'API Gateway', 'DynamoDB'], c: 'var(--color-morado)' },
-  { n: '04', t: 'IA generativa', d: 'Usas modelos fundacionales para crear asistentes y agentes que resuelven problemas reales.', s: ['Amazon Bedrock', 'Agentes'], c: 'var(--color-azul)' },
-  { n: '05', t: 'Certifícate', d: 'Preparamos juntos tu primera certificación de AWS para que lo aprendido cuente en tu CV.', s: ['Cloud Practitioner', 'AI Practitioner'], c: 'var(--color-menta)' },
-];
+// Camino en un lienzo de 1200×320: cada nivel en un punto, unidos por curvas suaves
+const ancho = 1200;
+const alto = 320;
+const puntos = [[110, 238], [355, 92], [600, 238], [845, 92], [1090, 238]].slice(0, niveles.length);
+let camino = `M -30 ${puntos[0][1]} L ${puntos[0][0]} ${puntos[0][1]}`;
+for (let i = 1; i < puntos.length; i++) {
+  const [ax, ay] = puntos[i - 1];
+  const [bx, by] = puntos[i];
+  const dx = (bx - ax) / 2;
+  camino += ` C ${ax + dx} ${ay} ${bx - dx} ${by} ${bx} ${by}`;
+}
+camino += ` L ${ancho + 30} ${puntos[puntos.length - 1][1]}`;
+const colores = ['#ff9900', '#ff57e9', '#ad5cff', '#42b4ff', '#00e582'];
 ---
-<section id="ruta" class="relative mt-16 overflow-hidden" data-horizontal>
-  <div class="contenedor-ruta flex flex-col justify-center py-12 lg:min-h-screen lg:py-16">
-    <div class="mx-auto w-full max-w-7xl px-5">
-      <div class="flex flex-wrap items-end justify-between gap-6">
+<section id="ruta" class="ruta-mapa relative mt-16" data-ruta>
+  <div class="escena-ruta relative" data-escena-ruta>
+    <div class="fondo-ruta pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+      <div class="rejilla absolute inset-0 opacity-15 [mask-image:radial-gradient(ellipse_at_50%_55%,#000,transparent_70%)]"></div>
+    </div>
+
+    <div class="mx-auto flex h-full max-w-7xl flex-col justify-center px-5 py-14 lg:py-8">
+      <div class="flex flex-wrap items-end justify-between gap-4">
         <div class="max-w-2xl">
           <p class="chip" data-reveal>// Tu ruta en la nube</p>
           <Palabras texto="De cero a certificarte, paso a paso" resaltar={['certificarte,']} class="mt-5 text-4xl font-bold leading-tight md:text-5xl" />
         </div>
-        <div class="hidden w-56 lg:block" aria-hidden="true">
-          <div class="h-1 overflow-hidden rounded-full bg-linea"><div class="barra-ruta h-full w-full origin-left scale-x-0 rounded-full bg-gradient-to-r from-magenta via-morado to-azul"></div></div>
-          <p class="mt-2 text-right font-mono text-xs text-suave/60">Sigue bajando →</p>
+        <div class="flex flex-col items-start gap-2 lg:items-end">
+          <p class="ayuda-mapa hidden font-mono text-xs text-suave/60">Baja o toca un nivel</p>
+          <a href="/aprende/#ruta" class="enlace-aws text-sm">Ver la ruta completa <Icono nombre="flecha" class="size-4" /></a>
         </div>
       </div>
-    </div>
 
-    <ol data-carrusel="lg" class="pista-ruta mt-10 flex flex-col gap-6 px-5 lg:mt-12 lg:w-max lg:flex-row lg:pl-[max(1.25rem,calc((100vw-80rem)/2+1.25rem))] lg:pr-[20vw]">
-      {pasos.map((p) => (
-        <li class="tarjeta flex flex-col p-6 lg:w-[26rem] lg:p-8" style={`--acento:${p.c}`} data-tilt>
-          <span class="titulo text-5xl font-bold lg:text-6xl" style="color:var(--acento);opacity:.9">{p.n}</span>
-          <h3 class="titulo mt-4 text-2xl font-semibold lg:mt-6">{p.t}</h3>
-          <p class="mt-3 leading-relaxed">{p.d}</p>
-          <ul class="mt-auto flex flex-wrap gap-2 pt-6 lg:pt-8">
-            {p.s.map((s) => <li class="rounded-full border px-3 py-1 font-mono text-xs" style="border-color:color-mix(in srgb,var(--acento) 50%,transparent);color:var(--acento)">{s}</li>)}
-          </ul>
-        </li>
-      ))}
-    </ol>
+      <!-- Mapa del camino (solo en computadora con animaciones) -->
+      <div class="mapa relative mx-auto mt-6 hidden w-full">
+        <svg viewBox={`0 0 ${ancho} ${alto}`} class="block w-full overflow-visible" aria-hidden="true">
+          <defs>
+            <linearGradient id="degradado-ruta" x1="0" y1="0" x2={ancho} y2="0" gradientUnits="userSpaceOnUse">
+              {colores.map((c, i) => <stop offset={`${(i / (colores.length - 1)) * 100}%`} stop-color={c} />)}
+            </linearGradient>
+            <clipPath id="recorte-viajero"><circle r="22" /></clipPath>
+          </defs>
+          <path d={camino} class="borde-camino" />
+          <path d={camino} class="camino" />
+          <path d={camino} class="linea-central" />
+          <path d={camino} class="avance" data-avance />
+          {puntos.map(([x, y], i) => (
+            <g class="hito" transform={`translate(${x} ${y})`} style={`--c:${colores[i]}`} data-hito={i}>
+              <circle r="38" class="halo-hito" />
+              <circle r="26" class="aro-hito" />
+              <circle r="20" class="nucleo-hito" />
+              <text text-anchor="middle" dy="6" class="num-hito">{niveles[i].n}</text>
+            </g>
+          ))}
+          <g class="viajero" data-viajero>
+            <circle r="40" class="brillo-viajero" />
+            <circle r="27" fill="#161d26" stroke="url(#degradado-ruta)" stroke-width="3" />
+            <image href="/img/logo-192.png" x="-22" y="-22" width="44" height="44" clip-path="url(#recorte-viajero)" />
+          </g>
+        </svg>
+        {puntos.map(([x, y], i) => (
+          <button
+            type="button"
+            class:list={['boton-hito absolute grid size-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full', y > alto / 2 ? 'abajo' : 'arriba']}
+            style={`left:${(x / ancho) * 100}%;top:${(y / alto) * 100}%;--c:${colores[i]}`}
+            data-ir-nivel={i}
+            aria-label={`Nivel ${niveles[i].n}: ${niveles[i].t}`}
+          >
+            <span class="etiqueta-hito pointer-events-none absolute left-1/2 w-max max-w-[13rem] -translate-x-1/2 text-center">
+              <span class="block font-mono text-[0.62rem] uppercase tracking-[0.2em]" style="color:var(--c)">{niveles[i].nivel}</span>
+              <span class="titulo block text-sm font-semibold leading-tight">{niveles[i].t}</span>
+            </span>
+          </button>
+        ))}
+      </div>
+
+      <!-- Niveles: en celular, una línea vertical; en el mapa, un panel a la vez -->
+      <ol class="niveles relative mt-10 pl-12 lg:pl-14">
+        <span class="linea-ruta absolute bottom-6 left-[19px] top-6 w-0.5 bg-linea lg:left-[23px]" aria-hidden="true"></span>
+        <span class="linea-ruta absolute bottom-6 left-[19px] top-6 w-0.5 origin-top bg-gradient-to-b from-naranja via-morado to-menta lg:left-[23px]" data-linea aria-hidden="true"></span>
+        {niveles.map((nv, i) => (
+          <li class="nivel-panel relative" style={`--c:${colores[i]}`} data-panel={i}>
+            <span class="nodo-ruta absolute -left-12 top-6 grid size-10 place-items-center rounded-full border-2 bg-marino font-mono text-xs font-bold lg:-left-14 lg:size-12" aria-hidden="true">{nv.n}</span>
+            <article class="tarjeta-nivel tarjeta grid gap-6 p-6 md:grid-cols-2 lg:grid-cols-[1.15fr_1fr_1fr] lg:gap-8 lg:p-7">
+              <div class="pieza">
+                <div class="flex flex-wrap items-center gap-3">
+                  <span class="titulo text-4xl font-bold" style="color:var(--c)">{nv.n}</span>
+                  <span class="insignia" style="--color-insignia:var(--c)">{nv.nivel}</span>
+                </div>
+                <h3 class="titulo mt-3 text-2xl font-semibold">{nv.t}</h3>
+                <p class="mt-2 leading-relaxed">{nv.resumen}</p>
+              </div>
+              <div class="pieza extra">
+                <p class="text-xs font-semibold uppercase tracking-widest text-suave/70">Qué aprendes</p>
+                <ul class="mt-3 space-y-2">
+                  {nv.aprendes.map((a) => <li class="flex gap-2.5 text-sm"><Icono nombre="check" class="mt-0.5 size-4 shrink-0 text-menta" />{a}</li>)}
+                </ul>
+              </div>
+              <div class="pieza space-y-4 md:col-span-2 lg:col-span-1">
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-widest text-suave/70">Servicios</p>
+                  <ul class="mt-3 flex flex-wrap gap-2">
+                    {nv.servicios.map((s) => <li class="rounded-md border px-2.5 py-1 font-mono text-xs" style="border-color:color-mix(in srgb,var(--c) 45%,transparent);color:var(--c)">{s}</li>)}
+                  </ul>
+                </div>
+                <div class="extra rounded-xl border border-linea bg-marino/60 p-4">
+                  <p class="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-white"><span style="color:var(--c)"><Icono nombre="proyecto" class="size-4" /></span>Proyecto</p>
+                  <p class="mt-2 text-sm leading-relaxed">{nv.proyecto}</p>
+                </div>
+              </div>
+              <button type="button" class="ver-mas hidden items-center justify-center gap-2 rounded-full border border-linea py-2.5 text-sm font-semibold text-white md:col-span-2" aria-expanded="false" data-ver-mas>
+                <span class="texto-ver">Ver qué aprendes y el proyecto</span>
+                <Icono nombre="chevron" class="flecha-ver size-4 rotate-90 transition-transform" />
+              </button>
+            </article>
+          </li>
+        ))}
+      </ol>
+    </div>
   </div>
 </section>
+
+<style>
+  /* Lista vertical (celular y respaldo) */
+  .niveles { display: grid; gap: 1.5rem; }
+  .nodo-ruta { border-color: color-mix(in srgb, var(--c) 55%, var(--color-linea)); color: var(--c); transition: background-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease, scale 0.4s ease; }
+  .nivel-panel.alcanzado .nodo-ruta { background: var(--c); color: var(--color-marino); box-shadow: 0 0 0 6px color-mix(in srgb, var(--c) 20%, transparent), 0 0 30px var(--c); scale: 1.08; }
+  .tarjeta-nivel { border-color: color-mix(in srgb, var(--c) 18%, var(--color-linea)); }
+  /* En celular (con JavaScript) cada nivel muestra lo esencial y despliega el resto con un botón */
+  @media (max-width: 1023px) {
+    .ruta-mapa.con-js .ver-mas { display: flex; }
+    .ruta-mapa.con-js .nivel-panel:not(.abierto) .extra { display: none; }
+    .ruta-mapa.con-js .nivel-panel.abierto .flecha-ver { rotate: -90deg; }
+    .ruta-mapa.con-js .nivel-panel.abierto .extra { animation: desplegar 0.45s cubic-bezier(0.2, 0.7, 0.2, 1); }
+  }
+  @keyframes desplegar { from { opacity: 0; translate: 0 -8px; } }
+
+  /* Camino del mapa */
+  .borde-camino { fill: none; stroke: #2b3542; stroke-width: 46; stroke-linecap: round; }
+  .camino { fill: none; stroke: #19212b; stroke-width: 40; stroke-linecap: round; }
+  .linea-central { fill: none; stroke: #3a4655; stroke-width: 2; stroke-dasharray: 12 14; }
+  .avance { fill: none; stroke: url(#degradado-ruta); stroke-width: 8; stroke-linecap: round; filter: drop-shadow(0 0 8px rgb(255 87 233 / 0.55)); }
+  .halo-hito { fill: var(--c); opacity: 0; transition: opacity 0.4s ease; }
+  .aro-hito { fill: #161d26; stroke: #3a4655; stroke-width: 2; transition: stroke 0.4s ease; }
+  .nucleo-hito { fill: #1e2732; transition: fill 0.4s ease; }
+  .num-hito { fill: #c9ccd1; font: 700 15px ui-monospace, monospace; transition: fill 0.4s ease; }
+  .hito.alcanzado .aro-hito { stroke: var(--c); }
+  .hito.alcanzado .nucleo-hito { fill: var(--c); }
+  .hito.alcanzado .num-hito { fill: #161d26; }
+  .hito.activo .halo-hito { opacity: 0.22; animation: latir-hito 1.6s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+  @keyframes latir-hito { 50% { transform: scale(1.25); opacity: 0.08; } }
+  .brillo-viajero { fill: #ff57e9; opacity: 0.18; filter: blur(6px); }
+  .viajero { transition: none; }
+
+  /* Etiquetas y botones de cada nivel */
+  .boton-hito { cursor: pointer; }
+  .boton-hito.abajo .etiqueta-hito { top: calc(100% + 0.25rem); }
+  .boton-hito.arriba .etiqueta-hito { bottom: calc(100% + 0.25rem); }
+  .etiqueta-hito { opacity: 0.55; transition: opacity 0.3s ease, translate 0.3s ease; }
+  .boton-hito:hover .etiqueta-hito,
+  .boton-hito:focus-visible .etiqueta-hito,
+  .boton-hito.activo .etiqueta-hito { opacity: 1; }
+  .boton-hito:focus-visible { outline-offset: 0; }
+
+  /* Modo mapa (computadora con animaciones): escena fija y un panel a la vez */
+  .ruta-mapa.modo-mapa .escena-ruta { height: calc(100svh - 72px); }
+  .ruta-mapa.modo-mapa .mapa { display: block; max-width: min(100%, calc((100svh - 34rem) * 3.75)); }
+  .ruta-mapa.modo-mapa .ayuda-mapa { display: block; }
+  .ruta-mapa.modo-mapa .niveles { margin-top: 1.5rem; padding-left: 0; }
+  .ruta-mapa.modo-mapa .niveles > * { grid-area: 1 / 1; }
+  .ruta-mapa.modo-mapa .linea-ruta,
+  .ruta-mapa.modo-mapa .nodo-ruta { display: none; }
+  .ruta-mapa.modo-mapa .nivel-panel { opacity: 0; visibility: hidden; transition: opacity 0.45s ease, visibility 0.45s; }
+  .ruta-mapa.modo-mapa .nivel-panel .pieza { opacity: 0; translate: 0 18px; filter: blur(4px); transition: opacity 0.5s ease, translate 0.6s cubic-bezier(0.2, 0.7, 0.2, 1), filter 0.5s ease; }
+  .ruta-mapa.modo-mapa .nivel-panel.activo { opacity: 1; visibility: visible; }
+  .ruta-mapa.modo-mapa .nivel-panel.activo .pieza { opacity: 1; translate: 0 0; filter: none; }
+  .ruta-mapa.modo-mapa .nivel-panel.activo .pieza:nth-child(2) { transition-delay: 0.08s; }
+  .ruta-mapa.modo-mapa .nivel-panel.activo .pieza:nth-child(3) { transition-delay: 0.16s; }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+
+  const seccion = document.querySelector<HTMLElement>('[data-ruta]');
+  const escena = seccion?.querySelector<HTMLElement>('[data-escena-ruta]');
+  if (seccion && escena) {
+    const paneles = Array.from(seccion.querySelectorAll<HTMLElement>('[data-panel]'));
+    const hitos = Array.from(seccion.querySelectorAll<SVGGElement>('[data-hito]'));
+    const botones = Array.from(seccion.querySelectorAll<HTMLButtonElement>('[data-ir-nivel]'));
+    const avance = seccion.querySelector<SVGPathElement>('[data-avance]');
+    const viajero = seccion.querySelector<SVGGElement>('[data-viajero]');
+    const n = paneles.length;
+    const mm = gsap.matchMedia();
+
+    // Botón "Ver qué aprendes y el proyecto" (celular)
+    seccion.classList.add('con-js');
+    seccion.querySelectorAll<HTMLButtonElement>('[data-ver-mas]').forEach((b) => {
+      b.addEventListener('click', () => {
+        const panel = b.closest<HTMLElement>('[data-panel]')!;
+        const abierto = panel.classList.toggle('abierto');
+        b.setAttribute('aria-expanded', String(abierto));
+        b.querySelector('.texto-ver')!.textContent = abierto ? 'Ver menos' : 'Ver qué aprendes y el proyecto';
+        ScrollTrigger.refresh();
+      });
+    });
+
+    // Computadora: el camino se dibuja con el scroll y el jaguar viaja de un nivel al siguiente
+    mm.add('(min-width: 1024px) and (prefers-reduced-motion: no-preference)', () => {
+      if (!avance || !viajero) return;
+      seccion.classList.add('modo-mapa');
+      const largo = avance.getTotalLength();
+      // Distancia sobre el camino de cada nivel (el punto del camino más cercano a cada hito)
+      const enCamino = hitos.map((h) => {
+        const m = h.transform.baseVal.consolidate()?.matrix;
+        const hx = m?.e ?? 0;
+        const hy = m?.f ?? 0;
+        let mejor = 0;
+        let dist = Infinity;
+        for (let l = 0; l <= largo; l += largo / 800) {
+          const p = avance.getPointAtLength(l);
+          const d = (p.x - hx) ** 2 + (p.y - hy) ** 2;
+          if (d < dist) { dist = d; mejor = l; }
+        }
+        return mejor;
+      });
+      const inicio = enCamino[0];
+      const fin = enCamino[n - 1];
+      const fracciones = enCamino.map((l) => (l - inicio) / (fin - inicio));
+      avance.style.strokeDasharray = `${largo}`;
+
+      let activo = -1;
+      const pintar = (p: number) => {
+        const l = inicio + p * (fin - inicio);
+        avance.style.strokeDashoffset = `${largo - l}`;
+        const punto = avance.getPointAtLength(l);
+        viajero.setAttribute('transform', `translate(${punto.x} ${punto.y})`);
+        let i = 0;
+        fracciones.forEach((f, k) => { if (p >= f - 0.02) i = k; });
+        hitos.forEach((h, k) => h.classList.toggle('alcanzado', k <= i));
+        if (i === activo) return;
+        activo = i;
+        hitos.forEach((h, k) => h.classList.toggle('activo', k === i));
+        botones.forEach((b, k) => { b.classList.toggle('activo', k === i); b.setAttribute('aria-current', String(k === i)); });
+        paneles.forEach((pn, k) => pn.classList.toggle('activo', k === i));
+      };
+
+      const estado = { p: 0 };
+      const tween = gsap.to(estado, {
+        p: 1,
+        ease: 'none',
+        onUpdate: () => pintar(estado.p),
+        scrollTrigger: {
+          trigger: escena,
+          start: 'top top+=72',
+          end: () => `+=${(n - 1) * window.innerHeight * 0.75}`,
+          pin: true,
+          scrub: 0.7,
+          snap: { snapTo: fracciones, duration: { min: 0.2, max: 0.6 }, delay: 0.1, ease: 'power2.inOut' },
+          invalidateOnRefresh: true,
+        },
+      });
+      pintar(0);
+
+      // Tocar un nivel lleva directo a él
+      const st = tween.scrollTrigger!;
+      const alClic = (e: Event) => {
+        const i = Number((e.currentTarget as HTMLElement).dataset.irNivel);
+        const destino = st.start + (st.end - st.start) * fracciones[i] + 1;
+        const lenis = (window as unknown as { lenis?: { scrollTo: (y: number, o?: object) => void } }).lenis;
+        if (lenis) lenis.scrollTo(destino, { duration: 1.2 });
+        else window.scrollTo({ top: destino, behavior: 'smooth' });
+      };
+      botones.forEach((b) => b.addEventListener('click', alClic));
+
+      return () => {
+        seccion.classList.remove('modo-mapa');
+        botones.forEach((b) => b.removeEventListener('click', alClic));
+      };
+    });
+
+    // Celular y tableta: cada nivel se enciende y aparece al llegar a él
+    mm.add('(max-width: 1023px) and (prefers-reduced-motion: no-preference)', () => {
+      paneles.forEach((pn) => {
+        ScrollTrigger.create({ trigger: pn, start: 'top 70%', onEnter: () => pn.classList.add('alcanzado'), onLeaveBack: () => pn.classList.remove('alcanzado') });
+        gsap.from(pn.querySelector('.tarjeta-nivel'), { y: 50, opacity: 0, duration: 0.9, ease: 'power3.out', scrollTrigger: { trigger: pn, start: 'top 85%' } });
+      });
+    });
+  }
+</script>

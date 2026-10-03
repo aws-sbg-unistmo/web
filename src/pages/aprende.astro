@@ -6,7 +6,7 @@ import Palabras from '../components/Palabras.astro';
 import Icono from '../components/Icono.astro';
 import Mosaico from '../components/Mosaico.astro';
 import LlamadoFinal from '../components/LlamadoFinal.astro';
-import { categorias, certificaciones, glosario, recursos, regionMexico, temas } from '../data/contenido';
+import { categorias, certificaciones, glosario, niveles, recursos, regionMexico, temas } from '../data/contenido';
 
 // Las seis ventajas de la nube que AWS explica en su introducción "Overview of Amazon Web Services"
 const ventajas = [
@@ -18,38 +18,6 @@ const ventajas = [
   { t: 'Global en minutos', d: 'Publica tu aplicación en distintas regiones del mundo para estar cerca de tus usuarios.' },
 ];
 
-const niveles = [
-  {
-    n: '01', t: 'Fundamentos de la nube', nivel: 'Principiante', c: 'var(--color-naranja)',
-    aprendes: ['Qué es la nube y cómo se organiza AWS', 'Crear tu cuenta y protegerla con MFA', 'Usuarios y permisos con IAM', 'Alertas de presupuesto para no gastar de más'],
-    servicios: ['AWS IAM', 'AWS Budgets', 'Consola de AWS'],
-    proyecto: 'Deja lista una cuenta segura: MFA, un usuario con permisos mínimos y una alerta de gasto.',
-  },
-  {
-    n: '02', t: 'Tu primer sitio en la nube', nivel: 'Principiante', c: 'var(--color-magenta)',
-    aprendes: ['Guardar archivos en buckets de S3', 'Publicar un sitio web estático', 'Entregarlo rápido y con HTTPS desde una CDN'],
-    servicios: ['Amazon S3', 'Amazon CloudFront'],
-    proyecto: 'Publica tu portafolio personal en la nube, con tu propio enlace.',
-  },
-  {
-    n: '03', t: 'Apps sin servidores', nivel: 'Intermedio', c: 'var(--color-morado)',
-    aprendes: ['Funciones que corren solo cuando se necesitan', 'Crear y proteger una API', 'Guardar datos en una base NoSQL', 'Describir tu infraestructura como código'],
-    servicios: ['AWS Lambda', 'Amazon API Gateway', 'Amazon DynamoDB', 'AWS SAM'],
-    proyecto: 'Un formulario que guarda registros y avisa por correo, como el de esta página.',
-  },
-  {
-    n: '04', t: 'IA generativa', nivel: 'Intermedio', c: 'var(--color-azul)',
-    aprendes: ['Qué es un modelo fundacional', 'Escribir buenas instrucciones (prompts)', 'Responder con tus propios documentos (RAG)', 'Agentes que usan herramientas'],
-    servicios: ['Amazon Bedrock', 'Bedrock Knowledge Bases', 'Agentes de IA'],
-    proyecto: 'Un asistente que responde dudas sobre los trámites de tu carrera usando sus documentos.',
-  },
-  {
-    n: '05', t: 'Certifícate', nivel: 'Meta', c: 'var(--color-menta)',
-    aprendes: ['Repasar los temas oficiales del examen', 'Practicar con preguntas tipo examen', 'Estudiar en grupo y resolver dudas'],
-    servicios: ['Cloud Practitioner', 'AI Practitioner'],
-    proyecto: 'Un plan de estudio en grupo de varias semanas, hasta el día del examen.',
-  },
-];
 const quitarAcentos = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 ---
 <Layout titulo="Aprende" precargar="/img/cabecera-aprende.jpg" descripcion="Qué es la nube, servicios de AWS, ruta de aprendizaje, certificaciones, glosario y recursos gratuitos para estudiantes.">

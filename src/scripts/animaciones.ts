@@ -107,20 +107,6 @@ if (reducir) {
     });
   });
 
-  // Secciones con scroll horizontal fijado (solo en pantallas grandes)
-  const mm = gsap.matchMedia();
-  mm.add('(min-width: 1024px)', () => {
-    todos('[data-horizontal]').forEach((seccion) => {
-      const pista = seccion.querySelector<HTMLElement>('.pista-ruta');
-      if (!pista) return;
-      const distancia = () => Math.max(0, pista.scrollWidth - window.innerWidth);
-      const comun = { trigger: seccion, start: 'top top', end: () => `+=${distancia()}`, scrub: 0.8, invalidateOnRefresh: true };
-      gsap.to(pista, { x: () => -distancia(), ease: 'none', scrollTrigger: { ...comun, pin: true, anticipatePin: 1 } });
-      const barra = seccion.querySelector('.barra-ruta');
-      if (barra) gsap.to(barra, { scaleX: 1, ease: 'none', scrollTrigger: comun });
-    });
-  });
-
   // Etiquetas tipo terminal: el texto se "descifra" al aparecer
   const signos = '!<>-_\\/[]{}=+*^?#01';
   // Las de los encabezados ya entran con CSS (.entrada): si cambiaran su texto tarde, el navegador las tomaría como
