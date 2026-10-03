@@ -79,6 +79,24 @@ import { site } from '../data/site';
         <span class="inline-flex items-center gap-1.5"><span class="text-menta">✓</span> Para todas las carreras</span>
       </p>
 
+      {site.usarMascota && (
+        <>
+          <!-- En celular el video se muestra aquí, en una tarjeta, en lugar de ir detrás del texto -->
+          <div id="tarjeta-video" class="entrada relative mt-10 aspect-[16/11] overflow-hidden rounded-3xl border border-linea shadow-[0_30px_80px_-30px_rgba(255,87,233,0.45)] md:hidden" style="--d:0.5s" aria-hidden="true">
+            <div class="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-16 bg-gradient-to-t from-marino/80 to-transparent"></div>
+          </div>
+          <script is:inline>
+            (function () {
+              var tarjeta = document.getElementById('tarjeta-video');
+              var video = document.getElementById('video-portada');
+              if (!tarjeta || !video || !matchMedia('(max-width: 767px)').matches) return;
+              video.className = 'absolute inset-0 size-full object-cover object-[74%_center]';
+              tarjeta.prepend(video);
+            })();
+          </script>
+        </>
+      )}
+
       <div class="entrada mt-10 inline-flex items-center gap-3 rounded-xl border border-linea bg-marino/70 px-4 py-3 font-mono text-sm backdrop-blur" style="--d:0.55s">
         <span class="text-menta">~/unistmo</span>
         <span class="text-magenta">$</span>
