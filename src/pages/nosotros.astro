@@ -214,11 +214,11 @@ const iniciales = (n: string) => n.split(' ').filter(Boolean).slice(0, 2).map((p
     ) : (
       <>
         <p class="mt-5 max-w-2xl text-lg leading-relaxed" data-reveal>
-          Somos {equipo.length} estudiantes de la UNISTMO que organizamos el grupo, los talleres y los eventos.
+          Somos estudiantes de la UNISTMO que organizamos el grupo, los talleres y los eventos.
         </p>
-        <ul class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" data-stagger>
+        <ul class:list={['mt-12 grid gap-6 sm:grid-cols-2', equipo.length === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3']} data-stagger>
           {equipo.map((p, i) => (
-            <li class:list={['tarjeta relative flex flex-col overflow-hidden p-7', i === 0 && 'sm:col-span-2 lg:col-span-1']} data-tilt>
+            <li class:list={['tarjeta relative flex flex-col overflow-hidden p-7', i === 0 && equipo.length % 2 === 1 && 'sm:col-span-2', i === 0 && equipo.length === 5 && 'lg:col-span-2', i === 0 && equipo.length !== 5 && 'lg:col-span-1']} data-tilt>
               {i === 0 && <div class="absolute -right-16 -top-16 size-48 rounded-full bg-magenta/15 blur-3xl" aria-hidden="true"></div>}
               {p.foto ? (
                 <img src={p.foto} alt="" width="160" height="160" loading="lazy" class="relative size-20 rounded-2xl object-cover ring-2 ring-magenta/40" />
@@ -229,10 +229,11 @@ const iniciales = (n: string) => n.split(' ').filter(Boolean).slice(0, 2).map((p
               <p class="relative mt-1 font-medium text-magenta">{p.rol}</p>
               {p.carrera && <p class="relative mt-1 text-sm text-suave/80">{p.carrera}</p>}
               {descripcionRol[p.rol] && <p class="relative mt-4 text-sm leading-relaxed">{descripcionRol[p.rol]}</p>}
-              {p.linkedin && (
-                <a href={p.linkedin} target="_blank" rel="noopener" class="enlace-aws relative mt-auto pt-6 text-sm">
-                  LinkedIn <Icono nombre="externo" class="size-4" />
-                </a>
+              {(p.linkedin || p.instagram) && (
+                <span class="relative mt-auto flex flex-wrap gap-x-5 gap-y-1 pt-6">
+                  {p.linkedin && <a href={p.linkedin} target="_blank" rel="noopener" class="enlace-aws text-sm">LinkedIn <Icono nombre="externo" class="size-4" /></a>}
+                  {p.instagram && <a href={p.instagram} target="_blank" rel="noopener" class="enlace-aws text-sm">Instagram <Icono nombre="externo" class="size-4" /></a>}
+                </span>
               )}
             </li>
           ))}

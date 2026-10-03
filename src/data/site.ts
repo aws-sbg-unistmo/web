@@ -71,13 +71,16 @@ export const servicios = [
 ];
 
 // Core Team. Para agregar a alguien basta con sumar un objeto. "foto" es opcional (una imagen cuadrada en public/img/equipo/).
-export type Integrante = { nombre: string; rol: string; carrera?: string; linkedin?: string; foto?: string };
+export type Integrante = { nombre: string; rol: string; carrera?: string; linkedin?: string; instagram?: string; foto?: string };
 export const equipo: Integrante[] = [
   {
     nombre: 'Jean Paul Gallegos Cruz',
     rol: 'Group Leader',
     linkedin: 'https://www.linkedin.com/in/jeanpaulgc',
   },
+  { nombre: 'Joan Garfias', rol: 'Core Team', instagram: 'https://www.instagram.com/joangarfias_/' },
+  { nombre: 'Jeovani Pacheco Bautista', rol: 'Core Team', instagram: 'https://www.instagram.com/jeovanipachecobautista/' },
+  { nombre: 'Gerónimo', rol: 'Core Team' },
 ];
 
 // Comunidades, empresas e instituciones aliadas. Con la lista vacía la página muestra cómo ser aliado.
