@@ -171,10 +171,23 @@ export const regionMexico = {
   zonas: 3,
 };
 
-// Ruta de aprendizaje: la usan el roadmap del inicio y la página Aprende
-export const niveles = [
+// Ruta de aprendizaje: la usan el roadmap del inicio y la página Aprende.
+// "pose": imagen del jaguar en public/img/mascota; "mosaicos": servicios que aparecen junto al nivel en el mapa.
+export const niveles: {
+  n: string; t: string; nivel: string; c: string; pose: string;
+  mosaicos: { categoria: Categoria; icono: 'escudo' | 'globo' | 'nube' | 'rayo' | 'flecha' | 'base' | 'chispa' | 'certificado' | 'check' }[];
+  referencias: { texto: string; url: string }[];
+  resumen: string; aprendes: string[]; servicios: string[]; proyecto: string;
+}[] = [
   {
     n: '01', t: 'Fundamentos de la nube', nivel: 'Principiante', c: 'var(--color-naranja)',
+    pose: '08-leyendo',
+    mosaicos: [{ categoria: 'seguridad', icono: 'escudo' }, { categoria: 'redes', icono: 'globo' }],
+    referencias: [
+      { texto: 'Primeros pasos en AWS', url: 'https://aws.amazon.com/es/getting-started/' },
+      { texto: 'Guía de IAM', url: 'https://docs.aws.amazon.com/es_es/IAM/latest/UserGuide/introduction.html' },
+      { texto: 'AWS Budgets', url: 'https://aws.amazon.com/es/aws-cost-management/aws-budgets/' },
+    ],
     resumen: 'Qué es AWS, regiones, tu cuenta con seguridad (IAM) y alertas de presupuesto para no gastar de más.',
     aprendes: ['Qué es la nube y cómo se organiza AWS', 'Crear tu cuenta y protegerla con MFA', 'Usuarios y permisos con IAM', 'Alertas de presupuesto para no gastar de más'],
     servicios: ['AWS IAM', 'AWS Budgets', 'Consola de AWS'],
@@ -182,6 +195,12 @@ export const niveles = [
   },
   {
     n: '02', t: 'Tu primer sitio en la nube', nivel: 'Principiante', c: 'var(--color-magenta)',
+    pose: '07-sentado-en-servidor',
+    mosaicos: [{ categoria: 'almacenamiento', icono: 'nube' }, { categoria: 'redes', icono: 'globo' }],
+    referencias: [
+      { texto: 'Sitio estático en S3', url: 'https://docs.aws.amazon.com/es_es/AmazonS3/latest/userguide/WebsiteHosting.html' },
+      { texto: 'Amazon CloudFront', url: 'https://aws.amazon.com/es/cloudfront/' },
+    ],
     resumen: 'Publicas una página web en minutos con almacenamiento y distribución global, igual que esta.',
     aprendes: ['Guardar archivos en buckets de S3', 'Publicar un sitio web estático', 'Entregarlo rápido y con HTTPS desde una CDN'],
     servicios: ['Amazon S3', 'Amazon CloudFront'],
@@ -189,6 +208,13 @@ export const niveles = [
   },
   {
     n: '03', t: 'Apps sin servidores', nivel: 'Intermedio', c: 'var(--color-morado)',
+    pose: '12-audifonos',
+    mosaicos: [{ categoria: 'computo', icono: 'rayo' }, { categoria: 'redes', icono: 'flecha' }, { categoria: 'bases', icono: 'base' }],
+    referencias: [
+      { texto: 'AWS Lambda', url: 'https://aws.amazon.com/es/lambda/' },
+      { texto: 'Serverless Land', url: 'https://serverlessland.com/' },
+      { texto: 'AWS SAM', url: 'https://aws.amazon.com/es/serverless/sam/' },
+    ],
     resumen: 'Creas APIs y funciones que escalan solas y solo cobran cuando se usan.',
     aprendes: ['Funciones que corren solo cuando se necesitan', 'Crear y proteger una API', 'Guardar datos en una base NoSQL', 'Describir tu infraestructura como código'],
     servicios: ['AWS Lambda', 'Amazon API Gateway', 'Amazon DynamoDB', 'AWS SAM'],
@@ -196,6 +222,12 @@ export const niveles = [
   },
   {
     n: '04', t: 'IA generativa', nivel: 'Intermedio', c: 'var(--color-azul)',
+    pose: '06-nube-brillante',
+    mosaicos: [{ categoria: 'ia', icono: 'chispa' }, { categoria: 'computo', icono: 'rayo' }],
+    referencias: [
+      { texto: 'Amazon Bedrock', url: 'https://aws.amazon.com/es/bedrock/' },
+      { texto: 'PartyRock (gratis)', url: 'https://partyrock.aws/' },
+    ],
     resumen: 'Usas modelos fundacionales para crear asistentes y agentes que resuelven problemas reales.',
     aprendes: ['Qué es un modelo fundacional', 'Escribir buenas instrucciones (prompts)', 'Responder con tus propios documentos (RAG)', 'Agentes que usan herramientas'],
     servicios: ['Amazon Bedrock', 'Bedrock Knowledge Bases', 'Agentes de IA'],
@@ -203,6 +235,13 @@ export const niveles = [
   },
   {
     n: '05', t: 'Certifícate', nivel: 'Meta', c: 'var(--color-menta)',
+    pose: '03-celebrando',
+    mosaicos: [{ categoria: 'ia', icono: 'certificado' }, { categoria: 'computo', icono: 'check' }],
+    referencias: [
+      { texto: 'Cloud Practitioner', url: 'https://aws.amazon.com/es/certification/certified-cloud-practitioner/' },
+      { texto: 'AI Practitioner', url: 'https://aws.amazon.com/es/certification/certified-ai-practitioner/' },
+      { texto: 'AWS Skill Builder', url: 'https://skillbuilder.aws/' },
+    ],
     resumen: 'Preparamos juntos tu primera certificación de AWS para que lo aprendido cuente en tu CV.',
     aprendes: ['Repasar los temas oficiales del examen', 'Practicar con preguntas tipo examen', 'Estudiar en grupo y resolver dudas'],
     servicios: ['Cloud Practitioner', 'AI Practitioner'],

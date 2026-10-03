@@ -265,6 +265,7 @@ const dos = (n: number) => String(n).padStart(2, '0');
       gsap.set(miembros.slice(1), { autoAlpha: 0 });
       gsap.set(seccion.querySelectorAll('.lienzo'), { clipPath: 'inset(0% 0% 0% 0% round 2rem)' });
 
+      const entradaRef: { t?: gsap.core.Timeline } = {};
       const tl = gsap.timeline({
         defaults: { ease: 'power3.inOut' },
         scrollTrigger: {
@@ -275,7 +276,10 @@ const dos = (n: number) => String(n).padStart(2, '0');
           scrub: 0.9,
           snap: n > 1 ? { snapTo: 'labels', duration: { min: 0.25, max: 0.7 }, delay: 0.08, ease: 'power2.inOut' } : undefined,
           invalidateOnRefresh: true,
-          onUpdate: (st) => activar(Math.round(st.progress * (n - 1))),
+          onUpdate: (st) => {
+            if (st.progress > 0.01 && entradaRef.t && entradaRef.t.progress() < 1) entradaRef.t.progress(1);
+            activar(Math.round(st.progress * (n - 1)));
+          },
         },
       });
       tl.addLabel('m0');
@@ -283,14 +287,16 @@ const dos = (n: number) => String(n).padStart(2, '0');
         const a = miembros[i - 1];
         const b = miembros[i];
         const s = `s${i}`;
+        // Salida con valores de inicio explícitos: al regresar, el integrante siempre vuelve completo
+        const sinRender = { immediateRender: false };
         tl.addLabel(s, '+=0.25')
-          .to(a.querySelectorAll('.t-linea'), { y: -60, autoAlpha: 0, stagger: 0.04, duration: 0.5, ease: 'power2.in' }, s)
-          .to(a.querySelector('.lienzo'), { clipPath: 'inset(0% 0% 100% 0% round 2rem)', duration: 0.6 }, s)
-          .to(a.querySelector('.capa'), { scale: 1.25, rotation: 5, duration: 0.6 }, s)
-          .to(a.querySelector('.marco'), { rotation: 60, scale: 0.6, autoAlpha: 0, duration: 0.6 }, s)
-          .to(a.querySelector('.numero'), { yPercent: -70, autoAlpha: 0, duration: 0.6 }, s)
-          .to(a.querySelector('.orbita'), { scale: 1.5, autoAlpha: 0, duration: 0.6 }, s)
-          .to(a.querySelectorAll('.flotante'), { y: -160, autoAlpha: 0, duration: 0.5 }, s)
+          .fromTo(a.querySelectorAll('.t-linea'), { y: 0, autoAlpha: 1 }, { y: -60, autoAlpha: 0, stagger: 0.04, duration: 0.5, ease: 'power2.in', ...sinRender }, s)
+          .fromTo(a.querySelector('.lienzo'), { clipPath: 'inset(0% 0% 0% 0% round 2rem)' }, { clipPath: 'inset(0% 0% 100% 0% round 2rem)', duration: 0.6, ...sinRender }, s)
+          .fromTo(a.querySelector('.capa'), { scale: 1, rotation: 0 }, { scale: 1.25, rotation: 5, duration: 0.6, ...sinRender }, s)
+          .fromTo(a.querySelector('.marco'), { rotation: 9, scale: 1, autoAlpha: 0.85 }, { rotation: 60, scale: 0.6, autoAlpha: 0, duration: 0.6, ...sinRender }, s)
+          .fromTo(a.querySelector('.numero'), { yPercent: 0, autoAlpha: 0.6 }, { yPercent: -70, autoAlpha: 0, duration: 0.6, ...sinRender }, s)
+          .fromTo(a.querySelector('.orbita'), { scale: 1, autoAlpha: 1 }, { scale: 1.5, autoAlpha: 0, duration: 0.6, ...sinRender }, s)
+          .fromTo(a.querySelectorAll('.flotante'), { y: 0, autoAlpha: 1, scale: 1 }, { y: -160, autoAlpha: 0, duration: 0.5, ...sinRender }, s)
           .set(a, { autoAlpha: 0 }, `${s}+=0.6`)
           .set(b, { autoAlpha: 1 }, `${s}+=0.3`)
           .fromTo(b.querySelector('.lienzo'), { clipPath: 'inset(100% 0% 0% 0% round 2rem)' }, { clipPath: 'inset(0% 0% 0% 0% round 2rem)', duration: 0.75 }, `${s}+=0.3`)
@@ -328,12 +334,14 @@ const dos = (n: number) => String(n).padStart(2, '0');
         .fromTo(m0.querySelectorAll('.t-linea'), { y: 60, autoAlpha: 0 }, { y: 0, autoAlpha: 1, stagger: 0.07, duration: 0.8 }, 0.25)
         .fromTo(m0.querySelectorAll('.flotante'), { y: 120, autoAlpha: 0, scale: 0.6 }, { y: 0, autoAlpha: 1, scale: 1, stagger: 0.12, duration: 0.9, ease: 'back.out(1.5)' }, 0.45);
       if (riel) entrada.fromTo(riel, { x: 40, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: 0.8 }, 0.3);
+      entradaRef.t = entrada;
       // La animación va ligada a su ScrollTrigger para que su estado inicial (oculto) se respete al recalcular
       ScrollTrigger.create({
         trigger: escenario,
         start: 'top 72%',
         animation: entrada,
-        toggleActions: 'play none none reverse',
+        toggleActions: 'play none none none',
+        once: true,
         // Nombre que se descifra y glitch justo cuando aparece
         onEnter: () => setTimeout(() => { if (activo === 0) { activo = -1; activar(0); } }, 300),
       });

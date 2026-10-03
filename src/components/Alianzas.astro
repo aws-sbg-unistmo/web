@@ -1,10 +1,12 @@
 ---
-// Alianzas: carrusel infinito con la página web, el logo y la información de cada aliado (de "alianzas" en src/data/site.ts).
-// Se detiene al pasar el cursor o al enfocar un enlace. Con "reducir movimiento" se convierte en una fila que se desliza a mano.
+// Alianzas: carrusel infinito con el logo, la información y el enlace de cada aliado (de "alianzas" en src/data/site.ts).
+// Al tocar una tarjeta se abre una ventana con todas sus redes. El carrusel no se detiene con el cursor; tiene un botón
+// para pausarlo (contenido en movimiento) y con "reducir movimiento" se vuelve una fila que se desliza a mano.
 // Mientras haya pocos aliados, se intercala una tarjeta para invitar a otras comunidades.
 import Icono from './Icono.astro';
+import LogoRed from './LogoRed.astro';
 import Palabras from './Palabras.astro';
-import { alianzas, type Alianza } from '../data/site';
+import { alianzas, type Alianza, type Red } from '../data/site';
 
 const tipos = [
   { icono: 'usuarios', t: 'Comunidades tech', d: 'Organizamos eventos en conjunto y compartimos ponentes y difusión.', c: 'var(--color-magenta)' },
@@ -12,22 +14,26 @@ const tipos = [
   { icono: 'libro', t: 'Instituciones educativas', d: 'Intercambio con otras universidades y grupos estudiantiles.', c: 'var(--color-azul)' },
   { icono: 'microfono', t: 'Medios y creadores', d: 'Difusión de eventos y contenido de tecnología para la región.', c: 'var(--color-menta)' },
 ] as const;
+const nombreRed: Record<Red['tipo'], string> = {
+  linkedin: 'LinkedIn', instagram: 'Instagram', github: 'GitHub', youtube: 'YouTube',
+  tiktok: 'TikTok', x: 'X', facebook: 'Facebook', web: 'Sitio web',
+};
 const iniciales = (n: string) => n.split(' ').filter(Boolean).slice(0, 2).map((p) => p[0]).join('').toUpperCase();
 const dominio = (url?: string) => (url ? new URL(url).hostname.replace(/^www\./, '') : '');
 
 // Elementos del carrusel: los aliados (y la invitación, si son pocos) intercalados con frases, como una cinta.
 // Se repiten hasta llenar la pista.
-type Elemento = { tipo: 'aliado'; a: Alianza } | { tipo: 'invitacion' } | { tipo: 'frase'; texto: string };
+type Elemento = { tipo: 'aliado'; a: Alianza; i: number } | { tipo: 'invitacion' } | { tipo: 'frase'; texto: string };
 const frases = ['Aprendemos en comunidad', 'Construimos juntos', 'Del Istmo al mundo', 'Tecnología desde Oaxaca'];
-const tarjetas: Elemento[] = [...alianzas.map((a) => ({ tipo: 'aliado' as const, a })), ...(alianzas.length < 4 ? [{ tipo: 'invitacion' as const }] : [])];
+const tarjetas: Elemento[] = [...alianzas.map((a, i) => ({ tipo: 'aliado' as const, a, i })), ...(alianzas.length < 4 ? [{ tipo: 'invitacion' as const }] : [])];
 const ronda: Elemento[] = [];
 let f = 0;
 while (alianzas.length && ronda.length < 6) {
   for (const t of tarjetas) ronda.push(t, { tipo: 'frase', texto: frases[f++ % frases.length] });
 }
-const duracion = Math.max(35, ronda.length * 7);
+const duracion = Math.max(30, ronda.length * 6);
 ---
-<section id="alianzas" class="mt-28">
+<section id="alianzas" class="mt-28" data-alianzas>
   <div class="mx-auto max-w-7xl px-5">
     <div class="flex flex-wrap items-end justify-between gap-6">
       <div class="max-w-2xl">
@@ -35,6 +41,7 @@ const duracion = Math.max(35, ronda.length * 7);
         <Palabras texto="Construimos junto a otras comunidades" resaltar={['comunidades']} class="mt-5 text-4xl font-bold leading-tight md:text-5xl" />
         <p class="mt-5 text-lg leading-relaxed" data-reveal>
           Comunidades y organizaciones con las que aprendemos, organizamos eventos y acercamos la tecnología al Istmo.
+          Toca una para ver sus redes.
         </p>
       </div>
       <a href="/contacto/?motivo=alianza" class="boton boton-primario" data-reveal data-magnetico>Quiero ser aliado <Icono nombre="flecha" class="size-5" /></a>
@@ -42,58 +49,93 @@ const duracion = Math.max(35, ronda.length * 7);
   </div>
 
   {ronda.length > 0 && (
-    <div class="marquesina relative mt-12 overflow-hidden py-4" style={`--duracion:${duracion}s`} data-reveal>
-      <ul class="pista flex w-max gap-6 pl-6">
-        {[0, 1].map((copia) =>
-          ronda.map((e) => (
-            <li class="shrink-0" aria-hidden={copia === 1 ? 'true' : undefined}>
-              {e.tipo === 'frase' ? (
-                <span class="flex h-full items-center gap-6 px-2">
-                  <span class="size-2 rotate-45 bg-magenta" aria-hidden="true"></span>
-                  <span class="whitespace-nowrap font-display text-2xl font-semibold tracking-tight text-suave/40 sm:text-4xl">{e.texto}</span>
-                </span>
-              ) : e.tipo === 'aliado' ? (
-                <a href={e.a.url} target="_blank" rel="noopener" tabindex={copia === 1 ? -1 : undefined} class="aliado group flex w-[19rem] flex-col overflow-hidden rounded-3xl border border-linea bg-marino-2 transition-colors hover:border-white/25 sm:w-[25rem]">
-                  <div class="relative">
-                    <div class="flex items-center gap-2 border-b border-linea bg-marino px-4 py-2.5">
-                      <span class="size-2.5 rounded-full bg-[#ff5f57]"></span><span class="size-2.5 rounded-full bg-[#febc2e]"></span><span class="size-2.5 rounded-full bg-[#28c840]"></span>
-                      <span class="ml-2 flex-1 truncate rounded-md bg-marino-2 px-3 py-1 text-center font-mono text-[0.68rem] text-suave/80">{dominio(e.a.url)}</span>
-                    </div>
-                    <div class="aspect-[16/10] overflow-hidden bg-marino">
-                      {e.a.sitio ? (
-                        <img src={e.a.sitio} alt={`Página web de ${e.a.nombre}`} width="800" height="500" loading="lazy" class="size-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.04]" />
+    <div class="relative mt-12" data-reveal>
+      <div class="marquesina relative overflow-hidden py-4" style={`--duracion:${duracion}s`}>
+        <ul class="pista flex w-max items-stretch gap-6 pl-6">
+          {[0, 1].map((copia) =>
+            ronda.map((e) => (
+              <li class="shrink-0" aria-hidden={copia === 1 ? 'true' : undefined}>
+                {e.tipo === 'frase' ? (
+                  <span class="flex h-full items-center gap-6 px-2">
+                    <span class="size-2 rotate-45 bg-magenta" aria-hidden="true"></span>
+                    <span class="whitespace-nowrap font-display text-2xl font-semibold tracking-tight text-suave/40 sm:text-4xl">{e.texto}</span>
+                  </span>
+                ) : e.tipo === 'aliado' ? (
+                  <button type="button" data-abrir-aliado={e.i} tabindex={copia === 1 ? -1 : undefined} class="aliado group flex h-full w-[19rem] flex-col rounded-3xl border border-linea bg-marino-2 p-6 text-left transition-colors hover:border-white/25 sm:w-[24rem]" aria-label={`Ver las redes de ${e.a.nombre}`}>
+                    <span class="flex items-center gap-4">
+                      {e.a.logo ? (
+                        <img src={e.a.logo} alt="" width="80" height="80" loading="lazy" class="size-16 shrink-0 rounded-2xl bg-white object-contain p-1 ring-1 ring-white/10 transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-105" />
                       ) : (
-                        <span class="titulo grid size-full place-items-center text-5xl font-bold text-white/80">{iniciales(e.a.nombre)}</span>
+                        <span class="titulo grid size-16 shrink-0 place-items-center rounded-2xl bg-linea text-xl font-bold">{iniciales(e.a.nombre)}</span>
                       )}
-                    </div>
-                    {e.a.logo && (
-                      <img src={e.a.logo} alt="" width="72" height="72" loading="lazy" class="absolute -bottom-7 left-5 size-14 rounded-2xl bg-white object-contain p-1 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.8)] ring-4 ring-marino-2 transition-transform duration-500 group-hover:-rotate-6 sm:size-16" />
-                    )}
-                  </div>
-                  <div class="flex flex-1 flex-col p-5 pt-10">
-                    <div class="flex flex-wrap items-center gap-2">
-                      <span class="titulo text-lg font-semibold text-white">{e.a.nombre}</span>
-                      <span class="insignia" style="--color-insignia:var(--color-azul)">{e.a.tipo}</span>
-                    </div>
-                    {e.a.lema && <span class="mt-1 font-mono text-[0.68rem] uppercase tracking-[0.18em] text-menta">{e.a.lema}</span>}
-                    <p class="mt-3 line-clamp-3 text-sm leading-relaxed">{e.a.texto}</p>
-                    <span class="enlace-aws mt-auto pt-5 text-sm">Visitar sitio <Icono nombre="externo" class="size-4" /></span>
-                  </div>
-                </a>
-              ) : (
-                <a href="/contacto/?motivo=alianza" tabindex={copia === 1 ? -1 : undefined} class="group flex h-full w-[15rem] flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-magenta/40 bg-magenta/[0.04] p-6 text-center transition-colors hover:border-magenta hover:bg-magenta/[0.08] sm:w-[17rem]">
-                  <span class="grid size-12 place-items-center rounded-2xl border border-dashed border-magenta/60 text-2xl text-magenta transition-transform duration-500 group-hover:rotate-90">+</span>
-                  <span class="titulo text-lg font-semibold text-white">Tu comunidad aquí</span>
-                  <span class="max-w-xs text-sm leading-relaxed">¿Tu comunidad, empresa o escuela quiere construir con nosotros? Escríbenos.</span>
-                  <span class="enlace-aws text-sm">Quiero ser aliado <Icono nombre="flecha" class="size-4" /></span>
-                </a>
-              )}
-            </li>
-          )),
-        )}
-      </ul>
+                      <span>
+                        <span class="titulo block text-lg font-semibold leading-tight">{e.a.nombre}</span>
+                        <span class="insignia mt-1.5" style="--color-insignia:var(--color-azul)">{e.a.tipo}</span>
+                      </span>
+                    </span>
+                    {e.a.lema && <span class="mt-4 font-mono text-[0.68rem] uppercase tracking-[0.18em] text-menta">{e.a.lema}</span>}
+                    <span class="mt-2 line-clamp-3 text-sm leading-relaxed">{e.a.texto}</span>
+                    <span class="mt-auto flex items-center justify-between gap-3 pt-5">
+                      {e.a.url && (
+                        <span class="inline-flex items-center gap-2 rounded-full border border-linea bg-marino px-3 py-1.5 font-mono text-xs text-white">
+                          <Icono nombre="globo" class="size-3.5 text-magenta" />{dominio(e.a.url)}
+                        </span>
+                      )}
+                      <span class="inline-flex items-center gap-1 text-sm font-semibold text-white group-hover:text-magenta">Ver redes <Icono nombre="flecha" class="size-4 transition-transform group-hover:translate-x-1" /></span>
+                    </span>
+                  </button>
+                ) : (
+                  <a href="/contacto/?motivo=alianza" tabindex={copia === 1 ? -1 : undefined} class="group flex h-full w-[15rem] flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-magenta/40 bg-magenta/[0.04] p-6 text-center transition-colors hover:border-magenta hover:bg-magenta/[0.08] sm:w-[17rem]">
+                    <span class="grid size-12 place-items-center rounded-2xl border border-dashed border-magenta/60 text-2xl text-magenta transition-transform duration-500 group-hover:rotate-90">+</span>
+                    <span class="titulo text-lg font-semibold text-white">Tu comunidad aquí</span>
+                    <span class="max-w-xs text-sm leading-relaxed">¿Tu comunidad, empresa o escuela quiere construir con nosotros? Escríbenos.</span>
+                    <span class="enlace-aws text-sm">Quiero ser aliado <Icono nombre="flecha" class="size-4" /></span>
+                  </a>
+                )}
+              </li>
+            )),
+          )}
+        </ul>
+      </div>
+      <button type="button" class="pausa-cinta mx-auto mt-3 flex items-center gap-2 rounded-full border border-linea px-3.5 py-1.5 text-xs text-suave transition-colors hover:text-white" data-pausa aria-pressed="false">
+        <span class="icono-pausa" aria-hidden="true"></span><span class="texto-pausa">Pausar carrusel</span>
+      </button>
     </div>
   )}
+
+  <!-- Ventana con todas las redes de cada aliado -->
+  {alianzas.map((a, i) => (
+    <dialog class="ventana-aliado m-auto w-[min(92vw,30rem)] rounded-3xl border border-linea bg-marino-2 p-0 text-suave backdrop:bg-marino/70 backdrop:backdrop-blur-sm" data-ventana-aliado={i} aria-labelledby={`aliado-${i}`}>
+      <div class="relative p-7">
+        <button type="button" class="absolute right-4 top-4 grid size-10 place-items-center rounded-full border border-linea text-suave transition-colors hover:text-white" data-cerrar aria-label="Cerrar">
+          <Icono nombre="cerrar" class="size-5" />
+        </button>
+        <div class="flex items-center gap-4 pr-10">
+          {a.logo ? <img src={a.logo} alt="" width="80" height="80" class="size-16 rounded-2xl bg-white object-contain p-1" /> : <span class="titulo grid size-16 place-items-center rounded-2xl bg-linea text-xl font-bold">{iniciales(a.nombre)}</span>}
+          <div>
+            <h3 id={`aliado-${i}`} class="titulo text-xl font-semibold">{a.nombre}</h3>
+            {a.lema && <p class="mt-1 font-mono text-[0.68rem] uppercase tracking-[0.18em] text-menta">{a.lema}</p>}
+          </div>
+        </div>
+        <p class="mt-5 text-sm leading-relaxed">{a.texto}</p>
+        {a.redes && a.redes.length > 0 && (
+          <ul class="mt-6 grid gap-2 sm:grid-cols-2">
+            {a.redes.map((r) => (
+              <li>
+                <a href={r.url} target="_blank" rel="noopener" class="flex items-center gap-3 rounded-2xl border border-linea bg-marino/60 p-2.5 pr-4 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:border-white/30">
+                  <LogoRed red={r.tipo} class="size-9" />
+                  <span class="min-w-0">
+                    <span class="block leading-tight">{nombreRed[r.tipo]}</span>
+                    <span class="block truncate text-xs font-normal text-suave/70">{r.tipo === 'web' ? dominio(r.url) : new URL(r.url).pathname.replace(/^\/|\/$/g, '').replace(/^company\//, '') || dominio(r.url)}</span>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </dialog>
+  ))}
 
   <div class="mx-auto mt-10 max-w-7xl px-5">
     <div class="grid gap-px overflow-hidden rounded-3xl border border-linea bg-linea sm:grid-cols-2 lg:grid-cols-4" data-stagger>
@@ -115,13 +157,49 @@ const duracion = Math.max(35, ronda.length * 7);
     mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
   }
   .pista { animation: desplazar var(--duracion) linear infinite; }
-  .marquesina:hover .pista,
-  .marquesina:focus-within .pista { animation-play-state: paused; }
+  .marquesina.pausada .pista { animation-play-state: paused; }
   @keyframes desplazar { to { transform: translateX(-50%); } }
-  .pista > li > a { height: 100%; }
+  .pista > li > * { height: 100%; }
+  .icono-pausa { width: 0.6rem; height: 0.7rem; border-inline: 3px solid currentColor; }
+  .pausa-cinta[aria-pressed='true'] .icono-pausa { border: none; border-left: 0.6rem solid currentColor; border-block: 0.35rem solid transparent; width: 0; height: 0; }
+  /* Ventana de redes */
+  .ventana-aliado[open] { animation: abrir-ventana 0.35s cubic-bezier(0.2, 0.7, 0.2, 1); }
+  .ventana-aliado[open]::backdrop { animation: abrir-fondo 0.35s ease; }
+  @keyframes abrir-ventana { from { opacity: 0; transform: translateY(16px) scale(0.97); } }
+  @keyframes abrir-fondo { from { opacity: 0; } }
   @media (prefers-reduced-motion: reduce) {
     .marquesina { overflow-x: auto; scroll-snap-type: x mandatory; mask-image: none; -webkit-mask-image: none; }
     .pista > li { scroll-snap-align: start; }
     .pista > li[aria-hidden='true'] { display: none; }
+    .pausa-cinta { display: none; }
   }
 </style>
+
+<script>
+  // Mientras la ventana está abierta, la página de atrás no se desplaza
+  const lenis = () => (window as unknown as { lenis?: { stop: () => void; start: () => void } }).lenis;
+  const seccion = document.querySelector<HTMLElement>('[data-alianzas]');
+  if (seccion) {
+    // Abrir la ventana de redes del aliado (las tarjetas duplicadas del carrusel abren la misma)
+    seccion.querySelectorAll<HTMLButtonElement>('[data-abrir-aliado]').forEach((b) =>
+      b.addEventListener('click', () => {
+        seccion.querySelector<HTMLDialogElement>(`[data-ventana-aliado="${b.dataset.abrirAliado}"]`)?.showModal();
+        lenis()?.stop();
+      }),
+    );
+    seccion.querySelectorAll<HTMLDialogElement>('dialog').forEach((d) => {
+      d.addEventListener('close', () => lenis()?.start());
+      d.querySelector('[data-cerrar]')?.addEventListener('click', () => d.close());
+      // Tocar fuera de la ventana la cierra
+      d.addEventListener('click', (e) => { if (e.target === d) d.close(); });
+    });
+    // Botón para pausar el carrusel
+    const pausa = seccion.querySelector<HTMLButtonElement>('[data-pausa]');
+    const cinta = seccion.querySelector<HTMLElement>('.marquesina');
+    pausa?.addEventListener('click', () => {
+      const pausada = cinta?.classList.toggle('pausada') ?? false;
+      pausa.setAttribute('aria-pressed', String(pausada));
+      pausa.querySelector('.texto-pausa')!.textContent = pausada ? 'Reanudar carrusel' : 'Pausar carrusel';
+    });
+  }
+</script>

@@ -36,7 +36,6 @@ export const navegacion = [
   { texto: 'Aprende', url: '/aprende/' },
   { texto: 'Eventos', url: '/eventos/' },
   { texto: 'Nosotros', url: '/nosotros/' },
-  { texto: 'Únete', url: '/unete/' },
   { texto: 'Contacto', url: '/contacto/' },
 ];
 
@@ -114,6 +113,7 @@ export const equipo: Integrante[] = [
     redes: [
       { tipo: 'linkedin', url: 'https://www.linkedin.com/in/joangarfias/' },
       { tipo: 'github', url: 'https://github.com/JoanGarfias' },
+      { tipo: 'instagram', url: 'https://www.instagram.com/joangarfias_/' },
     ],
   },
   {
@@ -125,6 +125,7 @@ export const equipo: Integrante[] = [
     redes: [
       { tipo: 'linkedin', url: 'https://www.linkedin.com/in/jeovanipacheco/' },
       { tipo: 'github', url: 'https://github.com/JeovaniPacheco' },
+      { tipo: 'instagram', url: 'https://www.instagram.com/jeovanipachecobautista/' },
     ],
   },
   { nombre: 'Gerónimo', rol: 'Core Team' },
@@ -132,8 +133,8 @@ export const equipo: Integrante[] = [
 
 // Comunidades, empresas e instituciones aliadas. Con la lista vacía la página muestra cómo ser aliado.
 // Ejemplo: { nombre: 'Nombre', tipo: 'Comunidad', texto: 'Qué hacemos juntos', url: 'https://…', logo: '/img/alianzas/nombre.png' }
-// "sitio": captura de su página web (16:10) que se muestra en el carrusel.
-export type Alianza = { nombre: string; tipo: 'Comunidad' | 'Empresa' | 'Institución' | 'Medio'; texto: string; lema?: string; url?: string; logo?: string; sitio?: string };
+// "redes": todas sus redes; se muestran en una ventana al tocar su tarjeta.
+export type Alianza = { nombre: string; tipo: 'Comunidad' | 'Empresa' | 'Institución' | 'Medio'; texto: string; lema?: string; url?: string; logo?: string; redes?: Red[] };
 export const alianzas: Alianza[] = [
   {
     nombre: 'Nexis Oaxaca Tech',
@@ -143,6 +144,13 @@ export const alianzas: Alianza[] = [
       'Comunidad de Oaxaca que conecta a estudiantes, desarrolladores y personas apasionadas por la tecnología para aprender, compartir conocimiento y crear proyectos reales.',
     url: 'https://nexisoaxaca.tech/',
     logo: '/img/alianzas/nexis.webp',
-    sitio: '/img/alianzas/nexis-sitio.webp',
+    redes: [
+      { tipo: 'web', url: 'https://nexisoaxaca.tech/' },
+      { tipo: 'instagram', url: 'https://www.instagram.com/nexis.oaxaca' },
+      { tipo: 'facebook', url: 'https://www.facebook.com/nexisoaxaca' },
+      { tipo: 'linkedin', url: 'https://www.linkedin.com/company/nexis-oaxaca/' },
+      { tipo: 'youtube', url: 'https://www.youtube.com/@NexisOaxaca' },
+      { tipo: 'github', url: 'https://github.com/Nexis-Oaxaca' },
+    ],
   },
 ];

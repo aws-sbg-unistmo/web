@@ -72,7 +72,7 @@ npm run build        # genera dist/
 | Servicios por categoría, beneficios, recursos, certificaciones, glosario y región de México | `src/data/contenido.ts` |
 | Universidad: datos, campus, mapa y fotos (con su crédito y licencia) | `universidad` en `src/data/contenido.ts` |
 | Preguntas frecuentes | `src/pages/index.astro` y `src/pages/eventos/index.astro` |
-| Ruta de aprendizaje | `src/components/Ruta.astro` |
+| Ruta de aprendizaje (niveles, poses, servicios y referencias) | `niveles` en `src/data/contenido.ts` |
 | Mascota en toda la página (sí / no) | `usarMascota` en `src/data/site.ts` |
 | Videos y fotos | `public/video`, `public/img`. Los originales de Flow están en `media-fuente/` |
 
@@ -116,7 +116,7 @@ src/
   components/   Encabezado, portada con video, ruta, diagrama, formularios…
   data/         site.ts y contenido.ts (textos), events.json (generado desde Meetup)
   layouts/      Plantilla base (SEO, fuentes, barra de progreso)
-  pages/        inicio, aprende, eventos, nosotros, únete, contacto, privacidad, 404
+  pages/        inicio, aprende, eventos, nosotros, contacto, privacidad, 404
   scripts/      animaciones.ts, red.ts (partículas), formulario.ts
 backend/        Plantilla SAM y código de la Lambda de formularios
 infra/          Rol OIDC para GitHub Actions

@@ -4,33 +4,37 @@ import CabeceraPagina from '../components/CabeceraPagina.astro';
 import Campo from '../components/Campo.astro';
 import EnvioFormulario from '../components/EnvioFormulario.astro';
 import Icono from '../components/Icono.astro';
+import LogoRed from '../components/LogoRed.astro';
 import Palabras from '../components/Palabras.astro';
 import { redes, site } from '../data/site';
 
-const tipos = [
-  'Quiero dar una charla o taller',
-  'Patrocinio o alianza',
-  'Colaboración con otra comunidad',
-  'Duda general',
-  'Otro',
-];
+// Motivos del formulario. "clave" sirve para elegirlo desde un enlace: /contacto/?motivo=charla
+const motivos = [
+  { clave: 'charla', texto: 'Quiero dar una charla o taller', icono: 'microfono' },
+  { clave: 'core-team', texto: 'Quiero ser parte del Core Team', icono: 'usuarios' },
+  { clave: 'alianza', texto: 'Patrocinio o alianza', icono: 'mano' },
+  { clave: 'comunidad', texto: 'Colaboración con otra comunidad', icono: 'globo' },
+  { clave: 'duda', texto: 'Duda general', icono: 'info' },
+  { clave: 'otro', texto: 'Otro', icono: 'correo' },
+] as const;
 const perfiles = [
   {
     icono: 'microfono', color: 'var(--color-magenta)', titulo: 'Si quieres dar una charla o taller',
     puntos: ['Charlas de 30 a 45 minutos o talleres de 1 a 2 horas', 'Presencial en el campus o en línea', 'Temas de nube, IA, desarrollo o tu experiencia profesional', 'Nosotros nos encargamos de la difusión y el registro'],
-    boton: 'Proponer una charla', motivo: 'Quiero dar una charla o taller',
+    boton: 'Proponer una charla', motivo: 'charla',
   },
   {
     icono: 'usuarios', color: 'var(--color-morado)', titulo: 'Si eres una comunidad u organización',
     puntos: ['Organizar eventos en conjunto', 'Compartir convocatorias, becas o programas para estudiantes', 'Conectar a estudiantes con la industria tech de la región'],
-    boton: 'Proponer una colaboración', motivo: 'Colaboración con otra comunidad',
+    boton: 'Proponer una colaboración', motivo: 'comunidad',
   },
   {
     icono: 'info', color: 'var(--color-azul)', titulo: 'Si eres estudiante',
-    puntos: ['Para enterarte de eventos, únete al grupo en Meetup', 'Para participar en el Core Team, llena el formulario de Únete', 'Para otra duda, escríbenos aquí'],
-    boton: 'Ir a Únete', url: '/unete/',
+    puntos: ['Para enterarte de eventos, únete al grupo en Meetup', 'Para ayudar a organizar, súmate al Core Team', 'Para cualquier otra duda, escríbenos aquí'],
+    boton: 'Quiero ser parte del Core Team', motivo: 'core-team',
   },
 ] as const;
+const tipoRed = (n: string) => n.toLowerCase() as 'instagram' | 'tiktok' | 'facebook' | 'youtube' | 'linkedin' | 'github';
 ---
 <Layout titulo="Contacto" descripcion="Escríbenos: charlas, talleres, alianzas, colaboraciones o dudas sobre AWS SBG UNISTMO.">
   <CabeceraPagina
@@ -38,62 +42,15 @@ const perfiles = [
     etiqueta="// Contacto"
     titulo="Hablemos"
     resaltar={['Hablemos']}
-    descripcion="¿Quieres dar una charla, colaborar con tu comunidad o apoyar al grupo? Escríbenos y te respondemos lo antes posible."
+    descripcion="¿Quieres dar una charla, colaborar con tu comunidad o ser parte del grupo? Elige cómo quieres trabajar con nosotros y escríbenos."
     pose="09-lupa"
   />
 
-  <section class="mx-auto grid max-w-7xl gap-10 px-5 lg:grid-cols-[1.4fr_1fr]">
-    <div id="formulario" class="tarjeta scroll-mt-36 p-7 md:p-10" data-reveal>
-      <form data-formulario="contacto" class="space-y-6">
-        <div class="grid gap-6 md:grid-cols-2">
-          <Campo nombre="nombre" etiqueta="Nombre" requerido max={100} min={2} autocompletar="name" />
-          <Campo nombre="correo" etiqueta="Correo" tipo="email" requerido max={200} autocompletar="email" marcador="tu@correo.com" />
-          <Campo nombre="tipo" etiqueta="Motivo" tipo="select" requerido opciones={tipos} />
-          <Campo nombre="organizacion" etiqueta="Empresa, comunidad o escuela" max={120} autocompletar="organization" />
-        </div>
-        <Campo nombre="mensaje" etiqueta="Mensaje" tipo="textarea" requerido min={10} max={2000} marcador="Cuéntanos tu idea…" />
-        <EnvioFormulario texto="Enviar mensaje" />
-      </form>
-
-      <div data-exito="contacto" class="py-10 text-center" hidden>
-        {site.usarMascota && <img src="/img/mascota/03-celebrando.webp" alt="" width="330" height="450" class="mx-auto h-56 w-auto" />}
-        <h2 class="titulo mt-6 text-3xl font-bold">¡Mensaje enviado!</h2>
-        <p class="mx-auto mt-3 max-w-md leading-relaxed">Gracias por escribirnos. Te responderemos al correo que nos dejaste.</p>
-      </div>
-    </div>
-
-    <aside class="space-y-6" data-stagger>
-      <a href={`mailto:${site.correo}`} class="tarjeta group flex items-center gap-5 p-6" data-tilt>
-        <span class="grid size-12 place-items-center rounded-xl bg-magenta/15 text-magenta"><Icono nombre="correo" /></span>
-        <span>
-          <span class="block text-xs uppercase tracking-widest text-suave/70">Correo</span>
-          <span class="titulo text-lg font-semibold group-hover:text-magenta">{site.correo}</span>
-        </span>
-      </a>
-      <div class="tarjeta flex items-center gap-5 p-6" data-tilt>
-        <span class="grid size-12 place-items-center rounded-xl bg-morado/15 text-morado"><Icono nombre="lugar" /></span>
-        <span>
-          <span class="block text-xs uppercase tracking-widest text-suave/70">Dónde estamos</span>
-          <span class="titulo text-lg font-semibold">{site.campus}</span>
-        </span>
-      </div>
-      <div class="tarjeta p-6" data-tilt>
-        <span class="block text-xs uppercase tracking-widest text-suave/70">Redes</span>
-        <ul class="mt-4 grid grid-cols-2 gap-2 text-sm">
-          {redes.map((r) => (
-            <li><a href={r.url} target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 hover:text-white">{r.nombre} <Icono nombre="externo" class="size-3.5" /></a></li>
-          ))}
-        </ul>
-      </div>
-    </aside>
-  </section>
-
-  <section class="mx-auto mt-28 max-w-7xl px-5">
-    <div class="max-w-3xl">
-      <p class="chip" data-reveal>// Colaboremos</p>
-      <Palabras texto="¿Cómo podemos trabajar juntos?" resaltar={['juntos?']} class="mt-5 text-4xl font-bold leading-tight md:text-5xl" />
-    </div>
-    <div class="mt-12 grid gap-6 lg:grid-cols-3" data-stagger>
+  <!-- Colaboremos: va antes del formulario y cada opción lo deja listo -->
+  <section class="mx-auto max-w-7xl px-5">
+    <p class="chip" data-reveal>// Colaboremos</p>
+    <Palabras texto="¿Cómo podemos trabajar juntos?" resaltar={['juntos?']} class="mt-5 text-3xl font-bold leading-tight md:text-4xl" />
+    <div class="mt-8 grid gap-6 lg:grid-cols-3" data-stagger data-carrusel>
       {perfiles.map((p) => (
         <article class="tarjeta flex flex-col p-7" data-tilt style={`--acento:${p.color}`}>
           <span class="grid size-12 place-items-center rounded-xl" style="background:color-mix(in srgb,var(--acento) 15%,transparent);color:var(--acento)"><Icono nombre={p.icono} class="size-6" /></span>
@@ -101,35 +58,143 @@ const perfiles = [
           <ul class="mt-4 space-y-2.5">
             {p.puntos.map((t) => <li class="flex gap-2.5 text-sm"><Icono nombre="check" class="mt-0.5 size-4 shrink-0 text-menta" />{t}</li>)}
           </ul>
-          {'motivo' in p ? (
-            <a href="#formulario" data-motivo={p.motivo} class="enlace-aws mt-auto pt-8 text-sm">{p.boton} <Icono nombre="flecha" class="size-4" /></a>
-          ) : (
-            <a href={p.url} class="enlace-aws mt-auto pt-8 text-sm">{p.boton} <Icono nombre="flecha" class="size-4" /></a>
-          )}
+          <a href="#formulario" data-motivo={p.motivo} class="enlace-aws mt-auto pt-8 text-sm">{p.boton} <Icono nombre="flecha" class="size-4" /></a>
         </article>
       ))}
     </div>
   </section>
 
+  <section class="mx-auto mt-16 grid max-w-7xl gap-8 px-5 lg:grid-cols-[1.45fr_1fr]">
+    <div id="formulario" class="tarjeta relative min-w-0 scroll-mt-36 overflow-hidden p-6 md:p-10" data-reveal>
+      <div class="pointer-events-none absolute -right-24 -top-24 size-72 rounded-full bg-magenta/10 blur-3xl" aria-hidden="true"></div>
+      <div class="relative">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h2 class="titulo text-2xl font-semibold md:text-3xl">Envíanos un mensaje</h2>
+            <p class="mt-1 text-sm">Te respondemos al correo que nos dejes.</p>
+          </div>
+          <span class="estado">Respondemos en pocos días</span>
+        </div>
+
+        <form data-formulario="contacto" class="mt-8 space-y-7">
+          <fieldset class="min-w-0">
+            <legend class="mb-3 text-sm font-medium text-white">¿Sobre qué nos quieres escribir? <span class="text-magenta" aria-hidden="true">*</span></legend>
+            <div class="grid gap-2.5 sm:grid-cols-2">
+              {motivos.map((m, i) => (
+                <label class="motivo cursor-pointer">
+                  <input type="radio" name="tipo" value={m.texto} required={i === 0} data-clave={m.clave} class="peer sr-only" />
+                  <span class="flex h-full items-center gap-3 rounded-2xl border border-linea bg-marino/60 p-3.5 text-sm text-suave transition peer-checked:border-magenta peer-checked:bg-magenta/10 peer-checked:text-white peer-focus-visible:outline-2 peer-focus-visible:outline-magenta">
+                    <span class="icono-motivo grid size-9 shrink-0 place-items-center rounded-xl bg-linea transition-colors"><Icono nombre={m.icono} class="size-[1.1rem]" /></span>
+                    {m.texto}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          <div class="grid gap-6 md:grid-cols-2">
+            <Campo nombre="nombre" etiqueta="Nombre" requerido max={100} min={2} autocompletar="name" />
+            <Campo nombre="correo" etiqueta="Correo" tipo="email" requerido max={200} autocompletar="email" marcador="tu@correo.com" />
+          </div>
+          <Campo nombre="organizacion" etiqueta="Empresa, comunidad o escuela" max={120} autocompletar="organization" />
+          <div>
+            <Campo nombre="mensaje" etiqueta="Mensaje" tipo="textarea" requerido min={10} max={2000} marcador="Cuéntanos tu idea: qué te gustaría hacer, cuándo y cómo podemos ayudarte…" />
+            <p class="mt-1.5 text-right font-mono text-xs text-suave/60" aria-live="polite"><span data-cuenta>0</span> / 2000</p>
+          </div>
+          <EnvioFormulario texto="Enviar mensaje" />
+        </form>
+
+        <div data-exito="contacto" class="py-10 text-center" hidden>
+          {site.usarMascota && <img src="/img/mascota/03-celebrando.webp" alt="" width="330" height="450" class="mx-auto h-56 w-auto" />}
+          <h2 class="titulo mt-6 text-3xl font-bold">¡Mensaje enviado!</h2>
+          <p class="mx-auto mt-3 max-w-md leading-relaxed">Gracias por escribirnos. Te responderemos al correo que nos dejaste.</p>
+        </div>
+      </div>
+    </div>
+
+    <aside class="space-y-5" data-stagger>
+      <div class="tarjeta p-6">
+        <p class="text-xs font-semibold uppercase tracking-widest text-suave/70">Correo</p>
+        <div class="mt-3 flex items-center gap-3">
+          <span class="grid size-12 shrink-0 place-items-center rounded-xl bg-magenta/15 text-magenta"><Icono nombre="correo" /></span>
+          <a href={`mailto:${site.correo}`} class="titulo min-w-0 flex-1 truncate text-lg font-semibold hover:text-magenta">{site.correo}</a>
+          <button type="button" class="shrink-0 rounded-full border border-linea px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:border-magenta" data-copiar={site.correo}>Copiar</button>
+        </div>
+      </div>
+
+      <a href="/nosotros/#universidad" class="tarjeta group flex items-center gap-4 p-6" data-tilt>
+        <span class="grid size-12 shrink-0 place-items-center rounded-xl bg-morado/15 text-morado"><Icono nombre="lugar" /></span>
+        <span class="flex-1">
+          <span class="block text-xs font-semibold uppercase tracking-widest text-suave/70">Dónde estamos</span>
+          <span class="titulo mt-1 block font-semibold leading-snug">{site.campus}</span>
+          <span class="mt-1 inline-flex items-center gap-1 text-sm text-magenta">Ver mapa <Icono nombre="flecha" class="size-4 transition-transform group-hover:translate-x-1" /></span>
+        </span>
+      </a>
+
+      <a href={site.meetup} target="_blank" rel="noopener" class="tarjeta group flex items-center gap-4 p-6" data-tilt>
+        <span class="grid size-12 shrink-0 place-items-center rounded-xl bg-[#ed1c40] text-white"><Icono nombre="evento" /></span>
+        <span class="flex-1">
+          <span class="block text-xs font-semibold uppercase tracking-widest text-suave/70">Eventos</span>
+          <span class="titulo mt-1 block font-semibold">Únete al grupo en Meetup</span>
+          <span class="block text-sm">Ahí publicamos cada taller y charla.</span>
+        </span>
+        <Icono nombre="externo" class="size-5 text-suave/60 group-hover:text-white" />
+      </a>
+
+      <div class="tarjeta p-6">
+        <p class="text-xs font-semibold uppercase tracking-widest text-suave/70">Síguenos</p>
+        <ul class="mt-4 grid grid-cols-2 gap-2">
+          {redes.map((r) => (
+            <li>
+              <a href={r.url} target="_blank" rel="noopener" class="flex items-center gap-3 rounded-2xl border border-linea bg-marino/60 p-2 pr-3 transition hover:-translate-y-0.5 hover:border-white/30">
+                <LogoRed red={tipoRed(r.nombre)} class="size-9" />
+                <span class="min-w-0">
+                  <span class="block text-sm font-semibold leading-tight text-white">{r.nombre}</span>
+                  <span class="block truncate text-xs text-suave/70">{r.usuario}</span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </aside>
+  </section>
+
   <script>
-    // Los botones "Proponer…" eligen el motivo del formulario antes de llevarte a él
-    const select = document.querySelector<HTMLSelectElement>('#campo-tipo');
-    document.querySelectorAll<HTMLAnchorElement>('[data-motivo]').forEach((a) =>
-      a.addEventListener('click', () => {
-        if (select) select.value = a.dataset.motivo ?? '';
+    const radios = Array.from(document.querySelectorAll<HTMLInputElement>('input[name="tipo"]'));
+    const elegir = (clave?: string | null) => {
+      const r = radios.find((x) => x.dataset.clave === clave);
+      if (r) r.checked = true;
+    };
+    // Los botones de "Colaboremos" eligen el motivo antes de llevarte al formulario
+    document.querySelectorAll<HTMLAnchorElement>('[data-motivo]').forEach((a) => a.addEventListener('click', () => elegir(a.dataset.motivo)));
+    // Desde otras páginas: /contacto/?motivo=alianza (charla, core-team, comunidad…)
+    elegir(new URLSearchParams(location.search).get('motivo'));
+
+    // Contador de caracteres del mensaje
+    const mensaje = document.querySelector<HTMLTextAreaElement>('#campo-mensaje');
+    const cuenta = document.querySelector<HTMLElement>('[data-cuenta]');
+    mensaje?.addEventListener('input', () => { if (cuenta) cuenta.textContent = String(mensaje.value.length); });
+
+    // Copiar el correo
+    document.querySelectorAll<HTMLButtonElement>('[data-copiar]').forEach((b) =>
+      b.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(b.dataset.copiar ?? '');
+          b.textContent = '¡Copiado!';
+        } catch {
+          b.textContent = 'No se pudo copiar';
+        }
+        setTimeout(() => (b.textContent = 'Copiar'), 1800);
       }),
     );
-    // Desde otras páginas: /contacto/?motivo=alianza (o charla, comunidad)
-    const motivos: Record<string, string> = {
-      alianza: 'Patrocinio o alianza',
-      charla: 'Quiero dar una charla o taller',
-      comunidad: 'Colaboración con otra comunidad',
-    };
-    const pedido = motivos[new URLSearchParams(location.search).get('motivo') ?? ''];
-    if (select && pedido) select.value = pedido;
   </script>
 
   <script>
     import '../scripts/formulario';
   </script>
 </Layout>
+
+<style>
+  .motivo input:checked + span .icono-motivo { background: var(--color-magenta); color: var(--color-marino); }
+</style>

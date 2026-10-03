@@ -6,8 +6,10 @@
 // - Celular, "reducir movimiento" o sin JavaScript: línea vertical con los cinco niveles.
 // Los datos vienen de "niveles" en src/data/contenido.ts (los mismos de la página Aprende).
 import Icono from './Icono.astro';
+import Mosaico from './Mosaico.astro';
 import Palabras from './Palabras.astro';
 import { niveles } from '../data/contenido';
+import { site } from '../data/site';
 
 // Camino en un lienzo de 1200×320: cada nivel en un punto, unidos por curvas suaves
 const ancho = 1200;
@@ -22,11 +24,13 @@ for (let i = 1; i < puntos.length; i++) {
 }
 camino += ` L ${ancho + 30} ${puntos[puntos.length - 1][1]}`;
 const colores = ['#ff9900', '#ff57e9', '#ad5cff', '#42b4ff', '#00e582'];
+// Confeti de la meta: ángulo y distancia de cada pedacito
+const confeti = Array.from({ length: 16 }, (_, k) => ({ a: (k / 16) * 360 + (k % 2) * 11, d: 70 + (k % 4) * 22, c: colores[k % colores.length] }));
 ---
 <section id="ruta" class="ruta-mapa relative mt-16" data-ruta>
   <div class="escena-ruta relative" data-escena-ruta>
     <div class="fondo-ruta pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
-      <div class="rejilla absolute inset-0 opacity-15 [mask-image:radial-gradient(ellipse_at_50%_55%,#000,transparent_70%)]"></div>
+      <div class="rejilla absolute -inset-x-20 inset-y-0 opacity-15 [mask-image:radial-gradient(ellipse_at_50%_55%,#000,transparent_70%)]" data-fondo-ruta></div>
     </div>
 
     <div class="mx-auto flex h-full max-w-7xl flex-col justify-center px-5 py-14 lg:py-8">
@@ -57,17 +61,29 @@ const colores = ['#ff9900', '#ff57e9', '#ad5cff', '#42b4ff', '#00e582'];
           {puntos.map(([x, y], i) => (
             <g class="hito" transform={`translate(${x} ${y})`} style={`--c:${colores[i]}`} data-hito={i}>
               <circle r="38" class="halo-hito" />
+              <circle r="26" class="onda-hito" />
               <circle r="26" class="aro-hito" />
               <circle r="20" class="nucleo-hito" />
               <text text-anchor="middle" dy="6" class="num-hito">{niveles[i].n}</text>
             </g>
           ))}
+          {Array.from({ length: 7 }, (_, k) => <circle r={7 - k * 0.8} class="estela" style={`opacity:${0.55 - k * 0.07}`} data-estela={k} />)}
           <g class="viajero" data-viajero>
             <circle r="40" class="brillo-viajero" />
             <circle r="27" fill="#161d26" stroke="url(#degradado-ruta)" stroke-width="3" />
             <image href="/img/logo-192.png" x="-22" y="-22" width="44" height="44" clip-path="url(#recorte-viajero)" />
           </g>
         </svg>
+        {puntos.map(([x, y], i) => (
+          <div class:list={['brotes pointer-events-none absolute flex gap-1.5', y > alto / 2 ? 'brotes-abajo' : 'brotes-arriba']} style={`left:${(x / ancho) * 100}%;top:${(y / alto) * 100}%`} data-brotes={i} aria-hidden="true">
+            {niveles[i].mosaicos.map((m, k) => (
+              <span class="brote" style={`--k:${k}`}><Mosaico categoria={m.categoria} icono={m.icono} tam="sm" /></span>
+            ))}
+          </div>
+        ))}
+        <div class="confeti pointer-events-none absolute" style={`left:${(puntos[puntos.length - 1][0] / ancho) * 100}%;top:${(puntos[puntos.length - 1][1] / alto) * 100}%`} data-confeti aria-hidden="true">
+          {confeti.map((c) => <i style={`--a:${c.a}deg;--d:${c.d}px;background:${c.c}`}></i>)}
+        </div>
         {puntos.map(([x, y], i) => (
           <button
             type="button"
@@ -91,14 +107,27 @@ const colores = ['#ff9900', '#ff57e9', '#ad5cff', '#42b4ff', '#00e582'];
         {niveles.map((nv, i) => (
           <li class="nivel-panel relative" style={`--c:${colores[i]}`} data-panel={i}>
             <span class="nodo-ruta absolute -left-12 top-6 grid size-10 place-items-center rounded-full border-2 bg-marino font-mono text-xs font-bold lg:-left-14 lg:size-12" aria-hidden="true">{nv.n}</span>
-            <article class="tarjeta-nivel tarjeta grid gap-6 p-6 md:grid-cols-2 lg:grid-cols-[1.15fr_1fr_1fr] lg:gap-8 lg:p-7">
+            <article class="tarjeta-nivel tarjeta relative grid gap-6 p-6 md:grid-cols-2 lg:grid-cols-[1.15fr_1fr_1fr] lg:gap-8 lg:p-7">
+              {site.usarMascota && (
+                <img src={`/img/mascota/${nv.pose}.webp`} alt="" width="300" height="400" loading="lazy" class="pose-nivel pointer-events-none absolute -top-10 right-3 h-24 w-auto drop-shadow-[0_15px_30px_rgba(0,0,0,0.5)] lg:-top-16 lg:right-[-3.5rem] lg:h-32" />
+              )}
               <div class="pieza">
                 <div class="flex flex-wrap items-center gap-3">
                   <span class="titulo text-4xl font-bold" style="color:var(--c)">{nv.n}</span>
                   <span class="insignia" style="--color-insignia:var(--c)">{nv.nivel}</span>
                 </div>
-                <h3 class="titulo mt-3 text-2xl font-semibold">{nv.t}</h3>
+                <h3 class="titulo mt-3 pr-20 text-2xl font-semibold lg:pr-0">{nv.t}</h3>
                 <p class="mt-2 leading-relaxed">{nv.resumen}</p>
+                <p class="mt-4 text-xs font-semibold uppercase tracking-widest text-suave/70">Referencias</p>
+                <ul class="mt-2 flex flex-wrap gap-1.5">
+                  {nv.referencias.map((r) => (
+                    <li>
+                      <a href={r.url} target="_blank" rel="noopener" class="referencia inline-flex items-center gap-1.5 rounded-full border border-linea bg-marino/60 px-2.5 py-1 text-xs text-white transition-colors">
+                        {r.texto} <Icono nombre="externo" class="size-3" />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
               </div>
               <div class="pieza extra">
                 <p class="text-xs font-semibold uppercase tracking-widest text-suave/70">Qué aprendes</p>
@@ -160,6 +189,28 @@ const colores = ['#ff9900', '#ff57e9', '#ad5cff', '#42b4ff', '#00e582'];
   .hito.activo .halo-hito { opacity: 0.22; animation: latir-hito 1.6s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
   @keyframes latir-hito { 50% { transform: scale(1.25); opacity: 0.08; } }
   .brillo-viajero { fill: #ff57e9; opacity: 0.18; filter: blur(6px); }
+  .estela { fill: #ff57e9; filter: drop-shadow(0 0 4px #ff57e9); }
+  /* Onda expansiva al llegar a un nivel */
+  .onda-hito { fill: none; stroke: var(--c); stroke-width: 3; opacity: 0; transform-box: fill-box; transform-origin: center; }
+  .hito.alcanzado .onda-hito { animation: onda-hito 0.9s ease-out; }
+  @keyframes onda-hito { from { opacity: 0.9; transform: scale(1); } to { opacity: 0; transform: scale(2.6); } }
+  /* Servicios que brotan junto a cada nivel */
+  .brotes-abajo { translate: 2.4rem -170%; }
+  .brotes-arriba { translate: 2.4rem 70%; }
+  .brote { opacity: 0; scale: 0.3; translate: -1.5rem 0.5rem; rotate: -20deg; transition: opacity 0.4s ease, scale 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), translate 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), rotate 0.6s ease; transition-delay: calc(var(--k) * 0.08s); }
+  .brotes.visible .brote { opacity: 1; scale: 1; translate: 0 0; rotate: 0deg; animation: flotar-brote 3s ease-in-out infinite; animation-delay: calc(var(--k) * 0.4s + 0.6s); }
+  @keyframes flotar-brote { 50% { translate: 0 -5px; } }
+  /* Confeti al llegar a la meta */
+  .confeti i { position: absolute; width: 7px; height: 12px; border-radius: 2px; opacity: 0; }
+  .confeti.lanzar i { animation: confeti 1.4s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+  @keyframes confeti {
+    0% { opacity: 1; transform: rotate(var(--a)) translateY(0) rotate(0deg) scale(1); }
+    100% { opacity: 0; transform: rotate(var(--a)) translateY(calc(var(--d) * -1)) rotate(540deg) scale(0.6); }
+  }
+  /* Imagen del jaguar en cada panel y referencias */
+  .referencia:hover { border-color: var(--c); color: var(--c); }
+  .ruta-mapa.modo-mapa .pose-nivel { opacity: 0; translate: 0 30px; rotate: 6deg; transition: opacity 0.5s ease, translate 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), rotate 0.7s ease; }
+  .ruta-mapa.modo-mapa .nivel-panel.activo .pose-nivel { opacity: 1; translate: 0 0; rotate: 0deg; transition-delay: 0.15s; }
   .viajero { transition: none; }
 
   /* Etiquetas y botones de cada nivel */
@@ -174,7 +225,7 @@ const colores = ['#ff9900', '#ff57e9', '#ad5cff', '#42b4ff', '#00e582'];
 
   /* Modo mapa (computadora con animaciones): escena fija y un panel a la vez */
   .ruta-mapa.modo-mapa .escena-ruta { height: calc(100svh - 72px); }
-  .ruta-mapa.modo-mapa .mapa { display: block; max-width: min(100%, calc((100svh - 34rem) * 3.75)); }
+  .ruta-mapa.modo-mapa .mapa { display: block; max-width: min(100%, calc((100svh - 37rem) * 3.75)); }
   .ruta-mapa.modo-mapa .ayuda-mapa { display: block; }
   .ruta-mapa.modo-mapa .niveles { margin-top: 1.5rem; padding-left: 0; }
   .ruta-mapa.modo-mapa .niveles > * { grid-area: 1 / 1; }
@@ -240,15 +291,32 @@ const colores = ['#ff9900', '#ff57e9', '#ad5cff', '#42b4ff', '#00e582'];
       const fracciones = enCamino.map((l) => (l - inicio) / (fin - inicio));
       avance.style.strokeDasharray = `${largo}`;
 
+      const estela = Array.from(seccion.querySelectorAll<SVGCircleElement>('[data-estela]'));
+      const brotes = Array.from(seccion.querySelectorAll<HTMLElement>('[data-brotes]'));
+      const confeti = seccion.querySelector<HTMLElement>('[data-confeti]');
+      const fondo = seccion.querySelector<HTMLElement>('[data-fondo-ruta]');
       let activo = -1;
       const pintar = (p: number) => {
         const l = inicio + p * (fin - inicio);
         avance.style.strokeDashoffset = `${largo - l}`;
         const punto = avance.getPointAtLength(l);
         viajero.setAttribute('transform', `translate(${punto.x} ${punto.y})`);
+        // Estela tipo cometa detrás del jaguar
+        estela.forEach((c, k) => {
+          const q = avance.getPointAtLength(Math.max(inicio, l - (k + 1) * 16));
+          c.setAttribute('cx', String(q.x));
+          c.setAttribute('cy', String(q.y));
+        });
+        if (fondo) fondo.style.translate = `${-p * 80}px 0`;
         let i = 0;
         fracciones.forEach((f, k) => { if (p >= f - 0.02) i = k; });
         hitos.forEach((h, k) => h.classList.toggle('alcanzado', k <= i));
+        brotes.forEach((b, k) => b.classList.toggle('visible', k <= i));
+        if (confeti) {
+          const meta = i === n - 1;
+          if (meta && !confeti.classList.contains('lanzar')) confeti.classList.add('lanzar');
+          if (!meta) confeti.classList.remove('lanzar');
+        }
         if (i === activo) return;
         activo = i;
         hitos.forEach((h, k) => h.classList.toggle('activo', k === i));
