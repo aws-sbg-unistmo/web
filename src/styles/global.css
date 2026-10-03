@@ -214,6 +214,53 @@ html {
 }
 @keyframes latido { 70% { box-shadow: 0 0 0 6px transparent; } }
 
+/* Carruseles en celular: las tarjetas de [data-carrusel] se deslizan de lado (hasta 767px;
+   con data-carrusel="lg", hasta 1023px). Los puntos los agrega src/scripts/carrusel.ts. */
+.puntos-carrusel { display: none; }
+@media (max-width: 767px) {
+  [data-carrusel]:not([data-carrusel='lg']) {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    margin-inline: -1.25rem;
+    padding: 0.25rem 1.25rem 0.75rem;
+    scroll-padding-inline: 1.25rem;
+  }
+  [data-carrusel]:not([data-carrusel='lg']) > * { flex: 0 0 min(84%, 22rem); scroll-snap-align: start; }
+  .puntos-carrusel:not(.lg) { display: flex; }
+}
+@media (max-width: 1023px) {
+  [data-carrusel='lg'] {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    padding: 0.25rem 1.25rem 0.75rem;
+    scroll-padding-inline: 1.25rem;
+  }
+  [data-carrusel='lg'] > * { flex: 0 0 min(84%, 24rem); scroll-snap-align: start; }
+  .puntos-carrusel.lg { display: flex; }
+}
+[data-carrusel]::-webkit-scrollbar { display: none; }
+.puntos-carrusel { justify-content: center; gap: 0.4rem; margin-top: 0.75rem; }
+.puntos-carrusel button {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--color-linea);
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+.puntos-carrusel button[aria-current='true'] { width: 1.5rem; background: var(--color-magenta); }
+
 /* Las anclas no quedan debajo del header ni de la barra "En esta página" */
 main section[id] { scroll-margin-top: 8.5rem; }
 

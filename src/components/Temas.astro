@@ -24,7 +24,7 @@ import { categorias, temas } from '../data/contenido';
 
   {temas.map((t, i) => (
     <div role="tabpanel" id={`panel-${t.categoria}`} aria-labelledby={`pestana-${t.categoria}`} class="panel mt-8 rounded-3xl" tabindex="0" hidden={i !== 0}>
-      <div class="grid gap-5 md:grid-cols-3">
+      <div class="grid gap-5 md:grid-cols-3" data-carrusel>
         {t.servicios.map((s) => (
           <article class="tarjeta flex gap-4 p-6" data-tilt>
             <Mosaico categoria={t.categoria} />

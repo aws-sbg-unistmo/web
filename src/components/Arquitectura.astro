@@ -47,11 +47,11 @@ const flujos: { titulo: string; color: string; nodos: Nodo[] }[] = [
   {flujos.map((flujo) => (
     <div class="tarjeta p-6 md:p-8" style={`--acento:${flujo.color}`}>
       <p class="font-mono text-xs uppercase tracking-[0.2em]" style="color:var(--acento)">{flujo.titulo}</p>
-      <ol class="mt-6 flex flex-col items-stretch gap-0 md:flex-row md:items-center">
+      <ol class="mt-6 flex items-start md:items-center">
         {flujo.nodos.map((n, i) => (
           <>
             {i > 0 && <li class="conector" aria-hidden="true"><span></span></li>}
-            <li class="nodo flex flex-1 items-center gap-3 rounded-2xl border border-linea bg-marino/70 p-4 md:flex-col md:text-center">
+            <li class="nodo flex min-w-0 flex-1 flex-col items-center gap-2 text-center md:gap-3 md:rounded-2xl md:border md:border-linea md:bg-marino/70 md:p-4">
               {n.categoria ? (
                 <Mosaico categoria={n.categoria} icono={n.icono} />
               ) : (
@@ -60,8 +60,8 @@ const flujos: { titulo: string; color: string; nodos: Nodo[] }[] = [
                 </span>
               )}
               <span>
-                <span class="titulo block text-sm font-semibold">{n.nombre}</span>
-                <span class="block text-xs text-suave/80">{n.rol}</span>
+                <span class="titulo block text-[11px] font-semibold leading-tight md:text-sm">{n.nombre}</span>
+                <span class="hidden text-xs text-suave/80 md:block">{n.rol}</span>
               </span>
             </li>
           </>
@@ -72,32 +72,26 @@ const flujos: { titulo: string; color: string; nodos: Nodo[] }[] = [
 </div>
 
 <style>
+  /* En celular el conector queda a la altura del centro del icono (48px / 2) */
   .conector {
     position: relative;
     flex: 0 0 auto;
-    align-self: center;
-    width: 2px;
-    height: 28px;
+    width: 14px;
+    height: 2px;
+    margin-top: 23px;
     background: var(--color-linea);
     overflow: hidden;
   }
   @media (min-width: 768px) {
-    .conector { width: 48px; height: 2px; }
+    .conector { width: 48px; margin-top: 0; align-self: center; }
   }
   .conector span {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, transparent, var(--acento), transparent);
-    animation: pulso-v 1.6s linear infinite;
-  }
-  @media (min-width: 768px) {
-    .conector span {
-      background: linear-gradient(90deg, transparent, var(--acento), transparent);
-      animation-name: pulso-h;
-    }
+    background: linear-gradient(90deg, transparent, var(--acento), transparent);
+    animation: pulso-h 1.6s linear infinite;
   }
   @keyframes pulso-h { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
-  @keyframes pulso-v { from { transform: translateY(-100%); } to { transform: translateY(100%); } }
   .nodo { transition: border-color 0.3s ease, transform 0.3s ease; }
   .nodo:hover { border-color: var(--acento); transform: translateY(-2px); }
 </style>

@@ -136,7 +136,7 @@ export const universidad = {
     {
       nombre: 'Tehuantepec',
       direccion: 'Ciudad Universitaria s/n, Barrio Santa Cruz Tagolaba, C.P. 70760, Santo Domingo Tehuantepec, Oaxaca',
-      mapa: 'https://www.google.com/maps/search/?api=1&query=16.2910,-95.2390',
+      mapa: 'https://maps.app.goo.gl/UPAAYtSSuXjGtyq89',
       aqui: true,
     },
     {
@@ -150,8 +150,8 @@ export const universidad = {
       mapa: 'https://www.google.com/maps/search/?api=1&query=Universidad+del+Istmo+Campus+Juchit%C3%A1n',
     },
   ],
-  // Punto central del Campus Tehuantepec (Circuito Universitario, OpenStreetMap)
-  coordenadas: { lat: 16.291, lon: -95.239 },
+  // Ubicación del Campus Tehuantepec en Google Maps (la marcó el Group Leader)
+  coordenadas: { lat: 16.28875, lon: -95.24087 },
   // Fotos con licencia libre de Wikimedia Commons. La licencia pide dar crédito y enlazarla.
   fotos: [
     {

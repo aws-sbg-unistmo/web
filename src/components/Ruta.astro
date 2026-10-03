@@ -12,7 +12,7 @@ const pasos = [
 ];
 ---
 <section id="ruta" class="relative mt-16 overflow-hidden" data-horizontal>
-  <div class="contenedor-ruta flex flex-col justify-center py-16 lg:min-h-screen">
+  <div class="contenedor-ruta flex flex-col justify-center py-12 lg:min-h-screen lg:py-16">
     <div class="mx-auto w-full max-w-7xl px-5">
       <div class="flex flex-wrap items-end justify-between gap-6">
         <div class="max-w-2xl">
@@ -26,13 +26,13 @@ const pasos = [
       </div>
     </div>
 
-    <ol class="pista-ruta mt-12 flex flex-col gap-6 px-5 lg:w-max lg:flex-row lg:pl-[max(1.25rem,calc((100vw-80rem)/2+1.25rem))] lg:pr-[20vw]">
+    <ol data-carrusel="lg" class="pista-ruta mt-10 flex flex-col gap-6 px-5 lg:mt-12 lg:w-max lg:flex-row lg:pl-[max(1.25rem,calc((100vw-80rem)/2+1.25rem))] lg:pr-[20vw]">
       {pasos.map((p) => (
-        <li class="tarjeta flex flex-col p-8 lg:w-[26rem]" style={`--acento:${p.c}`} data-tilt>
-          <span class="titulo text-6xl font-bold" style="color:var(--acento);opacity:.9">{p.n}</span>
-          <h3 class="titulo mt-6 text-2xl font-semibold">{p.t}</h3>
+        <li class="tarjeta flex flex-col p-6 lg:w-[26rem] lg:p-8" style={`--acento:${p.c}`} data-tilt>
+          <span class="titulo text-5xl font-bold lg:text-6xl" style="color:var(--acento);opacity:.9">{p.n}</span>
+          <h3 class="titulo mt-4 text-2xl font-semibold lg:mt-6">{p.t}</h3>
           <p class="mt-3 leading-relaxed">{p.d}</p>
-          <ul class="mt-auto flex flex-wrap gap-2 pt-8">
+          <ul class="mt-auto flex flex-wrap gap-2 pt-6 lg:pt-8">
             {p.s.map((s) => <li class="rounded-full border px-3 py-1 font-mono text-xs" style="border-color:color-mix(in srgb,var(--acento) 50%,transparent);color:var(--acento)">{s}</li>)}
           </ul>
         </li>

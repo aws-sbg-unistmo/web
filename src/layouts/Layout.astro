@@ -55,39 +55,53 @@ const imagenSocial = new URL('img/og.jpg', base ?? Astro.url).href;
       Saltar al contenido
     </a>
     <Header />
-    <main id="contenido">
+    <main id="contenido" class="overflow-x-clip">
       <slot />
     </main>
     <Footer />
 
-    <!-- En celular, botón fijo para unirse que aparece al bajar y se oculta al llegar al pie -->
+    <!-- En celular, botón fijo y discreto para unirse: aparece pasando la portada, se esconde mientras bajas
+         y vuelve cuando te detienes o subes. Al llegar al pie desaparece. -->
     {conCtaMovil && <a
       id="cta-movil"
       href={site.meetup}
       target="_blank"
       rel="noopener"
-      class="fixed inset-x-4 bottom-4 z-40 flex translate-y-24 items-center justify-center gap-2 rounded-full bg-magenta py-4 font-semibold text-marino shadow-[0_10px_40px_-8px_var(--color-magenta)] transition-transform duration-500 md:hidden"
+      class="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-1/2 z-40 flex -translate-x-1/2 translate-y-28 items-center gap-2.5 rounded-full border border-white/15 bg-marino/85 py-1.5 pl-1.5 pr-5 text-sm font-semibold text-white shadow-[0_12px_40px_-12px_rgba(0,0,0,0.8)] backdrop-blur-xl transition-transform duration-500 md:hidden"
     >
+      <span class="grid size-9 place-items-center rounded-full bg-magenta text-marino">
+        <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9" /></svg>
+      </span>
       Únete en Meetup
-      <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9" /></svg>
     </a>}
 
     <script>
       const cta = document.getElementById('cta-movil');
       if (cta) {
         let cercaDelPie = false;
+        let ultimoY = window.scrollY;
+        let bajando = false;
+        let quieto: number | undefined;
         const mover = () => {
-          const mostrar = window.scrollY > window.innerHeight * 0.7 && !cercaDelPie;
-          cta.classList.toggle('translate-y-24', !mostrar);
+          const mostrar = window.scrollY > window.innerHeight * 0.8 && !cercaDelPie && !bajando;
+          cta.classList.toggle('translate-y-28', !mostrar);
         };
         const pie = document.querySelector('footer');
         if (pie) new IntersectionObserver(([e]) => { cercaDelPie = e.isIntersecting; mover(); }).observe(pie);
-        window.addEventListener('scroll', mover, { passive: true });
+        window.addEventListener('scroll', () => {
+          const y = window.scrollY;
+          bajando = y > ultimoY + 2;
+          ultimoY = y;
+          mover();
+          clearTimeout(quieto);
+          quieto = window.setTimeout(() => { bajando = false; mover(); }, 700);
+        }, { passive: true });
       }
     </script>
 
     <script>
       import '../scripts/animaciones';
+      import '../scripts/carrusel';
     </script>
   </body>
 </html>

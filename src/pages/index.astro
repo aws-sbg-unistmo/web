@@ -59,26 +59,26 @@ const preguntas = [
 
   <!-- Respaldo: el grupo es parte de una red global (datos públicos de AWS Builder Center) -->
   <section class="relative mx-auto -mt-10 max-w-7xl px-5" aria-label="Parte de AWS Student Builder Groups">
-    <div class="grid gap-px overflow-hidden rounded-2xl border border-linea bg-linea sm:grid-cols-3" data-stagger>
-      <div class="bg-marino-2/90 px-6 py-5 backdrop-blur">
-        <p class="titulo text-3xl font-bold"><span data-contar="600">600</span><span class="text-magenta">+</span></p>
-        <p class="text-sm">universidades con un Student Builder Group</p>
+    <div class="grid grid-cols-3 gap-px overflow-hidden rounded-2xl border border-linea bg-linea" data-stagger>
+      <div class="bg-marino-2/90 px-3 py-4 backdrop-blur sm:px-6 sm:py-5">
+        <p class="titulo text-2xl font-bold sm:text-3xl"><span data-contar="600">600</span><span class="text-magenta">+</span></p>
+        <p class="mt-0.5 text-xs leading-snug sm:text-sm"><span class="sm:hidden">universidades</span><span class="hidden sm:inline">universidades con un Student Builder Group</span></p>
       </div>
-      <div class="bg-marino-2/90 px-6 py-5 backdrop-blur">
-        <p class="titulo text-3xl font-bold"><span data-contar="60">60</span><span class="text-magenta">+</span></p>
-        <p class="text-sm">países en la red de AWS</p>
+      <div class="bg-marino-2/90 px-3 py-4 backdrop-blur sm:px-6 sm:py-5">
+        <p class="titulo text-2xl font-bold sm:text-3xl"><span data-contar="60">60</span><span class="text-magenta">+</span></p>
+        <p class="mt-0.5 text-xs leading-snug sm:text-sm"><span class="sm:hidden">países</span><span class="hidden sm:inline">países en la red de AWS</span></p>
       </div>
-      <div class="bg-marino-2/90 px-6 py-5 backdrop-blur">
-        <p class="titulo text-3xl font-bold">1°<span class="text-magenta"> en Oaxaca</span></p>
-        <p class="text-sm">somos el primer Student Builder Group del estado</p>
+      <div class="bg-marino-2/90 px-3 py-4 backdrop-blur sm:px-6 sm:py-5">
+        <p class="titulo text-2xl font-bold sm:text-3xl">1°<span class="hidden text-magenta sm:inline"> en Oaxaca</span></p>
+        <p class="mt-0.5 text-xs leading-snug sm:text-sm"><span class="sm:hidden">grupo en Oaxaca</span><span class="hidden sm:inline">somos el primer Student Builder Group del estado</span></p>
       </div>
     </div>
   </section>
 
-  <div class="mt-16"><Cinta /></div>
+  <div class="mt-12 md:mt-16"><Cinta /></div>
 
   <!-- Qué hacemos -->
-  <section id="que-hacemos" class="mx-auto max-w-7xl px-5 pt-28">
+  <section id="que-hacemos" class="mx-auto max-w-7xl px-5 pt-20 md:pt-28">
     <div class="max-w-3xl">
       <p class="chip" data-reveal>// Qué hacemos</p>
       <Palabras texto="Aprendemos cloud construyendo cosas reales" resaltar={['construyendo']} class="mt-5 text-4xl font-bold leading-tight md:text-5xl" />
@@ -88,7 +88,7 @@ const preguntas = [
       </p>
     </div>
 
-    <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4" data-stagger>
+    <div class="mt-10 grid gap-6 sm:grid-cols-2 md:mt-14 lg:grid-cols-4" data-stagger data-carrusel>
       {actividades.map((a, i) => (
         <article class="tarjeta flex flex-col p-7" data-tilt>
           <div class="flex items-center justify-between">
@@ -107,7 +107,7 @@ const preguntas = [
   <Ruta />
 
   <!-- Lo que vas a aprender: pestañas por categoría, como el catálogo de aws.amazon.com -->
-  <section id="temas" class="mx-auto mt-32 max-w-7xl px-5">
+  <section id="temas" class="mx-auto mt-20 max-w-7xl px-5 md:mt-32">
     <div class="flex flex-wrap items-end justify-between gap-6">
       <div class="max-w-2xl">
         <p class="chip" data-reveal>// Lo que vas a aprender</p>
@@ -121,13 +121,13 @@ const preguntas = [
   </section>
 
   <!-- Para quién -->
-  <section class="relative mx-auto mt-32 max-w-7xl px-5">
+  <section class="relative mx-auto mt-20 max-w-7xl px-5 md:mt-32">
     <div class="grid items-center gap-14 lg:grid-cols-[1fr_1.1fr]">
       <div class="relative order-2 mx-auto w-full max-w-md lg:order-1">
         <div class="absolute inset-[12%] rounded-full bg-magenta/25 blur-3xl" aria-hidden="true"></div>
-        <div class="absolute inset-[6%] rounded-full border border-magenta/30 girar" aria-hidden="true"></div>
+        <div class="absolute left-1/2 top-1/2 aspect-square w-[88%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-magenta/30 girar" aria-hidden="true"></div>
         {site.usarMascota ? (
-          <img src="/img/mascota/06-nube-brillante.webp" alt="El jaguar del grupo sostiene una nube brillante" width="641" height="900" loading="lazy" class="flotar relative mx-auto h-[26rem] w-auto drop-shadow-[0_30px_60px_rgba(255,87,233,0.25)]" data-parallax="0.12" />
+          <img src="/img/mascota/06-nube-brillante.webp" alt="El jaguar del grupo sostiene una nube brillante" width="641" height="900" loading="lazy" class="flotar relative mx-auto h-72 w-auto sm:h-80 lg:h-[26rem] drop-shadow-[0_30px_60px_rgba(255,87,233,0.25)]" data-parallax="0.12" />
         ) : (
           <img src="/img/logo-512.png" alt="" width="512" height="512" loading="lazy" class="relative mx-auto size-80 rounded-3xl" />
         )}
@@ -181,7 +181,7 @@ const preguntas = [
   <RegionMexico />
 
   <!-- Eventos -->
-  <section class="mx-auto mt-32 max-w-7xl px-5">
+  <section class="mx-auto mt-20 max-w-7xl px-5 md:mt-32">
     <div class="flex flex-wrap items-end justify-between gap-6">
       <div>
         <p class="chip" data-reveal>// Próximos eventos</p>
@@ -208,14 +208,14 @@ const preguntas = [
           </a>
         </div>
         {site.usarMascota && (
-          <img src="/img/mascota/08-leyendo.webp" alt="" width="743" height="900" loading="lazy" class="mx-auto h-56 w-auto md:h-64" />
+          <img src="/img/mascota/08-leyendo.webp" alt="" width="743" height="900" loading="lazy" class="mx-auto h-40 w-auto md:h-64" />
         )}
       </div>
     )}
   </section>
 
   <!-- Arquitectura -->
-  <section class="mx-auto mt-32 max-w-7xl px-5">
+  <section class="mx-auto mt-20 max-w-7xl px-5 md:mt-32">
     <div class="grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
       <div class="lg:sticky lg:top-28 lg:self-start">
         <p class="chip" data-reveal>// Hecho en AWS</p>
@@ -233,7 +233,7 @@ const preguntas = [
   </section>
 
   <!-- Recursos gratuitos -->
-  <section class="mx-auto mt-32 max-w-7xl px-5">
+  <section class="mx-auto mt-20 max-w-7xl px-5 md:mt-32">
     <div class="flex flex-wrap items-end justify-between gap-6">
       <div class="max-w-2xl">
         <p class="chip" data-reveal>// Empieza hoy</p>
@@ -241,7 +241,7 @@ const preguntas = [
       </div>
       <a href="/aprende/#recursos" class="enlace-aws" data-reveal>Todos los recursos <Icono nombre="flecha" class="size-4" /></a>
     </div>
-    <div class="mt-12 grid gap-6 md:grid-cols-3" data-stagger>
+    <div class="mt-10 grid gap-6 md:mt-12 md:grid-cols-3" data-stagger data-carrusel>
       {recursos.slice(0, 3).map((r) => (
         <a href={r.url} target="_blank" rel="noopener" class="tarjeta group flex flex-col p-7" data-tilt>
           <span class="insignia self-start" style="--color-insignia:var(--color-azul)">{r.etiqueta}</span>
@@ -254,7 +254,7 @@ const preguntas = [
   </section>
 
   <!-- Preguntas -->
-  <section class="mx-auto mt-32 max-w-4xl px-5">
+  <section class="mx-auto mt-20 max-w-4xl px-5 md:mt-32">
     <div class="text-center">
       <p class="chip" data-reveal>// Preguntas frecuentes</p>
       <Palabras texto="Lo que más nos preguntan" resaltar={['preguntan']} class="mt-5 text-4xl font-bold md:text-5xl" />
