@@ -4,6 +4,7 @@ name: Desplegar página
 #  - push a main: compila, actualiza la infraestructura (si cambió) y publica.
 #  - cada 6 horas: vuelve a leer los eventos de Meetup y publica la versión nueva.
 #  - cuando alguien publica o cambia algo en Strapi (Strapi lanza este flujo con workflow_dispatch).
+#    Strapi puede vivir en Heroku (variable HEROKU_APP, gratis con el Student Pack) o en AWS (CMS_ACTIVO=true).
 #  - a mano desde la pestaña Actions.
 on:
   push:
@@ -149,14 +150,28 @@ jobs:
       - name: Compilar la imagen
         if: steps.cambio.outputs.si == 'true'
         run: docker build -t cms-prueba cms
-      - name: Arrancar Strapi y comprobar que responde
+      - name: Arrancar Strapi como en AWS (SQLite) y como en Heroku (Postgres, otro puerto, sin root)
         if: steps.cambio.outputs.si == 'true'
         run: |
           r() { openssl rand -hex 24; }
-          docker run -d --name cms -p 1337:1337 -e APP_KEYS="$(r),$(r)" -e API_TOKEN_SALT="$(r)" -e ADMIN_JWT_SECRET="$(r)"             -e TRANSFER_TOKEN_SALT="$(r)" -e JWT_SECRET="$(r)" -e ENCRYPTION_KEY="$(r)" -e DATABASE_FILENAME=.tmp/data.db cms-prueba
-          for i in $(seq 1 60); do curl -sf http://localhost:1337/_health && break; sleep 3; done
-          docker logs cms | grep -E "Datos iniciales|Token|started" || true
-          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:1337/admin)" = "200"
+          secretos() { printf 'APP_KEYS=%s,%s\nAPI_TOKEN_SALT=%s\nADMIN_JWT_SECRET=%s\nTRANSFER_TOKEN_SALT=%s\nJWT_SECRET=%s\nENCRYPTION_KEY=%s\n' "$(r)" "$(r)" "$(r)" "$(r)" "$(r)" "$(r)" "$(r)"; }
+          secretos > aws.env
+          secretos > heroku.env
+          docker network create red
+          docker run -d --name pg --network red -e POSTGRES_PASSWORD=prueba postgres:17-alpine
+          docker run -d --name cms-aws -p 1337:1337 --env-file aws.env -e DATABASE_FILENAME=.tmp/data.db cms-prueba
+          for i in $(seq 1 30); do docker exec pg pg_isready -U postgres > /dev/null 2>&1 && break; sleep 2; done
+          docker run -d --name cms-heroku --network red --user 4321 -p 5000:5000 --env-file heroku.env -e PORT=5000 -e IS_PROXIED=true \
+            -e DATABASE_CLIENT=postgres -e DATABASE_URL=postgres://postgres:prueba@pg:5432/postgres cms-prueba
+          for c in cms-aws:1337 cms-heroku:5000; do
+            nombre=${c%%:*}; puerto=${c##*:}
+            for i in $(seq 1 60); do curl -sf "http://localhost:$puerto/_health" > /dev/null && break; sleep 3; done
+            # Los datos iniciales se cargan en segundo plano, después de que el servidor ya responde
+            for i in $(seq 1 30); do docker logs "$nombre" 2>&1 | grep -q "integrantes y" && break; sleep 3; done
+            echo "== $nombre"; docker logs "$nombre" 2>&1 | grep -E "Datos iniciales|Token|started|rror" || true
+            test "$(curl -s -o /dev/null -w '%{http_code}' "http://localhost:$puerto/admin")" = "200"
+            docker logs "$nombre" 2>&1 | grep -q "integrantes y"
+          done
 
   # ------------------------------------------------------------------ CMS (Strapi) en AWS
   # Se activa con la variable CMS_ACTIVO=true. Crea la instancia y compila la imagen solo si cambió cms/.
@@ -197,6 +212,64 @@ jobs:
         run: |
           aws ssm send-command --instance-ids "${{ steps.cms.outputs.InstanceId }}" --document-name AWS-RunShellScript             --parameters 'commands=["/usr/local/bin/cms-actualizar"]' --comment "Actualizar CMS" > /dev/null
           echo "CMS: ${{ steps.cms.outputs.CmsUrl }}/admin" >> "$GITHUB_STEP_SUMMARY"
+
+  # ------------------------------------------------------------------ CMS (Strapi) en Heroku
+  # Se activa con la variable HEROKU_APP (nombre de la app) y el secreto HEROKU_API_KEY.
+  # Con el GitHub Student Developer Pack, Heroku da US$13 al mes: dyno Basic (US$7) + Postgres Essential-0 (US$5).
+  # Configura la app (contenedor y variables) y publica la imagen solo si cambió cms/ o si aún no hay ninguna.
+  cms-heroku:
+    if: vars.HEROKU_APP != '' && github.event_name != 'schedule' && inputs.origen != 'cms'
+    runs-on: ubuntu-latest
+    env:
+      APP: ${{ vars.HEROKU_APP }}
+      HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+      - name: Preparar la app (contenedor y variables)
+        id: app
+        run: |
+          h() { curl -sS --fail-with-body -H "Accept: application/vnd.heroku+json; version=3" -H "Authorization: Bearer $HEROKU_API_KEY" -H "Content-Type: application/json" "$@"; }
+          API="https://api.heroku.com/apps/$APP"
+          h -X PATCH "$API" -d '{"build_stack":"container"}' > /dev/null
+          actuales=$(h "$API/config-vars")
+          if [ "$(jq -r 'has("DATABASE_URL")' <<< "$actuales")" != true ]; then
+            echo "::error::Falta la base de datos: en Heroku → Resources agrega «Heroku Postgres» (plan Essential-0)."
+            exit 1
+          fi
+          [ "$(jq -r 'has("CLOUDINARY_URL")' <<< "$actuales")" = true ] ||
+            echo "::warning::Sin CLOUDINARY_URL las fotos que suban se borran cada vez que Heroku reinicia la app."
+          # Los secretos de Strapi se generan una sola vez; si ya existen no se tocan
+          r() { openssl rand -base64 32 | tr -d '\n'; }
+          secretos=$(jq -n --arg k "$(r),$(r)" --arg a "$(r)" --arg b "$(r)" --arg c "$(r)" --arg d "$(r)" --arg e "$(r)" \
+            '{APP_KEYS: $k, API_TOKEN_SALT: $a, ADMIN_JWT_SECRET: $b, TRANSFER_TOKEN_SALT: $c, JWT_SECRET: $d, ENCRYPTION_KEY: $e}')
+          fijas=$(jq -n --arg repo "$GITHUB_REPOSITORY" '{NODE_ENV: "production", IS_PROXIED: "true", DATABASE_CLIENT: "postgres",
+            DATABASE_SSL: "true", DATABASE_SSL_REJECT_UNAUTHORIZED: "false", GITHUB_REPO: $repo}')
+          cambios=$(jq -n --argjson act "$actuales" --argjson sec "$secretos" --argjson fij "$fijas" \
+            '($sec | with_entries(select($act[.key] == null))) + ($fij | with_entries(select($act[.key] != .value)))')
+          [ "$cambios" = "{}" ] || h -X PATCH "$API/config-vars" -d "$cambios" > /dev/null
+          # Se compila si cambió cms/ o si la app todavía no tiene ninguna versión
+          if ! h "$API/formation/web" > /dev/null 2>&1 || git diff --name-only HEAD~1 HEAD | grep -q '^cms/'; then
+            echo "compilar=true" >> "$GITHUB_OUTPUT"
+          fi
+          echo "url=$(h "$API" | jq -r .web_url)" >> "$GITHUB_OUTPUT"
+      - name: Compilar y publicar la imagen (amd64)
+        if: steps.app.outputs.compilar == 'true'
+        run: |
+          IMAGEN="registry.heroku.com/$APP/web"
+          docker build -t "$IMAGEN" cms
+          echo "$HEROKU_API_KEY" | docker login registry.heroku.com --username _ --password-stdin
+          docker push "$IMAGEN"
+          ID=$(docker inspect "$IMAGEN" --format '{{.Id}}')
+          h() { curl -sS --fail-with-body -H "Authorization: Bearer $HEROKU_API_KEY" -H "Content-Type: application/json" "$@"; }
+          h -X PATCH "https://api.heroku.com/apps/$APP/formation" -H "Accept: application/vnd.heroku+json; version=3.docker-releases" \
+            -d "{\"updates\":[{\"type\":\"web\",\"docker_image\":\"$ID\"}]}" > /dev/null
+          h -X PATCH "https://api.heroku.com/apps/$APP/formation/web" -H "Accept: application/vnd.heroku+json; version=3" \
+            -d '{"quantity":1,"size":"${{ vars.HEROKU_DYNO || 'basic' }}"}' > /dev/null
+      - name: Dirección del CMS
+        run: |
+          echo "CMS en Heroku: ${{ steps.app.outputs.url }}admin" >> "$GITHUB_STEP_SUMMARY"
 
   # ------------------------------------------------------------------ vista previa (GitHub Pages)
   vista-previa:

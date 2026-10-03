@@ -113,6 +113,45 @@ Al publicar, Strapi lanza este flujo y la página se actualiza sola en 2–3 min
 Mientras el CMS no esté activado, la página usa los datos de `src/data/site.ts`.
 Detalles y trabajo en local: [cms/README.md](cms/README.md).
 
+Puede vivir en dos lugares. Elige uno:
+
+| | Heroku (recomendado) | AWS |
+|---|---|---|
+| Costo | US$0 con el GitHub Student Developer Pack (US$13 al mes de crédito durante 24 meses); después ~US$12 al mes | ~US$11 al mes |
+| Qué usa | Dyno Basic (US$7) + Heroku Postgres Essential-0 (US$5) + Cloudinary gratis para las fotos | EC2 t4g.micro + IP pública + disco + CloudFront |
+| Requisito | Tarjeta de crédito o débito para canjear la oferta (no se cobra mientras no pases de US$13) | Haber terminado «Publicar en AWS» |
+
+### Activarlo en Heroku (una sola vez)
+
+1. **Crédito.** Con tu cuenta de GitHub Education, canjea la oferta de Heroku en [heroku.com/github-students](https://www.heroku.com/github-students/).
+2. **La app.** En el panel de Heroku: New → Create new app (por ejemplo `aws-sbg-unistmo-cms`, región United States).
+   - En Resources, agrega **Heroku Postgres** con el plan **Essential-0**.
+3. **Fotos.** Crea una cuenta gratis en [cloudinary.com](https://cloudinary.com).
+   - En su panel, copia la «API environment variable» (`cloudinary://…`).
+   - Pégala en Heroku → Settings → Config Vars como `CLOUDINARY_URL`.
+   - Sin esto, las fotos que suban se borran cada vez que Heroku reinicia la app (una vez al día).
+4. **Conectar GitHub con Heroku.**
+   - En Heroku → Account settings → API Key, copia la llave al secreto del repo `HEROKU_API_KEY`.
+   - Pon el nombre de la app en la variable `HEROKU_APP`.
+   - Corre el flujo «Desplegar página». El flujo:
+     - prepara la app;
+     - genera los secretos de Strapi;
+     - sube la imagen.
+   - En el resumen aparece la dirección del panel (`…herokuapp.com/admin`).
+5. **Tu cuenta.** Abre esa dirección **de inmediato** y crea la cuenta de Super Admin: la primera persona que entra la crea.
+6. **Conectar la página.** En el panel, ve a Ajustes → Tokens de API → `web` → Ver token.
+   - Cópialo al secreto `STRAPI_TOKEN`.
+   - Pon la dirección del CMS, sin `/admin`, en la variable `STRAPI_URL`.
+7. **Actualización inmediata (opcional).**
+   - Crea en GitHub un token *fine-grained* solo del repo `web` con permiso **Actions: Read and write**.
+   - Ponlo en Heroku → Config Vars como `GITHUB_TOKEN_DESPLIEGUE`.
+   - Sin este token, los cambios del CMS se ven en la compilación programada (cada 6 h).
+8. **Tu equipo.** Ajustes → Usuarios → Invitar con rol Author, y pon el mismo correo en «Correo del editor» de su tarjeta.
+
+El crédito es de tu cuenta personal de Heroku.
+Cuando entregues el liderazgo, transfiere la app en Settings → Transfer ownership.
+Heroku está en «modo de mantenimiento» desde febrero de 2026: sigue funcionando y recibe parches, pero ya no agrega funciones.
+
 ### Activarlo en AWS (una sola vez, después de «Publicar en AWS»)
 
 1. **Permisos.** En CloudFormation, actualiza el stack del rol de GitHub con la versión nueva de `infra/github-oidc.yaml`.

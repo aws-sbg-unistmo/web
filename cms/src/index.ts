@@ -49,10 +49,16 @@ async function permisosAutor(strapi: Core.Strapi) {
   strapi.log.info('Rol Author: puede editar y publicar su tarjeta, sus eventos y sus alianzas.');
 }
 
+// Se carga una sola vez (queda marcado en la base). Si el servidor se reinicia a la mitad, al volver
+// solo crea lo que falte, buscando por nombre; después de terminar ya no recrea lo que borren.
 async function datosIniciales(strapi: Core.Strapi) {
+  const almacen = strapi.store({ type: 'core', name: 'aws-sbg' });
+  if (await almacen.get({ key: 'datos-iniciales-v1' })) return;
   const archivo = path.join(process.cwd(), 'datos-iniciales.json');
   if (!fs.existsSync(archivo)) return;
   const datos = JSON.parse(fs.readFileSync(archivo, 'utf8'));
+  const existe = async (uid: 'api::integrante.integrante' | 'api::alianza.alianza', nombre: string) =>
+    Boolean(await strapi.documents(uid).findFirst({ filters: { nombre } }));
 
   const subir = async (ruta?: string) => {
     if (!ruta) return undefined;
@@ -65,37 +71,36 @@ async function datosIniciales(strapi: Core.Strapi) {
     return subido?.id;
   };
 
-  if ((await strapi.documents('api::integrante.integrante').count({})) === 0) {
-    for (const [i, p] of (datos.equipo ?? []).entries()) {
-      const [foto, ...extra] = await Promise.all((p.fotos ?? []).map(subir));
-      await strapi.documents('api::integrante.integrante').create({
-        data: {
-          nombre: p.nombre,
-          rol: p.rol,
-          carrera: p.carrera,
-          descripcion: p.descripcion,
-          correoEditor: p.correoEditor,
-          foto,
-          fotosExtra: extra.filter(Boolean),
-          ficha: (p.ficha ?? []).map((b: { titulo: string; items: string[] }) => ({ titulo: b.titulo, elementos: b.items.join('\n') })),
-          redes: p.redes ?? [],
-          orden: (i + 1) * 10,
-        },
-        status: 'published',
-      });
-    }
-    strapi.log.info(`Datos iniciales: ${datos.equipo?.length ?? 0} integrantes.`);
+  for (const [i, p] of (datos.equipo ?? []).entries()) {
+    if (await existe('api::integrante.integrante', p.nombre)) continue;
+    const [foto, ...extra] = await Promise.all((p.fotos ?? []).map(subir));
+    await strapi.documents('api::integrante.integrante').create({
+      data: {
+        nombre: p.nombre,
+        rol: p.rol,
+        carrera: p.carrera,
+        descripcion: p.descripcion,
+        correoEditor: p.correoEditor,
+        foto,
+        fotosExtra: extra.filter(Boolean),
+        ficha: (p.ficha ?? []).map((b: { titulo: string; items: string[] }) => ({ titulo: b.titulo, elementos: b.items.join('\n') })),
+        redes: p.redes ?? [],
+        orden: (i + 1) * 10,
+      },
+      status: 'published',
+    });
   }
 
-  if ((await strapi.documents('api::alianza.alianza').count({})) === 0) {
-    for (const [i, a] of (datos.alianzas ?? []).entries()) {
-      await strapi.documents('api::alianza.alianza').create({
-        data: { nombre: a.nombre, tipo: a.tipo, lema: a.lema, texto: a.texto, url: a.url, logo: await subir(a.logo), redes: a.redes ?? [], orden: (i + 1) * 10 },
-        status: 'published',
-      });
-    }
-    strapi.log.info(`Datos iniciales: ${datos.alianzas?.length ?? 0} alianzas.`);
+  for (const [i, a] of (datos.alianzas ?? []).entries()) {
+    if (await existe('api::alianza.alianza', a.nombre)) continue;
+    await strapi.documents('api::alianza.alianza').create({
+      data: { nombre: a.nombre, tipo: a.tipo, lema: a.lema, texto: a.texto, url: a.url, logo: await subir(a.logo), redes: a.redes ?? [], orden: (i + 1) * 10 },
+      status: 'published',
+    });
   }
+
+  await almacen.set({ key: 'datos-iniciales-v1', value: true });
+  strapi.log.info(`Datos iniciales: ${datos.equipo?.length ?? 0} integrantes y ${datos.alianzas?.length ?? 0} alianzas.`);
 }
 
 // Token de solo lectura para compilar la página. Se guarda una vez en .tmp/token-web.txt (no se sube a git).
@@ -103,10 +108,15 @@ async function tokenWeb(strapi: Core.Strapi) {
   const tokens = strapi.service('admin::api-token-content-api');
   if (await tokens.getByName('web')) return;
   const token = await tokens.create({ name: 'web', description: 'Lectura del contenido para compilar la página (GitHub Actions)', type: 'read-only', lifespan: null });
-  const carpeta = path.join(process.cwd(), '.tmp');
-  fs.mkdirSync(carpeta, { recursive: true });
-  fs.writeFileSync(path.join(carpeta, 'token-web.txt'), `${token.accessKey}\n`, { mode: 0o600 });
-  strapi.log.info('Token de lectura "web" creado y guardado en .tmp/token-web.txt (cópialo al secreto STRAPI_TOKEN de GitHub).');
+  try {
+    const carpeta = path.join(process.cwd(), '.tmp');
+    fs.mkdirSync(carpeta, { recursive: true });
+    fs.writeFileSync(path.join(carpeta, 'token-web.txt'), `${token.accessKey}\n`, { mode: 0o600 });
+    strapi.log.info('Token de lectura "web" creado y guardado en .tmp/token-web.txt (cópialo al secreto STRAPI_TOKEN de GitHub).');
+  } catch {
+    // En Heroku el disco no se puede usar: el token se copia desde el panel
+    strapi.log.info('Token de lectura "web" creado: cópialo desde Ajustes → API Tokens → web al secreto STRAPI_TOKEN de GitHub.');
+  }
 }
 
 // Pide a GitHub que recompile la página. Espera 45 s para juntar varios cambios seguidos en una sola compilación.
@@ -146,8 +156,9 @@ export default {
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
     await registrarCondicion(strapi);
     await permisosAutor(strapi);
-    await datosIniciales(strapi);
     await tokenWeb(strapi);
     avisarAGitHub(strapi);
+    // Sin await: subir las fotos iniciales tarda, y Heroku exige que el servidor responda en menos de 60 s
+    datosIniciales(strapi).catch((error) => strapi.log.error(`Datos iniciales: ${(error as Error).message}`));
   },
 };

@@ -32,7 +32,8 @@ npm install
 npm run develop        # http://localhost:1337/admin
 ```
 
-- La primera vez carga el equipo y las alianzas de `datos-iniciales.json` y crea el token de lectura `web` en `.tmp/token-web.txt`.
+- La primera vez carga el equipo y las alianzas de `datos-iniciales.json`, en segundo plano y una sola vez.
+- También crea el token de lectura `web` en `.tmp/token-web.txt`. En Heroku se copia desde Ajustes → Tokens de API.
 - Para probar la página con este contenido:
 
 ```sh
@@ -42,6 +43,17 @@ npm run dev
 ```
 
 Vuelve a dejar `src/data/cms.json` vacío antes de subir cambios. Si no, la página usará esos datos de prueba.
+
+## En Heroku (recomendado)
+
+Es gratis con el GitHub Student Developer Pack: US$13 al mes de crédito durante 24 meses.
+Lo despliega GitHub Actions (trabajo `cms-heroku`) en cuanto existe la variable `HEROKU_APP`:
+- Usa la misma imagen de Docker, compilada para amd64.
+- La base de datos vive en Heroku Postgres (Essential-0).
+- Las fotos se guardan en Cloudinary (`CLOUDINARY_URL`), porque el disco de Heroku se borra en cada reinicio.
+
+Costo: dyno Basic US$7 + Postgres US$5 = US$12 al mes, que cubre el crédito.
+Los pasos están en el README principal, en «Activarlo en Heroku».
 
 ## En AWS
 
