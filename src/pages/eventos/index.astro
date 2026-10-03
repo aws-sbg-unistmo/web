@@ -5,6 +5,13 @@ import EventoTarjeta from '../../components/EventoTarjeta.astro';
 import Icono from '../../components/Icono.astro';
 import { pasados, proximos } from '../../lib/eventos';
 import { site } from '../../data/site';
+
+const tipos = [
+  { icono: 'taller', titulo: 'Talleres prácticos', texto: 'Dos horas con tu laptop construyendo algo real en la consola de AWS.', color: 'var(--color-magenta)' },
+  { icono: 'usuarios', titulo: 'Charlas con la industria', texto: 'Profesionales de AWS y de la comunidad tech cuentan cómo trabajan.', color: 'var(--color-morado)' },
+  { icono: 'certificado', titulo: 'Study jams', texto: 'Sesiones en grupo para preparar tu primera certificación de AWS.', color: 'var(--color-azul)' },
+  { icono: 'rayo', titulo: 'Build days', texto: 'Retos en equipo para crear un proyecto completo en un solo día.', color: 'var(--color-menta)' },
+] as const;
 ---
 <Layout titulo="Eventos" descripcion="Talleres, charlas y eventos de AWS SBG UNISTMO en el Campus Tehuantepec.">
   <CabeceraPagina
@@ -31,6 +38,19 @@ import { site } from '../../data/site';
         </a>
       </div>
     )}
+
+    <h2 class="titulo mt-20 text-2xl font-semibold" data-reveal>Lo que organizamos</h2>
+    <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4" data-stagger>
+      {tipos.map((t) => (
+        <article class="tarjeta p-6" data-tilt style={`--acento:${t.color}`}>
+          <span class="grid size-11 place-items-center rounded-xl" style="background:color-mix(in srgb,var(--acento) 15%,transparent);color:var(--acento)">
+            <Icono nombre={t.icono} class="size-5" />
+          </span>
+          <h3 class="titulo mt-5 text-lg font-semibold">{t.titulo}</h3>
+          <p class="mt-2 text-sm leading-relaxed">{t.texto}</p>
+        </article>
+      ))}
+    </div>
 
     {pasados.length > 0 && (
       <>

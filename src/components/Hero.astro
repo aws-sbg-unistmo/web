@@ -5,20 +5,36 @@ import { site } from '../data/site';
 ---
 <section id="portada" class="relative isolate flex min-h-[100svh] items-center overflow-hidden">
   {site.usarMascota && (
-    <video
-      id="video-portada"
-      class="absolute inset-0 -z-30 size-full object-cover object-[72%_center] max-md:object-[96%_center] max-md:opacity-45"
-      autoplay
-      muted
-      loop
-      playsinline
-      preload="auto"
-      poster="/img/portada.jpg"
-      aria-hidden="true"
-    >
-      <source src="/video/portada-1280.webm" type="video/webm" />
-      <source src="/video/portada-1280.mp4" type="video/mp4" />
-    </video>
+    <div id="capa-video" class="absolute -inset-4 -z-30">
+      <video
+        id="video-portada"
+        class="absolute inset-0 size-full object-cover object-[72%_center] max-md:object-[96%_center] max-md:opacity-45"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="auto"
+        poster="/img/portada.jpg"
+        aria-hidden="true"
+      >
+        <source src="/video/portada-1280.webm" type="video/webm" />
+        <source src="/video/portada-1280.mp4" type="video/mp4" />
+      </video>
+      <script is:inline>
+        // Se decide la versión del video antes de que empiece a descargarse (sin bajar dos veces)
+        (function () {
+          var v = document.getElementById('video-portada');
+          if (!v) return;
+          if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            v.removeAttribute('autoplay');
+            v.preload = 'none';
+          } else if (innerWidth * Math.min(devicePixelRatio || 1, 2) > 1700) {
+            v.querySelectorAll('source').forEach(function (s) { s.src = s.src.replace('-1280.', '-1920.'); });
+            v.load();
+          }
+        })();
+      </script>
+    </div>
   )}
 
   <!-- Capas para que el texto se lea sobre el video -->
@@ -83,6 +99,7 @@ import { site } from '../data/site';
   /* Intro cinematográfica: el video entra con un ligero zoom hacia atrás */
   #video-portada { transform: scale(1.06); transition: transform 2.4s cubic-bezier(0.2, 0.7, 0.2, 1); }
   #video-portada.listo { transform: scale(1); }
+  #capa-video { transition: translate 1s cubic-bezier(0.2, 0.7, 0.2, 1); }
   /* En pantallas más anchas que 16:9 el video ocupa todo el alto (el jaguar se ve completo),
      se ancla a la derecha y su borde izquierdo se funde con el fondo */
   @media (min-aspect-ratio: 16/9) {
@@ -110,17 +127,22 @@ import { site } from '../data/site';
 
   const reducir = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const video = document.getElementById('video-portada') as HTMLVideoElement | null;
-  if (video) {
-    if (reducir) {
-      video.pause();
-    } else if (window.innerWidth * Math.min(window.devicePixelRatio || 1, 2) > 1700) {
-      // Pantallas grandes: versión de 1920 px
-      video.querySelectorAll('source').forEach((s) => (s.src = s.src.replace('-1280.', '-1920.')));
-      video.load();
-      video.play().catch(() => {});
+  if (video && !reducir) {
+    // Zoom de entrada en cuanto el video empieza a reproducirse (antes se ve la imagen de portada)
+    if (!video.paused) video.classList.add('listo');
+    else video.addEventListener('playing', () => video.classList.add('listo'), { once: true });
+
+    // Parallax con el mouse: el video se mueve un poco en sentido contrario al cursor
+    const capa = document.getElementById('capa-video');
+    const portada = document.getElementById('portada');
+    if (capa && portada && window.matchMedia('(pointer: fine)').matches) {
+      portada.addEventListener('pointermove', (e) => {
+        const x = (e.clientX / window.innerWidth - 0.5) * -14;
+        const y = (e.clientY / window.innerHeight - 0.5) * -10;
+        capa.style.translate = `${x}px ${y}px`;
+      });
+      portada.addEventListener('pointerleave', () => (capa.style.translate = ''));
     }
-    // Aparece suave cuando ya tiene cuadros listos (mientras tanto se ve la imagen de portada)
-    video.addEventListener('playing', () => video.classList.add('listo'), { once: true });
   }
 
   // Terminal que escribe comandos de AWS

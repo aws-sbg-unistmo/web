@@ -125,6 +125,17 @@ html {
   box-shadow: 0 0 40px -8px var(--color-magenta);
 }
 .boton-primario:hover { box-shadow: 0 0 60px -4px var(--color-magenta); }
+/* Destello que cruza el botón principal al pasar el cursor */
+.boton-primario { position: relative; overflow: hidden; isolation: isolate; }
+.boton-primario::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.55) 50%, transparent 70%);
+  transform: translateX(-120%);
+}
+.boton-primario:hover::after { transform: translateX(120%); transition: transform 0.7s ease; }
 .boton-secundario {
   border: 1px solid color-mix(in srgb, #fff 25%, transparent);
   color: #fff;

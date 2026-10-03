@@ -142,6 +142,25 @@ if (reducir) {
     });
   });
 
+  // Al bajar, el contenido de la portada sube y se desvanece mientras el video se acerca
+  const portada = document.getElementById('portada');
+  if (portada) {
+    const contenido = portada.querySelector('.max-w-2xl');
+    const trigger = { trigger: portada, start: 'top top', end: 'bottom top', scrub: true };
+    if (contenido) gsap.to(contenido, { yPercent: -18, opacity: 0.15, ease: 'none', scrollTrigger: trigger });
+    const capa = document.getElementById('capa-video');
+    if (capa) gsap.to(capa, { scale: 1.08, ease: 'none', scrollTrigger: trigger });
+  }
+
+  // Líneas de tiempo que se dibujan al hacer scroll
+  todos('[data-linea]').forEach((linea) => {
+    gsap.fromTo(linea, { scaleY: 0 }, {
+      scaleY: 1,
+      ease: 'none',
+      scrollTrigger: { trigger: linea.parentElement ?? linea, start: 'top 75%', end: 'bottom 55%', scrub: 0.6 },
+    });
+  });
+
   // Barra de progreso de lectura
   const barra = document.getElementById('progreso');
   if (barra) {
