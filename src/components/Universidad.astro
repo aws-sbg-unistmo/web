@@ -8,7 +8,7 @@ const { lat, lon } = universidad.coordenadas;
 const mapa = `https://www.openstreetmap.org/export/embed.html?bbox=${lon - 0.014},${lat - 0.008},${lon + 0.014},${lat + 0.008}&layer=mapnik&marker=${lat},${lon}`;
 const comoLlegar = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
 const verOsm = `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=16/${lat}/${lon}`;
-const [principal, ...otras] = universidad.fotos;
+const [principal] = universidad.fotos;
 const tehuantepec = universidad.campus.find((c) => c.aqui)!;
 ---
 <section id="universidad" class="mx-auto mt-28 max-w-7xl px-5">
@@ -53,23 +53,6 @@ const tehuantepec = universidad.campus.find((c) => c.aqui)!;
     </div>
   </div>
 
-  <div class="mt-6 grid gap-6 md:grid-cols-2" data-stagger>
-    {otras.map((f) => (
-      <figure class="tarjeta group overflow-hidden">
-        <div class="overflow-hidden">
-          <img src={f.src} alt={f.titulo} width={f.ancho} height={f.alto} loading="lazy" class="aspect-video w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
-        </div>
-        <figcaption class="p-5">
-          <span class="titulo block font-semibold">{f.titulo}</span>
-          <span class="mt-1 block text-xs text-suave/70">
-            Foto: {f.autor} · <a href={f.licenciaUrl} target="_blank" rel="noopener license" class="underline-offset-2 hover:text-white hover:underline">{f.licencia}</a> ·{' '}
-            <a href={f.fuente} target="_blank" rel="noopener" class="underline-offset-2 hover:text-white hover:underline">Wikimedia Commons</a>
-          </span>
-        </figcaption>
-      </figure>
-    ))}
-  </div>
-
   <!-- Mapa y cómo llegar -->
   <div class="tarjeta mt-6 grid overflow-hidden lg:grid-cols-[1.4fr_1fr]" data-reveal>
     <div class="relative min-h-80 border-b border-linea lg:border-b-0 lg:border-r">
@@ -109,15 +92,6 @@ const tehuantepec = universidad.campus.find((c) => c.aqui)!;
     </div>
   </div>
 
-  <div class="mt-6 rounded-3xl border border-linea bg-marino-2/60 p-7" data-reveal>
-    <p class="text-xs font-semibold uppercase tracking-widest text-suave/70">Carreras del Campus Tehuantepec</p>
-    <ul class="mt-4 flex flex-wrap gap-2">
-      {universidad.carrerasTehuantepec.map((c) => (
-        <li class="rounded-full border border-linea bg-marino/60 px-3.5 py-1.5 text-sm text-white">{c}</li>
-      ))}
-    </ul>
-    <p class="mt-4 text-sm">Estudiantes de <strong class="text-white">todas las carreras y campus</strong> son bienvenidos al grupo.</p>
-  </div>
 </section>
 
 <style>

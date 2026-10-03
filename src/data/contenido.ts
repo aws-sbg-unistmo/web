@@ -160,18 +160,6 @@ export const universidad = {
       autor: 'Universidad del Istmo', licencia: 'CC BY-SA 4.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/4.0/deed.es',
       fuente: 'https://commons.wikimedia.org/wiki/File:Unistmo.jpg',
     },
-    {
-      src: '/img/unistmo/entrada-ixtepec.webp', ancho: 800, alto: 450,
-      titulo: 'Entrada del Campus Ixtepec',
-      autor: 'Luixlaag', licencia: 'CC BY-SA 4.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/4.0/deed.es',
-      fuente: 'https://commons.wikimedia.org/wiki/File:Unistmo_Ixtepec.jpg',
-    },
-    {
-      src: '/img/unistmo/biblioteca-tehuantepec.webp', ancho: 960, alto: 720,
-      titulo: 'Biblioteca Pública de la UNISTMO en el centro de Tehuantepec',
-      autor: 'Adam Jones', licencia: 'CC BY-SA 2.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/2.0/deed.es',
-      fuente: 'https://commons.wikimedia.org/wiki/File:Facade_of_University_of_the_Isthmus_Library_-_Tehuantepec_-_Isthmus_Region_-_Oaxaca_-_Mexico_-_01_(6541222857).jpg',
-    },
   ],
 };
 

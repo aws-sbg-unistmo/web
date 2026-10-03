@@ -7,15 +7,12 @@
 // Solo aparece quien está en "equipo" de src/data/site.ts; desde la página nadie puede agregarse.
 import Icono from './Icono.astro';
 import Palabras from './Palabras.astro';
+import LogoRed from './LogoRed.astro';
 import { equipo, type Red } from '../data/site';
 
 const nombreRed: Record<Red['tipo'], string> = {
   linkedin: 'LinkedIn', instagram: 'Instagram', github: 'GitHub', youtube: 'YouTube',
   tiktok: 'TikTok', x: 'X', facebook: 'Facebook', web: 'Sitio web',
-};
-const iconoRed: Record<Red['tipo'], 'linkedin' | 'instagram' | 'github' | 'youtube' | 'tiktok' | 'x' | 'facebook' | 'globo'> = {
-  linkedin: 'linkedin', instagram: 'instagram', github: 'github', youtube: 'youtube',
-  tiktok: 'tiktok', x: 'x', facebook: 'facebook', web: 'globo',
 };
 const acentos = ['#ff57e9', '#ad5cff', '#42b4ff', '#00e582'];
 const areas = [
@@ -54,16 +51,28 @@ const dos = (n: number) => String(n).padStart(2, '0');
                 <span class="h-px w-10 bg-linea"></span>
                 <span>{dos(equipo.length)}</span>
               </p>
-              <h3 class="t-linea titulo mt-5 text-4xl font-bold leading-[1.05] sm:text-5xl lg:text-6xl" aria-label={p.nombre}><span class="nombre" data-texto={p.nombre} aria-hidden="true">{p.nombre}</span></h3>
+              <h3 class="t-linea nombre-h titulo mt-5 text-4xl font-bold leading-[1.05] sm:text-5xl xl:text-6xl" aria-label={p.nombre}><span class="nombre" data-texto={p.nombre} aria-hidden="true">{p.nombre}</span></h3>
               <p class="t-linea mt-4 text-xs font-bold uppercase tracking-[0.22em]" style="color:var(--acento)">{p.rol}</p>
               {p.carrera && <p class="t-linea mt-2 text-sm text-suave/80">{p.carrera}</p>}
-              {p.descripcion && <p class="t-linea mx-auto mt-6 max-w-lg text-lg leading-relaxed lg:mx-0">{p.descripcion}</p>}
+              {p.descripcion && <p class="t-linea desc mx-auto mt-5 max-w-xl leading-relaxed lg:mx-0 xl:text-[1.05rem]">{p.descripcion}</p>}
+              {p.ficha && (
+                <dl class="t-linea ficha mx-auto mt-6 grid max-w-xl gap-x-6 gap-y-4 sm:grid-cols-2 lg:mx-0">
+                  {p.ficha.map((f) => (
+                    <div>
+                      <dt class="text-[0.62rem] font-bold uppercase tracking-[0.2em] text-suave/60">{f.titulo}</dt>
+                      <dd class="mt-2 flex flex-wrap justify-center gap-1.5 lg:justify-start">
+                        {f.items.map((x) => <span class="etiqueta-ficha rounded-md border bg-marino/60 px-2 py-1 text-xs text-white">{x}</span>)}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
               {p.redes && p.redes.length > 0 && (
-                <ul class="t-linea mt-8 flex flex-wrap justify-center gap-2.5 lg:justify-start">
+                <ul class="t-linea mt-7 flex flex-wrap justify-center gap-2 lg:justify-start">
                   {p.redes.map((r) => (
                     <li>
-                      <a href={r.url} target="_blank" rel="noopener" class="red group/red inline-flex items-center gap-2 rounded-full border border-linea bg-marino/60 py-2 pl-2.5 pr-4 text-sm text-suave backdrop-blur transition-colors hover:text-white" aria-label={`${nombreRed[r.tipo]} de ${p.nombre}`}>
-                        <span class="grid size-7 place-items-center rounded-full bg-linea transition-colors group-hover/red:bg-[var(--acento)] group-hover/red:text-marino"><Icono nombre={iconoRed[r.tipo]} class="size-4" /></span>
+                      <a href={r.url} target="_blank" rel="noopener" class="red inline-flex items-center gap-2 rounded-full border border-linea bg-marino/60 py-1.5 pl-1.5 pr-3.5 text-sm text-suave backdrop-blur transition hover:-translate-y-0.5 hover:border-white/30 hover:text-white" aria-label={`${nombreRed[r.tipo]} de ${p.nombre}`}>
+                        <LogoRed red={r.tipo} class="size-7" />
                         {nombreRed[r.tipo]}
                       </a>
                     </li>
@@ -185,6 +194,13 @@ const dos = (n: number) => String(n).padStart(2, '0');
   .equipo-vivo.modo-pin .miembro { position: absolute; inset: 0; margin: 0; align-content: center; }
   .equipo-vivo.modo-pin .visual { width: min(25rem, calc((100svh - var(--arriba, 0px) - 7rem) * 0.8)); }
   .equipo-vivo.modo-pin .riel { display: flex; }
+  /* En pantallas bajas la ficha se compacta para que todo quepa en la escena fija */
+  @media (max-height: 820px) {
+    .equipo-vivo.modo-pin .nombre-h { font-size: 2.6rem; }
+    .equipo-vivo.modo-pin .desc { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .equipo-vivo.modo-pin .ficha { gap: 0.6rem 1.25rem; margin-top: 1rem; }
+  }
+  .etiqueta-ficha { border-color: color-mix(in srgb, var(--acento) 30%, var(--color-linea)); }
   .riel button[aria-current='true'] .punto { height: 1.75rem; background: var(--acento-actual); }
   .riel button[aria-current='true'] .etiqueta { color: #fff; opacity: 1; }
 </style>

@@ -73,14 +73,29 @@ export const servicios = [
 // Core Team. Para agregar a alguien basta con sumar un objeto.
 // "fotos": la primera es la principal (vertical 4:5, en public/img/equipo/); las demás flotan alrededor.
 export type Red = { tipo: 'linkedin' | 'instagram' | 'github' | 'youtube' | 'tiktok' | 'x' | 'facebook' | 'web'; url: string };
-export type Integrante = { nombre: string; rol: string; carrera?: string; descripcion?: string; fotos?: string[]; redes?: Red[] };
+// "ficha": bloques cortos (especialidad, intereses, credenciales, stack…) que se muestran como etiquetas.
+export type Integrante = {
+  nombre: string;
+  rol: string;
+  carrera?: string;
+  descripcion?: string;
+  ficha?: { titulo: string; items: string[] }[];
+  fotos?: string[];
+  redes?: Red[];
+};
 export const equipo: Integrante[] = [
   {
     nombre: 'Jean Paul Gallegos Cruz',
     rol: 'Student Builder Group Leader',
     carrera: 'Ingeniería en Computación',
     descripcion:
-      'Fundé el AWS Student Builder Group de la UNISTMO. También soy Google Student Ambassador ’26 y parte de Nexis Oaxaca Tech. Comparto lo que aprendo en los programas tech: cloud, seguridad y backend.',
+      'Fundé el AWS Student Builder Group de la UNISTMO. Me enfoco en la seguridad en la nube —AWS, Google Cloud y Azure— y en backend con Python y Laravel, con la IA como hilo que lo une todo. Soy Google Student Ambassador ’26, de la primera generación en México, y organizo eventos con Nexis Oaxaca Tech.',
+    ficha: [
+      { titulo: 'Especialidad', items: ['Cloud Security', 'Ciberseguridad multinube', 'Backend'] },
+      { titulo: 'Me apasiona', items: ['IA', 'Cloud', 'Ciberseguridad', 'Automatización', 'Robótica'] },
+      { titulo: 'Credenciales', items: ['Google Student Ambassador ’26', 'Google Cloud Cybersecurity', 'Google Cloud Computing Foundations', 'Cédula técnica en programación'] },
+      { titulo: 'Stack', items: ['Python', 'PHP · Laravel', 'C', 'Dart', 'Docker', 'Bash', 'AWS', 'Google Cloud'] },
+    ],
     fotos: ['/img/equipo/jean-paul.webp', '/img/equipo/jean-paul-2.webp', '/img/equipo/jean-paul-3.webp'],
     redes: [
       { tipo: 'linkedin', url: 'https://www.linkedin.com/in/jeanpaulgc' },
