@@ -37,9 +37,13 @@ if (reducir) {
   todos<HTMLAnchorElement>('a[href^="#"]').forEach((a) =>
     a.addEventListener('click', (e) => {
       const destino = a.getAttribute('href');
-      if (destino && destino.length > 1 && document.querySelector(destino)) {
+      const elemento = destino && destino.length > 1 ? document.querySelector<HTMLElement>(destino) : null;
+      if (elemento) {
         e.preventDefault();
-        lenis.scrollTo(destino, { offset: -80 });
+        // Lenis ya respeta el scroll-margin-top del CSS (deja espacio para el header y la barra "En esta página").
+        // Si el destino no lo tiene, se deja el espacio del header a mano.
+        const conMargen = parseFloat(getComputedStyle(elemento).scrollMarginTop) > 0;
+        lenis.scrollTo(elemento, { offset: conMargen ? 0 : -88 });
       }
     }),
   );

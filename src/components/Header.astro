@@ -1,60 +1,74 @@
 ---
 import Icono from './Icono.astro';
-import { navegacion, site } from '../data/site';
+import { anuncio, navegacion, site } from '../data/site';
 
 const ruta = Astro.url.pathname;
 const activo = (url: string) => (url === '/' ? ruta === '/' : ruta.startsWith(url));
 ---
-<header id="cabecera" class="fixed inset-x-0 top-0 z-50">
-  <div class="mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 py-4">
-    <a href="/" class="group flex items-center gap-3" aria-label={`${site.corto}, inicio`}>
-      <img src="/img/logo-192.png" alt="" width="40" height="40" class="size-10 rounded-xl ring-1 ring-white/15 transition-transform duration-500 group-hover:rotate-[-6deg] group-hover:scale-105" />
-      <span class="titulo text-lg font-semibold leading-none">
-        AWS SBG <span class="text-magenta">UNISTMO</span>
+<header id="cabecera" class:list={['fixed inset-x-0 top-0 z-50', anuncio.texto && 'con-anuncio']}>
+  {anuncio.texto && (
+    <a id="anuncio" href={anuncio.url} target="_blank" rel="noopener" class="group flex h-9 items-center justify-center gap-3 overflow-hidden border-b border-white/10 bg-[linear-gradient(90deg,#2a1640,#161d26_40%,#161d26_60%,#2a1640)] px-5 text-xs text-white sm:text-sm">
+      <span class="rounded bg-magenta px-1.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wider text-marino">{anuncio.etiqueta}</span>
+      <span class="truncate">
+        <span class="hidden sm:inline">{anuncio.texto}</span>
+        <span class="sm:hidden">{anuncio.corto}</span>
       </span>
+      <Icono nombre="flecha" class="size-4 shrink-0 text-magenta transition-transform group-hover:translate-x-1" />
     </a>
-
-    <nav class="hidden items-center gap-1 md:flex" aria-label="Principal">
-      {navegacion.map((item) => (
-        <a
-          href={item.url}
-          aria-current={activo(item.url) ? 'page' : undefined}
-          class="enlace-nav relative rounded-full px-4 py-2 text-sm font-medium text-suave transition-colors hover:text-white aria-[current=page]:text-white"
-        >
-          {item.texto}
-        </a>
-      ))}
-    </nav>
-
-    <a
-      href={site.meetup}
-      target="_blank"
-      rel="noopener"
-      data-magnetico
-      class="hidden items-center gap-2 rounded-full bg-magenta px-5 py-2.5 text-sm font-semibold text-marino shadow-[0_0_30px_-6px_var(--color-magenta)] transition-shadow hover:shadow-[0_0_44px_-4px_var(--color-magenta)] md:inline-flex"
-    >
-      Únete en Meetup <Icono nombre="externo" class="size-4" />
-    </a>
-
-    <button id="boton-menu" class="rounded-lg p-2 text-white md:hidden" aria-expanded="false" aria-controls="menu-movil" aria-label="Abrir menú">
-      <Icono nombre="menu" class="size-7" />
-    </button>
-  </div>
-
-  <div id="menu-movil" class="pointer-events-none fixed inset-0 z-40 flex flex-col bg-marino/95 px-6 pt-24 opacity-0 backdrop-blur-xl transition-opacity duration-300 md:hidden" hidden>
-    <button id="cerrar-menu" class="absolute right-5 top-4 rounded-lg p-2 text-white" aria-label="Cerrar menú">
-      <Icono nombre="cerrar" class="size-7" />
-    </button>
-    {navegacion.map((item, i) => (
-      <a href={item.url} class="titulo border-b border-linea py-5 text-3xl font-semibold" style={`transition-delay:${i * 40}ms`}>
-        {item.texto}
+  )}
+  <div class="barra-nav">
+    <div class="mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 py-4">
+      <a href="/" class="group flex items-center gap-3" aria-label={`${site.corto}, inicio`}>
+        <img src="/img/logo-192.png" alt="" width="40" height="40" class="size-10 rounded-xl ring-1 ring-white/15 transition-transform duration-500 group-hover:rotate-[-6deg] group-hover:scale-105" />
+        <span class="titulo text-lg font-semibold leading-none">
+          AWS SBG <span class="text-magenta">UNISTMO</span>
+        </span>
       </a>
-    ))}
-    <a href={site.meetup} target="_blank" rel="noopener" class="mt-8 inline-flex items-center justify-center gap-2 rounded-full bg-magenta py-4 font-semibold text-marino">
-      Únete en Meetup <Icono nombre="externo" class="size-4" />
-    </a>
+
+      <nav class="hidden items-center gap-1 lg:flex" aria-label="Principal">
+        {navegacion.map((item) => (
+          <a
+            href={item.url}
+            aria-current={activo(item.url) ? 'page' : undefined}
+            class="enlace-nav relative rounded-full px-4 py-2 text-sm font-medium text-suave transition-colors hover:text-white aria-[current=page]:text-white"
+          >
+            {item.texto}
+          </a>
+        ))}
+      </nav>
+
+      <a
+        href={site.meetup}
+        target="_blank"
+        rel="noopener"
+        data-magnetico
+        class="hidden items-center gap-2 rounded-full bg-magenta px-5 py-2.5 text-sm font-semibold text-marino shadow-[0_0_30px_-6px_var(--color-magenta)] transition-shadow hover:shadow-[0_0_44px_-4px_var(--color-magenta)] lg:inline-flex"
+      >
+        Únete en Meetup <Icono nombre="externo" class="size-4" />
+      </a>
+
+      <button id="boton-menu" class="rounded-lg p-2 text-white lg:hidden" aria-expanded="false" aria-controls="menu-movil" aria-label="Abrir menú">
+        <Icono nombre="menu" class="size-7" />
+      </button>
+    </div>
   </div>
 </header>
+
+<!-- Fuera del header: el desenfoque del header crearía un contenedor y recortaría el menú -->
+<div id="menu-movil" class="pointer-events-none fixed inset-0 z-[55] flex flex-col overflow-y-auto bg-marino/95 px-6 pb-10 pt-24 opacity-0 backdrop-blur-xl transition-opacity duration-300 lg:hidden" hidden>
+  <button id="cerrar-menu" class="absolute right-5 top-4 rounded-lg p-2 text-white" aria-label="Cerrar menú">
+    <Icono nombre="cerrar" class="size-7" />
+  </button>
+  {navegacion.map((item, i) => (
+    <a href={item.url} aria-current={activo(item.url) ? 'page' : undefined} class="titulo flex items-center justify-between border-b border-linea py-4 text-3xl font-semibold aria-[current=page]:text-magenta" style={`transition-delay:${i * 40}ms`}>
+      {item.texto}
+      <Icono nombre="flecha" class="size-6 text-suave/40" />
+    </a>
+  ))}
+  <a href={site.meetup} target="_blank" rel="noopener" class="mt-8 inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-magenta py-4 font-semibold text-marino">
+    Únete en Meetup <Icono nombre="externo" class="size-4" />
+  </a>
+</div>
 
 <style>
   /* Subrayado animado que crece desde el centro */
@@ -74,8 +88,11 @@ const activo = (url: string) => (url === '/' ? ruta === '/' : ruta.startsWith(ur
     width: 40%;
     left: 30%;
   }
-  #cabecera { transition: background-color 0.2s ease, box-shadow 0.2s ease, backdrop-filter 0.2s ease; }
-  #cabecera.con-fondo {
+  /* Al bajar, el aviso se esconde subiendo todo el header (transform: no mueve el resto de la página) */
+  #cabecera { transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1); }
+  #cabecera.con-anuncio.con-fondo { transform: translateY(-2.25rem); }
+  .barra-nav { transition: background-color 0.2s ease, box-shadow 0.2s ease, backdrop-filter 0.2s ease; }
+  #cabecera.con-fondo .barra-nav {
     background: color-mix(in srgb, var(--color-marino) 88%, transparent);
     backdrop-filter: blur(16px);
     box-shadow: 0 1px 0 0 var(--color-linea);

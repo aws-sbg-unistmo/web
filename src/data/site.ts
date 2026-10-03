@@ -14,6 +14,14 @@ export const site = {
   usarMascota: true,
 };
 
+// Barra de aviso arriba de toda la página (como la de aws.amazon.com). Con texto vacío no se muestra.
+export const anuncio = {
+  etiqueta: 'Nuevo',
+  texto: 'Ya somos AWS Student Builder Group en la UNISTMO. Únete al Meetup para el primer evento',
+  corto: 'Únete al Meetup para el primer evento',
+  url: 'https://www.meetup.com/aws-sbg-at-university-of-the-isthmus-tehuantepec-campus/',
+};
+
 export const redes = [
   { nombre: 'Instagram', usuario: '@aws.unistmo', url: 'https://www.instagram.com/aws.unistmo/' },
   { nombre: 'TikTok', usuario: '@awssbg_unistmo', url: 'https://www.tiktok.com/@awssbg_unistmo' },
@@ -25,6 +33,7 @@ export const redes = [
 
 export const navegacion = [
   { texto: 'Inicio', url: '/' },
+  { texto: 'Aprende', url: '/aprende/' },
   { texto: 'Eventos', url: '/eventos/' },
   { texto: 'Nosotros', url: '/nosotros/' },
   { texto: 'Únete', url: '/unete/' },

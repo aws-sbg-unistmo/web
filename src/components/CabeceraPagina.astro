@@ -1,5 +1,6 @@
 ---
-// Encabezado de las páginas internas: etiqueta, título animado, descripción y una pose del jaguar.
+// Encabezado de las páginas internas: migas de pan, etiqueta, título animado, descripción y una pose del jaguar.
+import Icono from './Icono.astro';
 import Palabras from './Palabras.astro';
 import { site } from '../data/site';
 
@@ -9,14 +10,25 @@ interface Props {
   resaltar?: string[];
   descripcion: string;
   pose?: string;
+  /** Nombre de la página en las migas de pan (Inicio › Nombre) */
+  migas?: string;
 }
-const { etiqueta, titulo, resaltar = [], descripcion, pose } = Astro.props;
+const { etiqueta, titulo, resaltar = [], descripcion, pose, migas } = Astro.props;
 ---
-<section class="relative isolate overflow-hidden pt-36 pb-16">
+<section class="relative isolate overflow-hidden pb-16 pt-40">
   <div class="rejilla absolute inset-0 -z-10 opacity-30 [mask-image:radial-gradient(ellipse_at_top,#000,transparent_70%)]"></div>
   <div class="absolute -top-40 left-1/2 -z-10 h-96 w-[56rem] -translate-x-1/2 rounded-full bg-morado/20 blur-3xl"></div>
   <div class="mx-auto grid max-w-7xl items-end gap-10 px-5 md:grid-cols-[1fr_auto]">
     <div class="max-w-3xl">
+      {migas && (
+        <nav aria-label="Migas de pan" class="entrada mb-6">
+          <ol class="flex items-center gap-2 text-sm">
+            <li><a href="/" class="text-suave/70 underline-offset-4 hover:text-white hover:underline">Inicio</a></li>
+            <li aria-hidden="true" class="text-suave/40"><Icono nombre="chevron" class="size-4" /></li>
+            <li><span aria-current="page" class="font-medium text-white">{migas}</span></li>
+          </ol>
+        </nav>
+      )}
       <p class="chip entrada">{etiqueta}</p>
       <Palabras como="h1" texto={titulo} resaltar={resaltar} inmediato class="mt-5 text-5xl font-bold leading-[1.05] md:text-6xl" />
       <p class="entrada mt-6 text-lg leading-relaxed" style="--d:0.3s">{descripcion}</p>

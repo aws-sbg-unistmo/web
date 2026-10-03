@@ -1,0 +1,79 @@
+---
+// Pestañas por categoría de servicios (como el catálogo de productos de aws.amazon.com).
+// Funciona con teclado: flechas izquierda/derecha para cambiar de categoría.
+import Mosaico from './Mosaico.astro';
+import { categorias, temas } from '../data/contenido';
+---
+<div class="temas" data-temas>
+  <div role="tablist" aria-label="Categorías de servicios" class="relative -mx-5 flex gap-2 overflow-x-auto px-5 pb-2 [scrollbar-width:none] md:mx-0 md:flex-wrap md:px-0">
+    {temas.map((t, i) => (
+      <button
+        role="tab"
+        id={`pestana-${t.categoria}`}
+        aria-controls={`panel-${t.categoria}`}
+        aria-selected={i === 0 ? 'true' : 'false'}
+        tabindex={i === 0 ? 0 : -1}
+        class="pestana flex shrink-0 items-center gap-2.5 rounded-full border border-linea px-4 py-2.5 text-sm font-medium transition"
+        style={`--cat:${categorias[t.categoria].color}`}
+      >
+        <span class="size-2.5 rounded-full" style="background:var(--cat)"></span>
+        {categorias[t.categoria].nombre}
+      </button>
+    ))}
+  </div>
+
+  {temas.map((t, i) => (
+    <div role="tabpanel" id={`panel-${t.categoria}`} aria-labelledby={`pestana-${t.categoria}`} class="panel mt-8 rounded-3xl" tabindex="0" hidden={i !== 0}>
+      <div class="grid gap-5 md:grid-cols-3">
+        {t.servicios.map((s) => (
+          <article class="tarjeta flex gap-4 p-6" data-tilt>
+            <Mosaico categoria={t.categoria} />
+            <div>
+              <h3 class="titulo text-lg font-semibold">{s.nombre}</h3>
+              <p class="mt-1.5 text-sm leading-relaxed">{s.texto}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  ))}
+</div>
+
+<style>
+  .pestana[aria-selected='true'] {
+    border-color: var(--cat);
+    background: color-mix(in srgb, var(--cat) 16%, transparent);
+    color: #fff;
+  }
+  .pestana:hover { color: #fff; border-color: color-mix(in srgb, var(--cat) 60%, transparent); }
+  .panel:not([hidden]) { animation: panel 0.5s cubic-bezier(0.2, 0.7, 0.2, 1); }
+  @keyframes panel { from { opacity: 0; transform: translateY(12px); } }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-temas]').forEach((caja) => {
+    const pestanas = Array.from(caja.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
+    const activar = (p: HTMLButtonElement, enfocar = false) => {
+      pestanas.forEach((otra) => {
+        const si = otra === p;
+        otra.setAttribute('aria-selected', String(si));
+        otra.tabIndex = si ? 0 : -1;
+        const panel = document.getElementById(otra.getAttribute('aria-controls')!);
+        if (panel) panel.hidden = !si;
+      });
+      if (enfocar) p.focus();
+      // En celular la fila de pestañas se recorre de lado para que la elegida quede al centro
+      const fila = p.parentElement!;
+      fila.scrollTo({ left: p.offsetLeft - (fila.clientWidth - p.offsetWidth) / 2, behavior: 'smooth' });
+    };
+    pestanas.forEach((p, i) => {
+      p.addEventListener('click', () => activar(p));
+      p.addEventListener('keydown', (e) => {
+        const paso = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+        if (!paso) return;
+        e.preventDefault();
+        activar(pestanas[(i + paso + pestanas.length) % pestanas.length], true);
+      });
+    });
+  });
+</script>

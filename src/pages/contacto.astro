@@ -4,6 +4,7 @@ import CabeceraPagina from '../components/CabeceraPagina.astro';
 import Campo from '../components/Campo.astro';
 import EnvioFormulario from '../components/EnvioFormulario.astro';
 import Icono from '../components/Icono.astro';
+import Palabras from '../components/Palabras.astro';
 import { redes, site } from '../data/site';
 
 const tipos = [
@@ -13,9 +14,27 @@ const tipos = [
   'Duda general',
   'Otro',
 ];
+const perfiles = [
+  {
+    icono: 'microfono', color: 'var(--color-magenta)', titulo: 'Si quieres dar una charla o taller',
+    puntos: ['Charlas de 30 a 45 minutos o talleres de 1 a 2 horas', 'Presencial en el campus o en línea', 'Temas de nube, IA, desarrollo o tu experiencia profesional', 'Nosotros nos encargamos de la difusión y el registro'],
+    boton: 'Proponer una charla', motivo: 'Quiero dar una charla o taller',
+  },
+  {
+    icono: 'usuarios', color: 'var(--color-morado)', titulo: 'Si eres una comunidad u organización',
+    puntos: ['Organizar eventos en conjunto', 'Compartir convocatorias, becas o programas para estudiantes', 'Conectar a estudiantes con la industria tech de la región'],
+    boton: 'Proponer una colaboración', motivo: 'Colaboración con otra comunidad',
+  },
+  {
+    icono: 'info', color: 'var(--color-azul)', titulo: 'Si eres estudiante',
+    puntos: ['Para enterarte de eventos, únete al grupo en Meetup', 'Para participar en el Core Team, llena el formulario de Únete', 'Para otra duda, escríbenos aquí'],
+    boton: 'Ir a Únete', url: '/unete/',
+  },
+] as const;
 ---
 <Layout titulo="Contacto" descripcion="Escríbenos: charlas, talleres, alianzas, colaboraciones o dudas sobre AWS SBG UNISTMO.">
   <CabeceraPagina
+    migas="Contacto"
     etiqueta="// Contacto"
     titulo="Hablemos"
     resaltar={['Hablemos']}
@@ -24,7 +43,7 @@ const tipos = [
   />
 
   <section class="mx-auto grid max-w-7xl gap-10 px-5 lg:grid-cols-[1.4fr_1fr]">
-    <div class="tarjeta p-7 md:p-10" data-reveal>
+    <div id="formulario" class="tarjeta scroll-mt-36 p-7 md:p-10" data-reveal>
       <form data-formulario="contacto" class="space-y-6">
         <div class="grid gap-6 md:grid-cols-2">
           <Campo nombre="nombre" etiqueta="Nombre" requerido max={100} min={2} autocompletar="name" />
@@ -68,6 +87,39 @@ const tipos = [
       </div>
     </aside>
   </section>
+
+  <section class="mx-auto mt-28 max-w-7xl px-5">
+    <div class="max-w-3xl">
+      <p class="chip" data-reveal>// Colaboremos</p>
+      <Palabras texto="¿Cómo podemos trabajar juntos?" resaltar={['juntos?']} class="mt-5 text-4xl font-bold leading-tight md:text-5xl" />
+    </div>
+    <div class="mt-12 grid gap-6 lg:grid-cols-3" data-stagger>
+      {perfiles.map((p) => (
+        <article class="tarjeta flex flex-col p-7" data-tilt style={`--acento:${p.color}`}>
+          <span class="grid size-12 place-items-center rounded-xl" style="background:color-mix(in srgb,var(--acento) 15%,transparent);color:var(--acento)"><Icono nombre={p.icono} class="size-6" /></span>
+          <h3 class="titulo mt-6 text-xl font-semibold">{p.titulo}</h3>
+          <ul class="mt-4 space-y-2.5">
+            {p.puntos.map((t) => <li class="flex gap-2.5 text-sm"><Icono nombre="check" class="mt-0.5 size-4 shrink-0 text-menta" />{t}</li>)}
+          </ul>
+          {'motivo' in p ? (
+            <a href="#formulario" data-motivo={p.motivo} class="enlace-aws mt-auto pt-8 text-sm">{p.boton} <Icono nombre="flecha" class="size-4" /></a>
+          ) : (
+            <a href={p.url} class="enlace-aws mt-auto pt-8 text-sm">{p.boton} <Icono nombre="flecha" class="size-4" /></a>
+          )}
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <script>
+    // Los botones "Proponer…" eligen el motivo del formulario antes de llevarte a él
+    document.querySelectorAll<HTMLAnchorElement>('[data-motivo]').forEach((a) =>
+      a.addEventListener('click', () => {
+        const select = document.querySelector<HTMLSelectElement>('#campo-tipo');
+        if (select) select.value = a.dataset.motivo ?? '';
+      }),
+    );
+  </script>
 
   <script>
     import '../scripts/formulario';

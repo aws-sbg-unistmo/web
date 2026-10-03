@@ -65,7 +65,9 @@ npm run build        # genera dist/
 | Qué | Dónde |
 |---|---|
 | Textos generales, redes, navegación, actividades, equipo | `src/data/site.ts` |
-| Preguntas frecuentes | `src/pages/index.astro` |
+| Barra de aviso de arriba (texto vacío = no se muestra) | `anuncio` en `src/data/site.ts` |
+| Servicios por categoría, beneficios, recursos, certificaciones, glosario, universidad y región de México | `src/data/contenido.ts` |
+| Preguntas frecuentes | `src/pages/index.astro` y `src/pages/eventos/index.astro` |
 | Ruta de aprendizaje | `src/components/Ruta.astro` |
 | Mascota en toda la página (sí / no) | `usarMascota` en `src/data/site.ts` |
 | Videos y fotos | `public/video`, `public/img`. Los originales de Flow están en `media-fuente/` |
@@ -108,9 +110,9 @@ Mientras AWS no esté configurado, cada push publica una vista previa en GitHub 
 ```
 src/
   components/   Encabezado, portada con video, ruta, diagrama, formularios…
-  data/         site.ts (contenido) y events.json (generado desde Meetup)
+  data/         site.ts y contenido.ts (textos), events.json (generado desde Meetup)
   layouts/      Plantilla base (SEO, fuentes, barra de progreso)
-  pages/        inicio, eventos, nosotros, únete, contacto, privacidad, 404
+  pages/        inicio, aprende, eventos, nosotros, únete, contacto, privacidad, 404
   scripts/      animaciones.ts, red.ts (partículas), formulario.ts
 backend/        Plantilla SAM y código de la Lambda de formularios
 infra/          Rol OIDC para GitHub Actions

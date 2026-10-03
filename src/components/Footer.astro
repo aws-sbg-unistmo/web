@@ -1,52 +1,90 @@
 ---
+// Pie de página con la estructura del de aws.amazon.com: banda "Volver arriba", columnas de enlaces y aviso legal.
 import Icono from './Icono.astro';
-import { navegacion, redes, site } from '../data/site';
+import { redes, site } from '../data/site';
+import { recursos } from '../data/contenido';
 const anio = new Date().getFullYear();
+
+const columnas = [
+  {
+    titulo: 'El grupo',
+    enlaces: [
+      { texto: 'Nosotros', url: '/nosotros/' },
+      { texto: 'Eventos', url: '/eventos/' },
+      { texto: 'Únete', url: '/unete/' },
+      { texto: 'Contacto', url: '/contacto/' },
+      { texto: 'Código de conducta', url: '/nosotros/#codigo' },
+    ],
+  },
+  {
+    titulo: 'Aprende',
+    enlaces: [
+      { texto: '¿Qué es la nube?', url: '/aprende/#nube' },
+      { texto: 'Servicios de AWS', url: '/aprende/#servicios' },
+      { texto: 'Ruta de aprendizaje', url: '/aprende/#ruta' },
+      { texto: 'Certificaciones', url: '/aprende/#certificaciones' },
+      { texto: 'Glosario', url: '/aprende/#glosario' },
+    ],
+  },
+  {
+    titulo: 'Recursos de AWS',
+    enlaces: recursos.slice(0, 5).map((r) => ({ texto: r.nombre, url: r.url, externo: true })),
+  },
+  {
+    titulo: 'Síguenos',
+    enlaces: redes.map((r) => ({ texto: r.nombre, url: r.url, externo: true })),
+  },
+] as { titulo: string; enlaces: { texto: string; url: string; externo?: boolean }[] }[];
 ---
-<footer class="relative mt-32 overflow-hidden border-t border-linea">
-  <div class="pointer-events-none absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-magenta to-transparent"></div>
+<footer class="relative mt-32 overflow-hidden">
+  <a href="#contenido" class="group flex items-center justify-center gap-2 border-y border-linea bg-marino-2 py-4 text-sm font-semibold text-white transition-colors hover:bg-linea/60">
+    <Icono nombre="arriba" class="size-4 transition-transform group-hover:-translate-y-0.5" /> Volver arriba
+  </a>
+
   <div class="pointer-events-none absolute -bottom-40 left-1/2 h-80 w-[60rem] -translate-x-1/2 rounded-full bg-magenta/10 blur-3xl"></div>
 
-  <div class="relative mx-auto grid max-w-7xl gap-12 px-5 py-16 md:grid-cols-[1.4fr_1fr_1fr]">
-    <div>
+  <div class="relative mx-auto grid max-w-7xl grid-cols-2 gap-x-6 gap-y-12 px-5 py-16 lg:grid-cols-[1.5fr_repeat(4,1fr)] lg:gap-x-8">
+    <div class="col-span-2 lg:col-span-1">
       <a href="/" class="flex items-center gap-3">
         <img src="/img/logo-192.png" alt="" width="48" height="48" class="size-12 rounded-xl ring-1 ring-white/15" loading="lazy" />
         <span class="titulo text-xl font-semibold">AWS SBG <span class="text-magenta">UNISTMO</span></span>
       </a>
       <p class="mt-4 max-w-sm text-sm leading-relaxed">{site.descripcion}</p>
-      <a href={`mailto:${site.correo}`} class="mt-4 inline-flex items-center gap-2 text-sm text-white hover:text-magenta">
-        <Icono nombre="correo" class="size-4" /> {site.correo}
+      <p class="mt-4 flex items-start gap-2 text-sm"><Icono nombre="lugar" class="mt-0.5 size-4 shrink-0 text-magenta" /> {site.campus}</p>
+      <a href={`mailto:${site.correo}`} class="mt-2 inline-flex items-center gap-2 text-sm text-white hover:text-magenta">
+        <Icono nombre="correo" class="size-4 text-magenta" /> {site.correo}
+      </a>
+      <a href={site.meetup} target="_blank" rel="noopener" class="boton boton-primario mt-6 px-5! py-3! text-sm">
+        Únete en Meetup <Icono nombre="externo" class="size-4" />
       </a>
     </div>
 
-    <nav aria-label="Pie de página">
-      <h2 class="font-mono text-xs uppercase tracking-[0.2em] text-magenta">Página</h2>
-      <ul class="mt-4 space-y-2 text-sm">
-        {navegacion.map((item) => <li><a href={item.url} class="hover:text-white">{item.texto}</a></li>)}
-        <li><a href="/privacidad/" class="hover:text-white">Aviso de privacidad</a></li>
-      </ul>
-    </nav>
-
-    <div>
-      <h2 class="font-mono text-xs uppercase tracking-[0.2em] text-magenta">Síguenos</h2>
-      <ul class="mt-4 space-y-2 text-sm">
-        {redes.map((r) => (
-          <li>
-            <a href={r.url} target="_blank" rel="noopener" class="group inline-flex items-center gap-2 hover:text-white">
-              {r.nombre}
-              <Icono nombre="externo" class="size-3.5 opacity-0 transition-opacity group-hover:opacity-100" />
-            </a>
-          </li>
-        ))}
-      </ul>
-    </div>
+    {columnas.map((c) => (
+      <nav aria-label={c.titulo}>
+        <h2 class="titulo text-sm font-semibold">{c.titulo}</h2>
+        <ul class="mt-4 space-y-2.5 text-sm">
+          {c.enlaces.map((e) => (
+            <li>
+              <a href={e.url} target={e.externo ? '_blank' : undefined} rel={e.externo ? 'noopener' : undefined} class="group inline-flex items-center gap-1.5 text-suave/85 hover:text-white hover:underline hover:underline-offset-4">
+                {e.texto}
+                {e.externo && <Icono nombre="externo" class="size-3 opacity-50 group-hover:opacity-100" />}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    ))}
   </div>
 
   <div class="relative border-t border-linea">
-    <div class="mx-auto flex max-w-7xl flex-col gap-2 px-5 py-6 text-xs text-suave/70 md:flex-row md:items-center md:justify-between">
-      <p>© {anio} {site.nombre}. Comunidad dirigida por estudiantes.</p>
-      <p>
-        No es un sitio oficial de Amazon Web Services. AWS y el logotipo de AWS son marcas de Amazon.com, Inc. o sus filiales.
+    <div class="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-6 text-xs text-suave/70 lg:flex-row lg:items-center lg:justify-between">
+      <p class="flex flex-wrap items-center gap-x-4 gap-y-1">
+        <span>© {anio} {site.nombre}</span>
+        <a href="/privacidad/" class="hover:text-white hover:underline">Aviso de privacidad</a>
+        <a href={site.github} target="_blank" rel="noopener" class="hover:text-white hover:underline">Código abierto</a>
+      </p>
+      <p class="max-w-2xl lg:text-right">
+        Comunidad dirigida por estudiantes. No es un sitio oficial de Amazon Web Services. AWS y el logotipo de AWS son marcas de Amazon.com, Inc. o sus filiales.
       </p>
     </div>
   </div>

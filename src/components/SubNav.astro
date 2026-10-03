@@ -1,0 +1,71 @@
+---
+// Barra "En esta página" que se queda fija debajo del header, como en las páginas de producto de AWS.
+// Marca la sección que estás leyendo y en celular se desliza de lado.
+interface Props {
+  titulo: string;
+  enlaces: { id: string; texto: string }[];
+}
+const { titulo, enlaces } = Astro.props;
+---
+<nav class="subnav sticky top-[72px] z-40 border-y border-linea bg-marino/85 backdrop-blur-xl" aria-label="En esta página" data-subnav>
+  <div class="mx-auto flex max-w-7xl items-center gap-6 px-5">
+    <span class="titulo hidden shrink-0 text-sm font-semibold lg:block">{titulo}</span>
+    <span class="hidden h-5 w-px bg-linea lg:block" aria-hidden="true"></span>
+    <ul class="relative -mx-5 flex gap-1 overflow-x-auto px-5 [scrollbar-width:none] lg:mx-0 lg:px-0">
+      {enlaces.map((e) => (
+        <li class="shrink-0">
+          <a href={`#${e.id}`} class="subnav-enlace relative block whitespace-nowrap px-3 py-3.5 text-sm font-medium text-suave transition-colors hover:text-white">{e.texto}</a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</nav>
+
+<style>
+  .subnav-enlace::after {
+    content: '';
+    position: absolute;
+    inset: auto 0.75rem -1px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--color-magenta);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
+  .subnav-enlace[aria-current='true'] { color: #fff; }
+  .subnav-enlace[aria-current='true']::after { transform: scaleX(1); }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-subnav]').forEach((nav) => {
+    const lista = nav.querySelector('ul')!;
+    const enlaces = Array.from(nav.querySelectorAll<HTMLAnchorElement>('a'));
+    const secciones = enlaces
+      .map((a) => document.getElementById(decodeURIComponent(a.hash.slice(1))))
+      .filter((s): s is HTMLElement => !!s);
+    let actual = '';
+    const marcar = () => {
+      const limite = nav.getBoundingClientRect().bottom + 80;
+      let id = '';
+      for (const s of secciones) if (s.getBoundingClientRect().top <= limite) id = s.id;
+      if (id === actual) return;
+      actual = id;
+      enlaces.forEach((a) => {
+        const si = a.hash === `#${id}`;
+        if (si) {
+          a.setAttribute('aria-current', 'true');
+          // En celular, el enlace activo se recorre hasta quedar a la vista (solo de lado)
+          const centro = a.offsetLeft - (lista.clientWidth - a.offsetWidth) / 2;
+          lista.scrollTo({ left: centro, behavior: 'smooth' });
+        } else a.removeAttribute('aria-current');
+      });
+    };
+    let pendiente = false;
+    window.addEventListener('scroll', () => {
+      if (pendiente) return;
+      pendiente = true;
+      requestAnimationFrame(() => { pendiente = false; marcar(); });
+    }, { passive: true });
+    marcar();
+  });
+</script>

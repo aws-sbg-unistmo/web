@@ -9,7 +9,10 @@ import Arquitectura from '../components/Arquitectura.astro';
 import Preguntas from '../components/Preguntas.astro';
 import LlamadoFinal from '../components/LlamadoFinal.astro';
 import Ruta from '../components/Ruta.astro';
+import Temas from '../components/Temas.astro';
+import RegionMexico from '../components/RegionMexico.astro';
 import { actividades, site } from '../data/site';
+import { recursos, universidad } from '../data/contenido';
 import { proximos } from '../lib/eventos';
 
 const preguntas = [
@@ -22,6 +25,10 @@ const preguntas = [
     r: 'No. Los talleres y eventos del grupo son gratuitos para estudiantes.',
   },
   {
+    p: '¿Qué es AWS?',
+    r: 'Amazon Web Services es la plataforma de nube de Amazon: más de 200 servicios para crear sitios, apps, bases de datos e inteligencia artificial sin comprar servidores. En la sección Aprende te contamos más.',
+  },
+  {
     p: '¿Tengo que ser de una carrera de computación?',
     r: 'Para nada. La nube y la IA se usan en todas las áreas: ingeniería, administración, diseño, ciencias. Cualquier estudiante de la UNISTMO es bienvenido.',
   },
@@ -31,7 +38,19 @@ const preguntas = [
   },
   {
     p: '¿Puedo ayudar a organizar?',
-    r: 'Sí. Estamos formando el Core Team del grupo. Llena el formulario de "Únete" y marca que quieres participar en la organización.',
+    r: 'Sí. Estamos formando el Core Team del grupo. Llena el formulario de "Únete" y marca que quieres ayudar a organizar; te contactaremos.',
+  },
+  {
+    p: '¿Necesito una cuenta de AWS o una tarjeta?',
+    r: 'Para empezar a aprender, no: muchos cursos de AWS Skill Builder son gratuitos. Para practicar en tu propia cuenta, AWS pide un método de pago al registrarte; en los talleres te enseñamos a usar la capa gratuita y a poner alertas para no gastar.',
+  },
+  {
+    p: '¿Los eventos son presenciales?',
+    r: 'La mayoría son en el Campus Tehuantepec. Si alguno es en línea, lo indicamos en Meetup junto con el enlace.',
+  },
+  {
+    p: '¿Es un grupo oficial de AWS?',
+    r: 'Somos un grupo dirigido por estudiantes dentro del programa AWS Student Builder Groups, que AWS apoya. El grupo lo organizamos estudiantes y esta página no es un sitio oficial de Amazon Web Services.',
   },
 ];
 ---
@@ -87,6 +106,20 @@ const preguntas = [
 
   <Ruta />
 
+  <!-- Lo que vas a aprender: pestañas por categoría, como el catálogo de aws.amazon.com -->
+  <section id="temas" class="mx-auto mt-32 max-w-7xl px-5">
+    <div class="flex flex-wrap items-end justify-between gap-6">
+      <div class="max-w-2xl">
+        <p class="chip" data-reveal>// Lo que vas a aprender</p>
+        <Palabras texto="Servicios de AWS, explicados sin rodeos" resaltar={['explicados']} class="mt-5 text-4xl font-bold leading-tight md:text-5xl" />
+      </div>
+      <a href="/aprende/#servicios" class="enlace-aws" data-reveal>Ver todo en Aprende <Icono nombre="flecha" class="size-4" /></a>
+    </div>
+    <div class="mt-10" data-reveal>
+      <Temas />
+    </div>
+  </section>
+
   <!-- Para quién -->
   <section class="relative mx-auto mt-32 max-w-7xl px-5">
     <div class="grid items-center gap-14 lg:grid-cols-[1fr_1.1fr]">
@@ -117,6 +150,15 @@ const preguntas = [
           ))}
         </ul>
 
+        <div class="mt-8" data-reveal>
+          <p class="text-xs font-semibold uppercase tracking-widest text-suave/70">Carreras del Campus Tehuantepec</p>
+          <ul class="mt-3 flex flex-wrap gap-2">
+            {universidad.carrerasTehuantepec.map((c) => (
+              <li class="rounded-full border border-linea bg-marino-2 px-3 py-1 text-xs text-white">{c.replace(/^(Ingeniería|Licenciatura) (en |de )?/, '')}</li>
+            ))}
+          </ul>
+        </div>
+
         <dl class="mt-10 grid grid-cols-3 gap-4 border-t border-linea pt-8" data-stagger>
           <div>
             <dt class="text-xs uppercase tracking-widest text-suave/70">Eventos</dt>
@@ -135,6 +177,8 @@ const preguntas = [
       </div>
     </div>
   </section>
+
+  <RegionMexico />
 
   <!-- Eventos -->
   <section class="mx-auto mt-32 max-w-7xl px-5">
@@ -185,6 +229,27 @@ const preguntas = [
         </a>
       </div>
       <Arquitectura />
+    </div>
+  </section>
+
+  <!-- Recursos gratuitos -->
+  <section class="mx-auto mt-32 max-w-7xl px-5">
+    <div class="flex flex-wrap items-end justify-between gap-6">
+      <div class="max-w-2xl">
+        <p class="chip" data-reveal>// Empieza hoy</p>
+        <Palabras texto="Recursos gratuitos para aprender por tu cuenta" resaltar={['gratuitos']} class="mt-5 text-4xl font-bold leading-tight md:text-5xl" />
+      </div>
+      <a href="/aprende/#recursos" class="enlace-aws" data-reveal>Todos los recursos <Icono nombre="flecha" class="size-4" /></a>
+    </div>
+    <div class="mt-12 grid gap-6 md:grid-cols-3" data-stagger>
+      {recursos.slice(0, 3).map((r) => (
+        <a href={r.url} target="_blank" rel="noopener" class="tarjeta group flex flex-col p-7" data-tilt>
+          <span class="insignia self-start" style="--color-insignia:var(--color-azul)">{r.etiqueta}</span>
+          <h3 class="titulo mt-5 text-xl font-semibold group-hover:text-magenta">{r.nombre}</h3>
+          <p class="mt-2 text-sm leading-relaxed">{r.texto}</p>
+          <span class="enlace-aws mt-auto pt-6 text-sm">Abrir <Icono nombre="externo" class="size-4" /></span>
+        </a>
+      ))}
     </div>
   </section>
 

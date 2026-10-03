@@ -1,0 +1,97 @@
+---
+// "La nube ya está en México": datos de la región mx-central-1 y un diagrama al estilo de los de arquitectura
+// de AWS (nube → región → zonas de disponibilidad) que explica la alta disponibilidad.
+import Icono from './Icono.astro';
+import Mosaico from './Mosaico.astro';
+import Palabras from './Palabras.astro';
+import { regionMexico } from '../data/contenido';
+
+const zonas = ['a', 'b', 'c'].slice(0, regionMexico.zonas);
+const datos = [
+  { k: 'Código', v: regionMexico.codigo, mono: true },
+  { k: 'Ubicación', v: regionMexico.lugar },
+  { k: 'Zonas de disponibilidad', v: String(regionMexico.zonas) },
+  { k: 'Disponible desde', v: regionMexico.apertura },
+];
+---
+<section id="region" class="mx-auto mt-32 max-w-7xl px-5">
+  <div class="grid items-center gap-12 lg:grid-cols-[1fr_1.15fr]">
+    <div>
+      <p class="chip" data-reveal>// Infraestructura global</p>
+      <Palabras texto="La nube de AWS ya está en México" resaltar={['México']} class="mt-5 text-4xl font-bold leading-tight md:text-5xl" />
+      <p class="mt-5 text-lg leading-relaxed" data-reveal>
+        Desde {regionMexico.apertura}, AWS tiene una región en {regionMexico.lugar}: centros de datos en el país donde tus
+        aplicaciones pueden correr más cerca de tus usuarios y guardar sus datos en México.
+      </p>
+
+      <!-- Pares clave-valor como en la consola de AWS -->
+      <dl class="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-linea bg-linea" data-reveal>
+        {datos.map((d) => (
+          <div class="bg-marino-2 px-5 py-4">
+            <dt class="text-xs text-suave/70">{d.k}</dt>
+            <dd class:list={['mt-1 font-semibold text-white', d.mono && 'font-mono text-sm']}>{d.v}</dd>
+          </div>
+        ))}
+      </dl>
+      <p class="mt-4" data-reveal><span class="estado">Disponible</span></p>
+    </div>
+
+    <figure class="tarjeta p-4 sm:p-6" data-reveal>
+      <div class="grupo-aws solido" style="--borde-grupo:#c9ccd1">
+        <span class="etiqueta-grupo"><span class="icono-grupo"><Icono nombre="nube" class="size-4" /></span>AWS Cloud</span>
+
+        <div class="grupo-aws" style="--borde-grupo:#00a4a6">
+          <span class="etiqueta-grupo"><span class="icono-grupo"><Icono nombre="bandera" class="size-4" /></span>{regionMexico.nombre}</span>
+
+          <!-- Balanceador que reparte el tráfico entre las zonas -->
+          <div class="flex flex-col items-center">
+            <div class="flex items-center gap-3 rounded-lg border border-linea bg-marino/70 px-3 py-2">
+              <Mosaico categoria="redes" icono="globo" tam="sm" />
+              <span class="text-xs font-semibold text-white sm:text-sm">Balanceador de carga</span>
+            </div>
+            <div class="relative h-8 w-2/3" aria-hidden="true">
+              <span class="absolute left-1/2 top-0 h-4 w-0.5 -translate-x-1/2 bg-linea"></span>
+              <span class="absolute inset-x-0 top-4 h-0.5 bg-linea"></span>
+              {zonas.map((_, i) => (
+                <span class="rama absolute top-4 h-4 w-0.5 bg-linea" style={`left:${(i / (zonas.length - 1)) * 100}%;--i:${i}`}><span></span></span>
+              ))}
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2 sm:gap-3">
+            {zonas.map((z) => (
+              <div class="grupo-aws compacto zona" style="--borde-grupo:#42b4ff">
+                <span class="etiqueta-grupo font-mono"><span class="sm:hidden">Zona {z.toUpperCase()}</span><span class="hidden sm:inline">{regionMexico.codigo}{z}</span></span>
+                <div class="flex flex-col items-center gap-2">
+                  <div class="flex items-center gap-1.5 sm:gap-2"><Mosaico categoria="computo" tam="sm" /><span class="hidden text-xs sm:inline">App</span></div>
+                  <div class="flex items-center gap-1.5 sm:gap-2"><Mosaico categoria="bases" tam="sm" /><span class="hidden text-xs sm:inline">Datos</span></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <figcaption class="mt-4 text-sm leading-relaxed">
+        <strong class="font-semibold text-white">Alta disponibilidad:</strong> si repartes tu app en varias zonas de
+        disponibilidad, sigue funcionando aunque una de ellas falle. Lo practicamos en los talleres.
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<style>
+  /* Pulso que baja del balanceador a cada zona */
+  .rama { overflow: hidden; }
+  .rama span {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent, #42b4ff, transparent);
+    animation: bajar 1.8s linear infinite;
+    animation-delay: calc(var(--i) * 0.3s);
+  }
+  @keyframes bajar { from { transform: translateY(-100%); } to { transform: translateY(100%); } }
+  .grupo-aws.compacto { padding: 2.1rem 0.5rem 0.75rem; }
+  .grupo-aws.compacto > .etiqueta-grupo { padding: 0.5rem; font-size: 0.62rem; }
+  .zona { transition: background-color 0.3s ease; }
+  .zona:hover { background: color-mix(in srgb, #42b4ff 8%, transparent); }
+</style>

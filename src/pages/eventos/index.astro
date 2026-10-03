@@ -3,6 +3,8 @@ import Layout from '../../layouts/Layout.astro';
 import CabeceraPagina from '../../components/CabeceraPagina.astro';
 import EventoTarjeta from '../../components/EventoTarjeta.astro';
 import Icono from '../../components/Icono.astro';
+import Palabras from '../../components/Palabras.astro';
+import Preguntas from '../../components/Preguntas.astro';
 import { pasados, proximos } from '../../lib/eventos';
 import { site } from '../../data/site';
 
@@ -12,9 +14,31 @@ const tipos = [
   { icono: 'certificado', titulo: 'Study jams', texto: 'Sesiones en grupo para preparar tu primera certificación de AWS.', color: 'var(--color-azul)' },
   { icono: 'rayo', titulo: 'Build days', texto: 'Retos en equipo para crear un proyecto completo en un solo día.', color: 'var(--color-menta)' },
 ] as const;
+
+const pasos = [
+  { t: 'Lo publicamos', d: 'Cada evento sale primero en Meetup y en nuestras redes, con fecha, lugar y temario.' },
+  { t: 'Te registras', d: 'Marca que asistes (RSVP) en Meetup para apartar tu lugar. Te llegan recordatorios.' },
+  { t: 'Llegas y construyes', d: 'Presentamos el tema y luego manos a la obra, con ayuda del equipo en todo momento.' },
+  { t: 'Te llevas el material', d: 'Compartimos las guías para que repitas el ejercicio en casa y sigas avanzando.' },
+];
+const llevar = [
+  { icono: 'laptop', t: 'Tu laptop y su cargador', d: 'Para los talleres. Cualquier sistema operativo funciona.' },
+  { icono: 'globo', t: 'Un navegador actualizado', d: 'Chrome, Edge o Firefox. Todo se hace desde la web.' },
+  { icono: 'correo', t: 'Acceso a tu correo', d: 'Por si hay que confirmar algo durante el taller.' },
+  { icono: 'chispa', t: 'Curiosidad', d: 'No necesitas experiencia: te explicamos todo desde cero.' },
+] as const;
+const preguntas = [
+  { p: '¿Cuánto cuestan los eventos?', r: 'Nada. Todos los eventos del grupo son gratuitos.' },
+  { p: '¿Tengo que registrarme?', r: 'Sí, en Meetup. Así apartas tu lugar, sabemos cuántas personas van y te llegan los avisos si algo cambia.' },
+  { p: '¿Necesito llevar laptop?', r: 'Para los talleres, sí, porque vas a construir algo. Para las charlas no hace falta. Cada evento lo indica en su descripción.' },
+  { p: '¿Necesito una cuenta de AWS?', r: 'Depende del taller. Si hace falta, lo decimos en la descripción del evento con tiempo y te explicamos cómo prepararla y cómo evitar cobros.' },
+  { p: '¿Puedo ir si soy de otro campus o de otra escuela?', r: 'Los eventos están pensados para la comunidad de la UNISTMO. Cuando un evento es abierto a más personas, lo indicamos en Meetup.' },
+  { p: '¿Y si ya no puedo ir?', r: 'Quita tu RSVP en Meetup para liberar tu lugar y que alguien más lo aproveche.' },
+];
 ---
 <Layout titulo="Eventos" descripcion="Talleres, charlas y eventos de AWS SBG UNISTMO en el Campus Tehuantepec.">
   <CabeceraPagina
+    migas="Eventos"
     etiqueta="// Eventos"
     titulo="Talleres, charlas y mucho cloud"
     resaltar={['cloud']}
@@ -52,6 +76,37 @@ const tipos = [
       ))}
     </div>
 
+    <h2 class="titulo mt-20 text-2xl font-semibold" data-reveal>Cómo funcionan</h2>
+    <ol class="mt-8 grid gap-px overflow-hidden rounded-3xl border border-linea bg-linea sm:grid-cols-2 lg:grid-cols-4" data-stagger>
+      {pasos.map((p, i) => (
+        <li class="relative bg-marino-2 p-7">
+          <span class="titulo grid size-10 place-items-center rounded-full border border-magenta/50 font-bold text-magenta">{i + 1}</span>
+          <h3 class="titulo mt-5 text-lg font-semibold">{p.t}</h3>
+          <p class="mt-2 text-sm leading-relaxed">{p.d}</p>
+        </li>
+      ))}
+    </ol>
+
+    <div class="mt-20 grid items-center gap-10 lg:grid-cols-[1fr_auto]">
+      <div>
+        <h2 class="titulo text-2xl font-semibold" data-reveal>Qué llevar a un taller</h2>
+        <ul class="mt-8 grid gap-4 sm:grid-cols-2" data-stagger>
+          {llevar.map((l) => (
+            <li class="flex gap-4 rounded-2xl border border-linea bg-marino-2 p-5">
+              <span class="grid size-11 shrink-0 place-items-center rounded-xl bg-menta/12 text-menta"><Icono nombre={l.icono} class="size-5" /></span>
+              <span>
+                <span class="titulo block font-semibold">{l.t}</span>
+                <span class="mt-1 block text-sm leading-relaxed">{l.d}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      {site.usarMascota && (
+        <img src="/img/mascota/08-leyendo.webp" alt="" width="743" height="900" loading="lazy" class="mx-auto hidden h-72 w-auto lg:block" data-reveal />
+      )}
+    </div>
+
     {pasados.length > 0 && (
       <>
         <h2 class="titulo mt-20 text-2xl font-semibold" data-reveal>Anteriores</h2>
@@ -60,5 +115,15 @@ const tipos = [
         </div>
       </>
     )}
+  </section>
+
+  <section class="mx-auto mt-28 max-w-4xl px-5">
+    <div class="text-center">
+      <p class="chip" data-reveal>// Preguntas sobre eventos</p>
+      <Palabras texto="Antes de tu primer evento" resaltar={['primer']} class="mt-5 text-4xl font-bold md:text-5xl" />
+    </div>
+    <div class="mt-12">
+      <Preguntas preguntas={preguntas} />
+    </div>
   </section>
 </Layout>

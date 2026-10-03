@@ -1,17 +1,20 @@
 ---
 // Diagrama de cómo funciona esta misma página, al estilo de los diagramas de arquitectura de AWS.
 // Las líneas tienen un pulso de luz que viaja de un servicio al siguiente.
+// Los servicios de AWS llevan el color de su categoría; lo que no es de AWS va en gris.
 import Icono from './Icono.astro';
+import Mosaico from './Mosaico.astro';
+import { categorias, type Categoria } from '../data/contenido';
 
-type Nodo = { icono: Parameters<typeof Icono>[0]['nombre']; nombre: string; rol: string };
+type Nodo = { icono: Parameters<typeof Icono>[0]['nombre']; nombre: string; rol: string; categoria?: Categoria };
 const flujos: { titulo: string; color: string; nodos: Nodo[] }[] = [
   {
     titulo: 'Cuando visitas la página',
     color: 'var(--color-magenta)',
     nodos: [
       { icono: 'usuarios', nombre: 'Tú', rol: 'Abres la página' },
-      { icono: 'globo', nombre: 'Amazon CloudFront', rol: 'La entrega rápido y con HTTPS' },
-      { icono: 'nube', nombre: 'Amazon S3', rol: 'Guarda los archivos del sitio' },
+      { icono: 'globo', nombre: 'Amazon CloudFront', rol: 'La entrega rápido y con HTTPS', categoria: 'redes' },
+      { icono: 'nube', nombre: 'Amazon S3', rol: 'Guarda los archivos del sitio', categoria: 'almacenamiento' },
     ],
   },
   {
@@ -19,9 +22,9 @@ const flujos: { titulo: string; color: string; nodos: Nodo[] }[] = [
     color: 'var(--color-morado)',
     nodos: [
       { icono: 'usuarios', nombre: 'Formulario', rol: 'Únete o contacto' },
-      { icono: 'flecha', nombre: 'Amazon API Gateway', rol: 'Recibe tu solicitud' },
-      { icono: 'rayo', nombre: 'AWS Lambda', rol: 'Valida y procesa' },
-      { icono: 'base', nombre: 'DynamoDB + SES', rol: 'Guarda y nos avisa' },
+      { icono: 'flecha', nombre: 'Amazon API Gateway', rol: 'Recibe tu solicitud', categoria: 'redes' },
+      { icono: 'rayo', nombre: 'AWS Lambda', rol: 'Valida y procesa', categoria: 'computo' },
+      { icono: 'base', nombre: 'DynamoDB + SES', rol: 'Guarda y nos avisa', categoria: 'bases' },
     ],
   },
   {
@@ -30,12 +33,17 @@ const flujos: { titulo: string; color: string; nodos: Nodo[] }[] = [
     nodos: [
       { icono: 'evento', nombre: 'Meetup', rol: 'Publicamos un evento' },
       { icono: 'proyecto', nombre: 'GitHub Actions', rol: 'Recompila la página' },
-      { icono: 'nube', nombre: 'Amazon S3', rol: 'Sube la versión nueva' },
+      { icono: 'nube', nombre: 'Amazon S3', rol: 'Sube la versión nueva', categoria: 'almacenamiento' },
     ],
   },
 ];
 ---
 <div class="space-y-6" data-stagger>
+  <ul class="flex flex-wrap gap-x-5 gap-y-2 text-xs" aria-label="Colores por categoría">
+    {(['redes', 'almacenamiento', 'computo', 'bases'] as const).map((c) => (
+      <li class="inline-flex items-center gap-2"><span class="size-2.5 rounded-sm" style={`background:${categorias[c].color}`}></span>{categorias[c].nombre}</li>
+    ))}
+  </ul>
   {flujos.map((flujo) => (
     <div class="tarjeta p-6 md:p-8" style={`--acento:${flujo.color}`}>
       <p class="font-mono text-xs uppercase tracking-[0.2em]" style="color:var(--acento)">{flujo.titulo}</p>
@@ -44,9 +52,13 @@ const flujos: { titulo: string; color: string; nodos: Nodo[] }[] = [
           <>
             {i > 0 && <li class="conector" aria-hidden="true"><span></span></li>}
             <li class="nodo flex flex-1 items-center gap-3 rounded-2xl border border-linea bg-marino/70 p-4 md:flex-col md:text-center">
-              <span class="grid size-12 shrink-0 place-items-center rounded-xl" style="background:color-mix(in srgb,var(--acento) 16%,transparent);color:var(--acento)">
-                <Icono nombre={n.icono} class="size-6" />
-              </span>
+              {n.categoria ? (
+                <Mosaico categoria={n.categoria} icono={n.icono} />
+              ) : (
+                <span class="grid size-12 shrink-0 place-items-center rounded-xl border border-linea bg-marino-2 text-suave">
+                  <Icono nombre={n.icono} class="size-6" />
+                </span>
+              )}
               <span>
                 <span class="titulo block text-sm font-semibold">{n.nombre}</span>
                 <span class="block text-xs text-suave/80">{n.rol}</span>

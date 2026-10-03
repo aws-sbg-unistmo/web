@@ -1,0 +1,311 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CabeceraPagina from '../components/CabeceraPagina.astro';
+import SubNav from '../components/SubNav.astro';
+import Palabras from '../components/Palabras.astro';
+import Icono from '../components/Icono.astro';
+import Mosaico from '../components/Mosaico.astro';
+import LlamadoFinal from '../components/LlamadoFinal.astro';
+import { categorias, certificaciones, glosario, recursos, regionMexico, temas } from '../data/contenido';
+
+// Las seis ventajas de la nube que AWS explica en su introducción "Overview of Amazon Web Services"
+const ventajas = [
+  { t: 'Paga solo lo que usas', d: 'En lugar de comprar servidores por adelantado, pagas por los recursos que consumes y cuando los consumes.' },
+  { t: 'Precios a gran escala', d: 'Millones de clientes comparten la infraestructura, así que el costo por recurso es más bajo.' },
+  { t: 'Deja de adivinar capacidad', d: 'Aumenta o reduce tus recursos según la demanda real, en minutos y sin comprar equipo.' },
+  { t: 'Más velocidad para crear', d: 'Un servidor nuevo está a unos clics: puedes experimentar, probar y equivocarte barato.' },
+  { t: 'Enfócate en tu proyecto', d: 'No gastas tiempo ni dinero en mantener centros de datos: te concentras en tu aplicación.' },
+  { t: 'Global en minutos', d: 'Publica tu aplicación en distintas regiones del mundo para estar cerca de tus usuarios.' },
+];
+
+const niveles = [
+  {
+    n: '01', t: 'Fundamentos de la nube', nivel: 'Principiante', c: 'var(--color-naranja)',
+    aprendes: ['Qué es la nube y cómo se organiza AWS', 'Crear tu cuenta y protegerla con MFA', 'Usuarios y permisos con IAM', 'Alertas de presupuesto para no gastar de más'],
+    servicios: ['AWS IAM', 'AWS Budgets', 'Consola de AWS'],
+    proyecto: 'Deja lista una cuenta segura: MFA, un usuario con permisos mínimos y una alerta de gasto.',
+  },
+  {
+    n: '02', t: 'Tu primer sitio en la nube', nivel: 'Principiante', c: 'var(--color-magenta)',
+    aprendes: ['Guardar archivos en buckets de S3', 'Publicar un sitio web estático', 'Entregarlo rápido y con HTTPS desde una CDN'],
+    servicios: ['Amazon S3', 'Amazon CloudFront'],
+    proyecto: 'Publica tu portafolio personal en la nube, con tu propio enlace.',
+  },
+  {
+    n: '03', t: 'Apps sin servidores', nivel: 'Intermedio', c: 'var(--color-morado)',
+    aprendes: ['Funciones que corren solo cuando se necesitan', 'Crear y proteger una API', 'Guardar datos en una base NoSQL', 'Describir tu infraestructura como código'],
+    servicios: ['AWS Lambda', 'Amazon API Gateway', 'Amazon DynamoDB', 'AWS SAM'],
+    proyecto: 'Un formulario que guarda registros y avisa por correo, como el de esta página.',
+  },
+  {
+    n: '04', t: 'IA generativa', nivel: 'Intermedio', c: 'var(--color-azul)',
+    aprendes: ['Qué es un modelo fundacional', 'Escribir buenas instrucciones (prompts)', 'Responder con tus propios documentos (RAG)', 'Agentes que usan herramientas'],
+    servicios: ['Amazon Bedrock', 'Bedrock Knowledge Bases', 'Agentes de IA'],
+    proyecto: 'Un asistente que responde dudas sobre los trámites de tu carrera usando sus documentos.',
+  },
+  {
+    n: '05', t: 'Certifícate', nivel: 'Meta', c: 'var(--color-menta)',
+    aprendes: ['Repasar los temas oficiales del examen', 'Practicar con preguntas tipo examen', 'Estudiar en grupo y resolver dudas'],
+    servicios: ['Cloud Practitioner', 'AI Practitioner'],
+    proyecto: 'Un plan de estudio en grupo de varias semanas, hasta el día del examen.',
+  },
+];
+const quitarAcentos = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+---
+<Layout titulo="Aprende" descripcion="Qué es la nube, servicios de AWS, ruta de aprendizaje, certificaciones, glosario y recursos gratuitos para estudiantes.">
+  <CabeceraPagina
+    migas="Aprende"
+    etiqueta="// Aprende"
+    titulo="Todo para empezar en la nube"
+    resaltar={['nube']}
+    descripcion="Qué es la nube, los servicios de AWS que más vas a usar, una ruta paso a paso, certificaciones, un glosario y recursos gratuitos para seguir aprendiendo por tu cuenta."
+    pose="07-sentado-en-servidor"
+  />
+
+  <SubNav
+    titulo="Aprende"
+    enlaces={[
+      { id: 'nube', texto: '¿Qué es la nube?' },
+      { id: 'servicios', texto: 'Servicios' },
+      { id: 'ruta', texto: 'Ruta' },
+      { id: 'certificaciones', texto: 'Certificaciones' },
+      { id: 'glosario', texto: 'Glosario' },
+      { id: 'recursos', texto: 'Recursos' },
+    ]}
+  />
+
+  <!-- ¿Qué es la nube? -->
+  <section id="nube" class="mx-auto max-w-7xl px-5 pt-20">
+    <div class="grid gap-12 lg:grid-cols-[1.1fr_1fr]">
+      <div>
+        <p class="chip" data-reveal>// Lo básico</p>
+        <Palabras texto="¿Qué es la nube?" resaltar={['nube?']} class="mt-5 text-4xl font-bold md:text-5xl" />
+        <p class="mt-6 text-lg leading-relaxed" data-reveal>
+          La computación en la nube es usar servidores, almacenamiento, bases de datos, redes e inteligencia artificial{' '}
+          <strong class="font-semibold text-white">por internet, cuando los necesitas y pagando solo por lo que usas</strong>.
+          En lugar de comprar y mantener tus propias computadoras, las usas desde un proveedor como Amazon Web Services (AWS).
+        </p>
+        <p class="mt-4 leading-relaxed" data-reveal>
+          Netflix, una app de tu banco o un sistema de inscripciones pueden correr en la nube. Con lo mismo, tú puedes publicar
+          un sitio, crear una API o un asistente con IA desde tu laptop.
+        </p>
+      </div>
+
+      <div class="tarjeta p-6 md:p-8" data-reveal>
+        <h3 class="titulo text-xl font-semibold">Cómo se organiza AWS</h3>
+        <ol class="mt-6 space-y-3">
+          <li class="grupo-aws pt-4!" style="--borde-grupo:#00a4a6">
+            <p class="flex items-center gap-3"><span class="grid size-8 place-items-center rounded bg-[#00a4a6] text-marino"><Icono nombre="bandera" class="size-4" /></span><strong class="text-white">Región</strong></p>
+            <p class="mt-2 text-sm leading-relaxed">Una zona geográfica del mundo, como <span class="font-mono text-white">{regionMexico.codigo}</span> en {regionMexico.lugar}.</p>
+            <div class="grupo-aws mt-3 pt-4!" style="--borde-grupo:#42b4ff">
+              <p class="flex items-center gap-3"><span class="grid size-8 place-items-center rounded bg-azul text-marino"><Icono nombre="base" class="size-4" /></span><strong class="text-white">Zona de disponibilidad</strong></p>
+              <p class="mt-2 text-sm leading-relaxed">Centros de datos separados dentro de la región, con su propia energía y red.</p>
+              <div class="mt-3 flex items-center gap-3 rounded-lg border border-linea bg-marino/70 p-3">
+                <Mosaico categoria="computo" tam="sm" />
+                <p class="text-sm"><strong class="text-white">Tus recursos:</strong> servidores, funciones, bases de datos…</p>
+              </div>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </div>
+
+    <h3 class="titulo mt-20 text-2xl font-semibold md:text-3xl" data-reveal>Seis ventajas de la nube</h3>
+    <div class="mt-8 grid gap-px overflow-hidden rounded-3xl border border-linea bg-linea sm:grid-cols-2 lg:grid-cols-3" data-stagger>
+      {ventajas.map((v, i) => (
+        <article class="bg-marino-2 p-7 transition-colors hover:bg-[#222c38]">
+          <span class="font-mono text-sm text-magenta">0{i + 1}</span>
+          <h4 class="titulo mt-3 text-lg font-semibold">{v.t}</h4>
+          <p class="mt-2 text-sm leading-relaxed">{v.d}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <!-- Catálogo de servicios por categoría -->
+  <section id="servicios" class="mx-auto mt-32 max-w-7xl px-5">
+    <div class="max-w-3xl">
+      <p class="chip" data-reveal>// Servicios</p>
+      <Palabras texto="Los servicios que más vas a usar" resaltar={['usar']} class="mt-5 text-4xl font-bold leading-tight md:text-5xl" />
+      <p class="mt-5 text-lg leading-relaxed" data-reveal>
+        AWS tiene más de 200 servicios, pero para empezar basta con unos cuantos. Los agrupamos por categoría, con el color
+        que usan los diagramas de arquitectura de AWS.
+      </p>
+    </div>
+    <div class="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3" data-stagger>
+      {temas.map((t) => (
+        <article class="tarjeta overflow-hidden" style={`--cat:${categorias[t.categoria].color}`}>
+          <div class="h-1" style="background:var(--cat)"></div>
+          <div class="p-6">
+            <div class="flex items-center gap-4">
+              <Mosaico categoria={t.categoria} tam="lg" />
+              <h3 class="titulo text-xl font-semibold">{categorias[t.categoria].nombre}</h3>
+            </div>
+            <ul class="mt-6 divide-y divide-linea">
+              {t.servicios.map((s) => (
+                <li class="py-3.5 first:pt-0 last:pb-0">
+                  <p class="font-semibold text-white">{s.nombre}</p>
+                  <p class="mt-1 text-sm leading-relaxed">{s.texto}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <!-- Ruta detallada -->
+  <section id="ruta" class="mx-auto mt-32 max-w-5xl px-5">
+    <p class="chip" data-reveal>// Ruta de aprendizaje</p>
+    <Palabras texto="De cero a certificarte, nivel por nivel" resaltar={['certificarte,']} class="mt-5 text-4xl font-bold leading-tight md:text-5xl" />
+    <p class="mt-5 max-w-3xl text-lg leading-relaxed" data-reveal>
+      Es la misma ruta que seguimos en los talleres. Cada nivel termina con un proyecto que puedes poner en tu portafolio.
+    </p>
+
+    <div class="relative mt-14 pl-8 md:pl-12">
+      <span class="absolute bottom-4 left-[7px] top-4 w-0.5 bg-linea md:left-[15px]" aria-hidden="true"></span>
+      <span class="absolute bottom-4 left-[7px] top-4 w-0.5 origin-top bg-gradient-to-b from-naranja via-morado to-menta md:left-[15px]" data-linea aria-hidden="true"></span>
+      <ol class="space-y-8">
+        {niveles.map((nv) => (
+          <li class="relative" style={`--acento:${nv.c}`} data-reveal>
+            <span class="absolute -left-8 top-8 grid size-4 place-items-center rounded-full border-2 bg-marino md:-left-12 md:size-8" style="border-color:var(--acento)" aria-hidden="true">
+              <span class="size-1.5 rounded-full md:size-2.5" style="background:var(--acento)"></span>
+            </span>
+            <article class="tarjeta p-6 md:p-8">
+              <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+                <span class="titulo text-4xl font-bold" style="color:var(--acento)">{nv.n}</span>
+                <h3 class="titulo text-2xl font-semibold">{nv.t}</h3>
+                <span class="insignia" style={`--color-insignia:${nv.c}`}>{nv.nivel}</span>
+              </div>
+              <div class="mt-6 grid gap-6 md:grid-cols-[1.2fr_1fr]">
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-widest text-suave/70">Qué aprendes</p>
+                  <ul class="mt-3 space-y-2">
+                    {nv.aprendes.map((a) => (
+                      <li class="flex gap-2.5 text-sm"><Icono nombre="check" class="mt-0.5 size-4 shrink-0 text-menta" />{a}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div class="space-y-5">
+                  <div>
+                    <p class="text-xs font-semibold uppercase tracking-widest text-suave/70">Servicios</p>
+                    <ul class="mt-3 flex flex-wrap gap-2">
+                      {nv.servicios.map((s) => <li class="rounded-md border px-2.5 py-1 font-mono text-xs" style="border-color:color-mix(in srgb,var(--acento) 45%,transparent);color:var(--acento)">{s}</li>)}
+                    </ul>
+                  </div>
+                  <div class="rounded-xl border border-linea bg-marino/60 p-4">
+                    <p class="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-white"><span style="color:var(--acento)"><Icono nombre="proyecto" class="size-4" /></span>Proyecto</p>
+                    <p class="mt-2 text-sm leading-relaxed">{nv.proyecto}</p>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- Certificaciones -->
+  <section id="certificaciones" class="mx-auto mt-32 max-w-7xl px-5">
+    <div class="max-w-3xl">
+      <p class="chip" data-reveal>// Certificaciones</p>
+      <Palabras texto="Tu primera certificación de AWS" resaltar={['certificación']} class="mt-5 text-4xl font-bold leading-tight md:text-5xl" />
+      <p class="mt-5 text-lg leading-relaxed" data-reveal>
+        Las certificaciones de nivel fundamental no piden experiencia técnica y son el mejor punto de partida.
+        En el grupo armamos sesiones de estudio para prepararlas juntos.
+      </p>
+    </div>
+    <div class="mt-12 grid gap-6 lg:grid-cols-2" data-stagger>
+      {certificaciones.map((c, i) => (
+        <article class="tarjeta flex flex-col p-7 md:p-9" data-tilt>
+          <div class="flex items-start justify-between gap-4">
+            <span class="grid size-14 place-items-center rounded-2xl" style={`background:color-mix(in srgb,${i ? 'var(--color-azul)' : 'var(--color-naranja)'} 15%,transparent);color:${i ? 'var(--color-azul)' : 'var(--color-naranja)'}`}>
+              <Icono nombre="certificado" class="size-7" />
+            </span>
+            <span class="insignia" style="--color-insignia:var(--color-naranja)">{c.nivel}</span>
+          </div>
+          <h3 class="titulo mt-6 text-2xl font-semibold">{c.nombre}</h3>
+          <p class="mt-3 leading-relaxed">{c.texto}</p>
+          <p class="mt-6 text-xs font-semibold uppercase tracking-widest text-suave/70">Temas del examen</p>
+          <ul class="mt-3 grid gap-2 sm:grid-cols-2">
+            {c.temas.map((t) => <li class="flex gap-2.5 text-sm"><Icono nombre="check" class="mt-0.5 size-4 shrink-0 text-menta" />{t}</li>)}
+          </ul>
+          <a href="https://aws.amazon.com/es/certification/" target="_blank" rel="noopener" class="enlace-aws mt-auto pt-8">
+            Más información en AWS <Icono nombre="flecha" class="size-4" />
+          </a>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <!-- Glosario con buscador -->
+  <section id="glosario" class="mx-auto mt-32 max-w-7xl px-5">
+    <div class="flex flex-wrap items-end justify-between gap-6">
+      <div class="max-w-2xl">
+        <p class="chip" data-reveal>// Glosario</p>
+        <Palabras texto="Palabras que vas a escuchar" resaltar={['escuchar']} class="mt-5 text-4xl font-bold leading-tight md:text-5xl" />
+      </div>
+      <div class="w-full md:w-80" data-reveal>
+        <label for="buscar-termino" class="mb-2 block text-sm font-medium text-white">Buscar un término</label>
+        <div class="relative">
+          <Icono nombre="buscar" class="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-suave/60" />
+          <input id="buscar-termino" type="search" autocomplete="off" placeholder="Ej. región, serverless…" class="w-full rounded-xl border border-linea bg-marino-2 py-3 pl-12 pr-4 text-white placeholder:text-suave/40 transition focus:border-magenta focus:outline-none focus:ring-4 focus:ring-magenta/15" />
+        </div>
+      </div>
+    </div>
+    <p id="conteo-glosario" class="mt-6 text-sm text-suave/70" aria-live="polite">{glosario.length} términos</p>
+    <dl id="lista-glosario" class="mt-4 grid gap-4 md:grid-cols-2">
+      {glosario.map((g) => (
+        <div class="termino rounded-2xl border border-linea bg-marino-2 p-5 transition-colors hover:border-magenta/50" data-buscar={quitarAcentos(`${g.t} ${g.d}`)}>
+          <dt class="titulo text-lg font-semibold">{g.t}</dt>
+          <dd class="mt-1.5 text-sm leading-relaxed">{g.d}</dd>
+        </div>
+      ))}
+    </dl>
+    <p id="sin-resultados" class="mt-4 rounded-2xl border border-dashed border-linea p-6 text-center" hidden>
+      No encontramos ese término. Pregúntanos en el próximo evento o en nuestras redes.
+    </p>
+  </section>
+
+  <!-- Recursos gratuitos -->
+  <section id="recursos" class="mx-auto mt-32 max-w-7xl px-5">
+    <div class="max-w-3xl">
+      <p class="chip" data-reveal>// Recursos</p>
+      <Palabras texto="Sigue aprendiendo por tu cuenta" resaltar={['aprendiendo']} class="mt-5 text-4xl font-bold leading-tight md:text-5xl" />
+      <p class="mt-5 text-lg leading-relaxed" data-reveal>Sitios oficiales de AWS, gratuitos o con mucho contenido sin costo.</p>
+    </div>
+    <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" data-stagger>
+      {recursos.map((r) => (
+        <a href={r.url} target="_blank" rel="noopener" class="tarjeta group flex flex-col p-7" data-tilt>
+          <span class="insignia self-start" style="--color-insignia:var(--color-azul)">{r.etiqueta}</span>
+          <h3 class="titulo mt-5 text-xl font-semibold group-hover:text-magenta">{r.nombre}</h3>
+          <p class="mt-2 text-sm leading-relaxed">{r.texto}</p>
+          <span class="enlace-aws mt-auto pt-6 text-sm">Abrir <Icono nombre="externo" class="size-4" /></span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <LlamadoFinal />
+</Layout>
+
+<script>
+  const entrada = document.getElementById('buscar-termino') as HTMLInputElement | null;
+  const terminos = Array.from(document.querySelectorAll<HTMLElement>('#lista-glosario .termino'));
+  const conteo = document.getElementById('conteo-glosario');
+  const vacio = document.getElementById('sin-resultados');
+  const normalizar = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+  entrada?.addEventListener('input', () => {
+    const q = normalizar(entrada.value);
+    let visibles = 0;
+    terminos.forEach((t) => {
+      const si = !q || (t.dataset.buscar ?? '').includes(q);
+      t.hidden = !si;
+      if (si) visibles++;
+    });
+    if (conteo) conteo.textContent = visibles === 1 ? '1 término' : `${visibles} términos`;
+    if (vacio) vacio.hidden = visibles > 0;
+  });
+</script>

@@ -143,6 +143,80 @@ html {
 }
 .boton-secundario:hover { background: color-mix(in srgb, #fff 8%, transparent); }
 
+/* Enlace "Más información →" como en las páginas de AWS: la flecha avanza al pasar el cursor */
+.enlace-aws {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+  color: #fff;
+  transition: color 0.25s ease;
+}
+.enlace-aws svg { transition: transform 0.3s ease; }
+.enlace-aws:hover { color: var(--color-magenta); }
+.enlace-aws:hover svg { transform: translateX(4px); }
+
+/* Insignia pequeña, como las de "Capa gratuita" en aws.amazon.com */
+.insignia {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 0.375rem;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: color-mix(in srgb, var(--color-insignia, var(--color-menta)) 14%, transparent);
+  color: var(--color-insignia, var(--color-menta));
+}
+
+/* Grupos de los diagramas de arquitectura de AWS: nube, región y zona de disponibilidad */
+.grupo-aws {
+  position: relative;
+  border: 1.5px dashed var(--borde-grupo, var(--color-linea));
+  border-radius: 0.5rem;
+  padding: 2.75rem 1rem 1rem;
+}
+.grupo-aws.solido { border-style: solid; }
+.etiqueta-grupo {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.75rem 0.45rem 0.45rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--borde-grupo, #fff);
+}
+.etiqueta-grupo > .icono-grupo {
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.25rem;
+  background: var(--borde-grupo);
+  color: var(--color-marino);
+}
+
+/* Indicador de estado como el de la consola de AWS */
+.estado { display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.8rem; font-weight: 600; color: var(--color-menta); }
+.estado::before {
+  content: '';
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: currentColor;
+  box-shadow: 0 0 0 0 currentColor;
+  animation: latido 2.2s ease-out infinite;
+}
+@keyframes latido { 70% { box-shadow: 0 0 0 6px transparent; } }
+
+/* Las anclas no quedan debajo del header ni de la barra "En esta página" */
+main section[id] { scroll-margin-top: 8.5rem; }
+
 :focus-visible {
   outline: 3px solid var(--color-magenta);
   outline-offset: 3px;
