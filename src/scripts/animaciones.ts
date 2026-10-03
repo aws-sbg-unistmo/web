@@ -31,6 +31,7 @@ if (reducir) {
 } else {
   // Desplazamiento suave sincronizado con GSAP
   const lenis = new Lenis({ lerp: 0.09, smoothWheel: true });
+  (window as unknown as { lenis?: Lenis }).lenis = lenis;
   lenis.on('scroll', ScrollTrigger.update);
   gsap.ticker.add((t) => lenis.raf(t * 1000));
   gsap.ticker.lagSmoothing(0);

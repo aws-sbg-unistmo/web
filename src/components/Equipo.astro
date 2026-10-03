@@ -1,10 +1,23 @@
 ---
-// Equipo del grupo: tarjetas centradas con foto (o iniciales) sobre un marco inclinado, rol y redes.
+// "Quién está detrás": cada integrante aparece al bajar.
+// - Computadora: la sección se queda fija y los integrantes van pasando con el scroll (foto que se revela, marco que gira,
+//   nombre que se "descifra", número gigante, fotos flotantes y un riel para saltar entre ellos).
+// - Celular: uno debajo de otro, cada uno con su animación de entrada.
+// - Sin JavaScript o con "reducir movimiento": la lista se ve completa y sin animar.
 // Solo aparece quien está en "equipo" de src/data/site.ts; desde la página nadie puede agregarse.
 import Icono from './Icono.astro';
 import Palabras from './Palabras.astro';
-import { equipo } from '../data/site';
+import { equipo, type Red } from '../data/site';
 
+const nombreRed: Record<Red['tipo'], string> = {
+  linkedin: 'LinkedIn', instagram: 'Instagram', github: 'GitHub', youtube: 'YouTube',
+  tiktok: 'TikTok', x: 'X', facebook: 'Facebook', web: 'Sitio web',
+};
+const iconoRed: Record<Red['tipo'], 'linkedin' | 'instagram' | 'github' | 'youtube' | 'tiktok' | 'x' | 'facebook' | 'globo'> = {
+  linkedin: 'linkedin', instagram: 'instagram', github: 'github', youtube: 'youtube',
+  tiktok: 'tiktok', x: 'x', facebook: 'facebook', web: 'globo',
+};
+const acentos = ['#ff57e9', '#ad5cff', '#42b4ff', '#00e582'];
 const areas = [
   { icono: 'evento', t: 'Eventos', d: 'Planea talleres y charlas, consigue los espacios y coordina cada evento.' },
   { icono: 'taller', t: 'Talleres y proyectos', d: 'Prepara el contenido técnico y acompaña los proyectos del grupo.' },
@@ -12,77 +25,302 @@ const areas = [
   { icono: 'usuarios', t: 'Comunidad y alianzas', d: 'Conecta con ponentes, otras comunidades y organizaciones.' },
 ] as const;
 const iniciales = (n: string) => n.split(' ').filter(Boolean).slice(0, 2).map((p) => p[0]).join('');
-const redesDe = (p: (typeof equipo)[number]) =>
-  [
-    p.web && { icono: 'globo', url: p.web, nombre: 'Sitio web' },
-    p.github && { icono: 'github', url: p.github, nombre: 'GitHub' },
-    p.linkedin && { icono: 'linkedin', url: p.linkedin, nombre: 'LinkedIn' },
-    p.instagram && { icono: 'instagram', url: p.instagram, nombre: 'Instagram' },
-  ].filter(Boolean) as { icono: 'globo' | 'github' | 'linkedin' | 'instagram'; url: string; nombre: string }[];
+const dos = (n: number) => String(n).padStart(2, '0');
 ---
-<section id="equipo" class="mx-auto mt-28 max-w-7xl px-5">
-  <div class="mx-auto max-w-2xl text-center">
-    <p class="chip" data-reveal>// Equipo</p>
-    <Palabras texto="Quién está detrás" resaltar={['detrás']} class="mt-5 text-4xl font-bold md:text-5xl" />
-    <p class="mt-5 text-lg leading-relaxed" data-reveal>
-      Estudiantes de la UNISTMO que organizamos el grupo, los talleres y los eventos.
-    </p>
+<section id="equipo" class="equipo-vivo mt-28" data-equipo style={`--acento-actual:${acentos[0]}`}>
+  <div class="mx-auto max-w-7xl px-5">
+    <div class="mx-auto max-w-2xl text-center">
+      <p class="chip" data-reveal>// Equipo</p>
+      <Palabras texto="Quién está detrás" resaltar={['detrás']} class="mt-5 text-4xl font-bold md:text-5xl" />
+      <p class="mt-5 text-lg leading-relaxed" data-reveal>
+        Estudiantes de la UNISTMO que organizamos el grupo, los talleres y los eventos. Baja para conocernos.
+      </p>
+    </div>
   </div>
 
-  <ul class="mt-12 flex flex-wrap justify-center gap-4 sm:gap-6" data-stagger>
-    {equipo.map((p, i) => (
-      <li class:list={['integrante tarjeta group relative overflow-hidden px-4 pb-6 pt-8 text-center sm:w-[calc(50%-0.75rem)] sm:px-6 sm:pb-8 sm:pt-10 lg:w-[calc(33.333%-1rem)]', i === 0 ? 'lider w-full' : 'w-[calc(50%-0.5rem)]']} data-tilt>
-        <span class="barra absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-magenta via-morado to-azul" aria-hidden="true"></span>
+  <div class="escenario relative mt-16" data-escenario>
+    <div class="fondo-escenario pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
+      <div class="rejilla absolute inset-0 opacity-20 [mask-image:radial-gradient(ellipse_at_70%_50%,#000,transparent_65%)]"></div>
+      <div class="halo"></div>
+    </div>
 
-        <div class="relative mx-auto size-20 sm:size-28">
-          <span class="marco absolute inset-0 rounded-[1.4rem] bg-gradient-to-br from-magenta to-morado opacity-80 sm:rounded-[1.75rem]" aria-hidden="true"></span>
-          {p.foto ? (
-            <img src={p.foto} alt={`Foto de ${p.nombre}`} width="224" height="224" loading="lazy" class="foto relative size-full rounded-[1.4rem] object-cover ring-4 ring-marino-2 sm:rounded-[1.75rem]" />
-          ) : (
-            <span class:list={['titulo relative grid size-full place-items-center rounded-[1.4rem] text-2xl font-bold ring-4 ring-marino-2 sm:rounded-[1.75rem] sm:text-3xl', i === 0 ? 'bg-gradient-to-br from-magenta to-morado text-marino' : 'bg-[#2a3441] text-white']} aria-hidden="true">
-              {iniciales(p.nombre)}
-            </span>
-          )}
+    <div class="relative mx-auto h-full max-w-7xl px-5">
+      <ol class="miembros relative h-full space-y-28">
+        {equipo.map((p, i) => (
+          <li class="miembro grid items-center gap-10 lg:grid-cols-[1fr_1.05fr] lg:gap-16" style={`--acento:${acentos[i % acentos.length]}`} data-miembro={i}>
+            <div class="texto order-2 text-center lg:order-1 lg:text-left">
+              <p class="t-linea flex items-center justify-center gap-3 font-mono text-xs uppercase tracking-[0.25em] text-suave/70 lg:justify-start">
+                <span style="color:var(--acento)">{dos(i + 1)}</span>
+                <span class="h-px w-10 bg-linea"></span>
+                <span>{dos(equipo.length)}</span>
+              </p>
+              <h3 class="t-linea titulo mt-5 text-4xl font-bold leading-[1.05] sm:text-5xl lg:text-6xl" aria-label={p.nombre}><span class="nombre" data-texto={p.nombre} aria-hidden="true">{p.nombre}</span></h3>
+              <p class="t-linea mt-4 text-xs font-bold uppercase tracking-[0.22em]" style="color:var(--acento)">{p.rol}</p>
+              {p.carrera && <p class="t-linea mt-2 text-sm text-suave/80">{p.carrera}</p>}
+              {p.descripcion && <p class="t-linea mx-auto mt-6 max-w-lg text-lg leading-relaxed lg:mx-0">{p.descripcion}</p>}
+              {p.redes && p.redes.length > 0 && (
+                <ul class="t-linea mt-8 flex flex-wrap justify-center gap-2.5 lg:justify-start">
+                  {p.redes.map((r) => (
+                    <li>
+                      <a href={r.url} target="_blank" rel="noopener" class="red group/red inline-flex items-center gap-2 rounded-full border border-linea bg-marino/60 py-2 pl-2.5 pr-4 text-sm text-suave backdrop-blur transition-colors hover:text-white" aria-label={`${nombreRed[r.tipo]} de ${p.nombre}`}>
+                        <span class="grid size-7 place-items-center rounded-full bg-linea transition-colors group-hover/red:bg-[var(--acento)] group-hover/red:text-marino"><Icono nombre={iconoRed[r.tipo]} class="size-4" /></span>
+                        {nombreRed[r.tipo]}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <div class="visual relative order-1 mx-auto w-[74%] max-w-xs sm:w-1/2 sm:max-w-sm lg:order-2 lg:w-full lg:max-w-[25rem]">
+              <span class="numero titulo pointer-events-none absolute -left-4 -top-14 select-none text-[7.5rem] font-bold leading-none sm:-left-10 lg:-left-24 lg:-top-24 lg:text-[13rem]" aria-hidden="true">{dos(i + 1)}</span>
+              <span class="orbita pointer-events-none absolute -inset-7 rounded-full border border-dashed lg:-inset-12" aria-hidden="true"></span>
+              <span class="marco absolute -inset-1 rounded-[2rem]" aria-hidden="true"></span>
+              <div class="lienzo relative aspect-[4/5] overflow-hidden rounded-[2rem] ring-4 ring-marino">
+                <div class="capa absolute inset-0">
+                  {p.fotos?.[0] ? (
+                    <img src={p.fotos[0]} alt={`Foto de ${p.nombre}`} width="800" height="1000" loading="lazy" class="size-full object-cover" />
+                  ) : (
+                    <span class="titulo grid size-full place-items-center bg-[radial-gradient(circle_at_30%_20%,color-mix(in_srgb,var(--acento)_45%,#1e2732),#161d26_70%)] text-[7rem] font-bold text-white/90 lg:text-[9rem]" aria-hidden="true">
+                      {iniciales(p.nombre)}
+                    </span>
+                  )}
+                </div>
+                <span class="brillo pointer-events-none absolute inset-0" aria-hidden="true"></span>
+                <span class="absolute bottom-4 left-4 rounded-full border border-white/15 bg-marino/70 px-3 py-1.5 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-white backdrop-blur-md">
+                  AWS SBG UNISTMO
+                </span>
+              </div>
+              {p.fotos?.slice(1, 3).map((f, k) => (
+                <img src={f} alt="" width="320" height="320" loading="lazy" class:list={['flotante absolute aspect-square rounded-2xl object-cover ring-4 ring-marino shadow-[0_20px_50px_-15px_rgba(0,0,0,0.8)]', k === 0 ? 'flotante-a' : 'flotante-b']} />
+              ))}
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+
+    {equipo.length > 1 && (
+      <nav class="riel absolute right-5 top-1/2 z-10 hidden -translate-y-1/2 flex-col items-end gap-1" aria-label="Integrantes del equipo">
+        {equipo.map((p, i) => (
+          <button type="button" data-ir={i} class="group/riel flex items-center gap-3 py-1.5" aria-label={`Ver a ${p.nombre}`}>
+            <span class="etiqueta text-xs font-semibold text-suave opacity-0 transition-opacity group-hover/riel:opacity-100" aria-hidden="true">{p.nombre.split(' ')[0]}</span>
+            <span class="punto block h-2 w-2 rounded-full bg-linea transition-all"></span>
+          </button>
+        ))}
+      </nav>
+    )}
+  </div>
+
+  <div class="mx-auto mt-20 max-w-7xl px-5">
+    <div class="grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-linea bg-linea lg:grid-cols-4" data-stagger>
+      {areas.map((a) => (
+        <div class="bg-marino-2 p-4 sm:p-6">
+          <span class="grid size-10 place-items-center rounded-lg bg-morado/15 text-morado"><Icono nombre={a.icono} class="size-5" /></span>
+          <p class="titulo mt-4 font-semibold">{a.t}</p>
+          <p class="mt-1 text-sm leading-relaxed">{a.d}</p>
         </div>
-
-        <h3 class="titulo mt-6 text-base font-semibold leading-snug sm:mt-7 sm:text-xl">{p.nombre}</h3>
-        <p class="mt-1.5 text-[0.62rem] font-bold uppercase tracking-[0.16em] text-magenta sm:text-[0.7rem]">{p.rol}</p>
-        {p.carrera && <p class="mt-1.5 text-sm text-suave/80">{p.carrera}</p>}
-
-        {redesDe(p).length > 0 && (
-          <ul class="mt-4 flex justify-center gap-2 sm:mt-5">
-            {redesDe(p).map((r) => (
-              <li>
-                <a href={r.url} target="_blank" rel="noopener" aria-label={`${r.nombre} de ${p.nombre}`} class="grid size-10 place-items-center rounded-full border border-linea text-suave/80 transition-colors hover:border-magenta hover:bg-magenta/10 hover:text-white">
-                  <Icono nombre={r.icono} class="size-[1.15rem]" />
-                </a>
-              </li>
-            ))}
-          </ul>
-        )}
-      </li>
-    ))}
-  </ul>
-
-  <div class="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-linea bg-linea lg:grid-cols-4" data-stagger>
-    {areas.map((a) => (
-      <div class="bg-marino-2 p-4 sm:p-6">
-        <span class="grid size-10 place-items-center rounded-lg bg-morado/15 text-morado"><Icono nombre={a.icono} class="size-5" /></span>
-        <p class="titulo mt-4 font-semibold">{a.t}</p>
-        <p class="mt-1 text-sm leading-relaxed">{a.d}</p>
-      </div>
-    ))}
+      ))}
+    </div>
   </div>
 </section>
 
 <style>
-  /* Barra de color arriba: fija en el líder, en los demás aparece al pasar el cursor */
-  .integrante .barra { transform: scaleX(0); transform-origin: left; transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1); }
-  .integrante.lider .barra,
-  .integrante:hover .barra { transform: scaleX(1); }
-  /* Marco inclinado detrás de la foto, como en un sello */
-  .integrante .marco { inset: -4px; rotate: 9deg; translate: 3px 3px; transition: rotate 0.5s cubic-bezier(0.2, 0.7, 0.2, 1), translate 0.5s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.3s ease; }
-  .integrante:hover .marco { rotate: 15deg; translate: 4px 2px; opacity: 1; }
-  .integrante .foto { filter: grayscale(1); transition: filter 0.5s ease; }
-  .integrante:hover .foto { filter: none; }
+  /* Marco inclinado en degradado detrás de la foto */
+  .marco {
+    background: linear-gradient(135deg, var(--acento), color-mix(in srgb, var(--acento) 30%, var(--color-morado)));
+    transform: rotate(9deg) translate(4px, 4px);
+    opacity: 0.85;
+  }
+  .orbita { border-color: color-mix(in srgb, var(--acento) 35%, transparent); animation: orbitar 40s linear infinite; }
+  @keyframes orbitar { to { rotate: 360deg; } }
+  /* Número gigante de fondo, solo con contorno */
+  .numero {
+    color: transparent;
+    -webkit-text-stroke: 1.5px color-mix(in srgb, var(--acento) 45%, transparent);
+    opacity: 0.6;
+  }
+  .lienzo { box-shadow: 0 40px 100px -40px color-mix(in srgb, var(--acento) 70%, transparent); }
+  /* Destello diagonal que cruza la foto */
+  .brillo {
+    background: linear-gradient(115deg, transparent 35%, rgb(255 255 255 / 0.18) 50%, transparent 65%);
+    background-size: 250% 100%;
+    background-position: 130% 0;
+  }
+  .miembro.activo .brillo { animation: destello 1.4s ease 0.3s both; }
+  @keyframes destello { to { background-position: -30% 0; } }
+  /* Fotos flotantes alrededor de la principal */
+  .flotante-a { width: 34%; left: -18%; bottom: 8%; rotate: -9deg; animation: flotar-a 7s ease-in-out infinite; }
+  .flotante-b { width: 28%; right: -14%; top: 6%; rotate: 8deg; animation: flotar-b 8s ease-in-out infinite; }
+  @keyframes flotar-a { 50% { translate: 0 -14px; } }
+  @keyframes flotar-b { 50% { translate: 0 12px; } }
+  /* Glitch con separación de color al cambiar de integrante */
+  .capa.glitch { animation: glitch 0.5s steps(2, end); }
+  @keyframes glitch {
+    0% { translate: 0; filter: drop-shadow(-6px 0 #ff57e9) drop-shadow(6px 0 #42b4ff); clip-path: inset(10% 0 55% 0); }
+    20% { translate: -8px 2px; clip-path: inset(60% 0 10% 0); }
+    40% { translate: 6px -3px; filter: drop-shadow(5px 0 #ff57e9) drop-shadow(-5px 0 #00e582); clip-path: inset(30% 0 35% 0); }
+    60% { translate: -3px 1px; clip-path: inset(0 0 70% 0); }
+    80% { translate: 2px 0; filter: none; clip-path: inset(0); }
+    100% { translate: 0; filter: none; clip-path: inset(0); }
+  }
+  /* Halo de color que cambia con cada integrante */
+  .halo {
+    position: absolute;
+    right: 8%;
+    top: 50%;
+    width: 38rem;
+    height: 38rem;
+    translate: 0 -50%;
+    border-radius: 999px;
+    background: var(--acento-actual);
+    opacity: 0.13;
+    filter: blur(120px);
+    transition: background-color 0.8s ease;
+  }
+
+  /* Modo fijo (computadora): todos los integrantes ocupan el mismo lugar y GSAP los va cambiando */
+  .equipo-vivo.modo-pin .escenario { height: calc(100svh - var(--arriba, 0px)); }
+  .equipo-vivo.modo-pin .miembros { height: 100%; }
+  .equipo-vivo.modo-pin .miembro { position: absolute; inset: 0; margin: 0; align-content: center; }
+  .equipo-vivo.modo-pin .visual { width: min(25rem, calc((100svh - var(--arriba, 0px) - 7rem) * 0.8)); }
+  .equipo-vivo.modo-pin .riel { display: flex; }
+  .riel button[aria-current='true'] .punto { height: 1.75rem; background: var(--acento-actual); }
+  .riel button[aria-current='true'] .etiqueta { color: #fff; opacity: 1; }
 </style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+
+  const seccion = document.querySelector<HTMLElement>('[data-equipo]');
+  const escenario = seccion?.querySelector<HTMLElement>('[data-escenario]');
+  if (seccion && escenario) {
+    const miembros = Array.from(seccion.querySelectorAll<HTMLElement>('[data-miembro]'));
+    const botones = Array.from(seccion.querySelectorAll<HTMLButtonElement>('[data-ir]'));
+    const n = miembros.length;
+    const signos = '!<>-_\\/[]{}=+*^?#01';
+
+    // El nombre se "descifra" letra por letra
+    const descifrar = (el: HTMLElement) => {
+      const final = el.dataset.texto ?? el.textContent ?? '';
+      let cuadro = 0;
+      const total = 26;
+      const paso = () => {
+        const avance = Math.floor((cuadro / total) * final.length);
+        el.textContent = final.split('').map((c, i) => (i < avance || c === ' ' ? c : signos[Math.floor(Math.random() * signos.length)])).join('');
+        if (++cuadro <= total) requestAnimationFrame(paso);
+        else el.textContent = final;
+      };
+      paso();
+    };
+    const glitch = (m: HTMLElement) => {
+      const capa = m.querySelector<HTMLElement>('.capa');
+      if (!capa) return;
+      capa.classList.remove('glitch');
+      void capa.offsetWidth;
+      capa.classList.add('glitch');
+    };
+    let activo = -1;
+    const activar = (i: number) => {
+      if (i === activo) return;
+      activo = i;
+      const m = miembros[i];
+      miembros.forEach((otro, k) => otro.classList.toggle('activo', k === i));
+      botones.forEach((b, k) => b.setAttribute('aria-current', String(k === i)));
+      seccion.style.setProperty('--acento-actual', m.style.getPropertyValue('--acento'));
+      const nombre = m.querySelector<HTMLElement>('.nombre');
+      if (nombre) descifrar(nombre);
+      glitch(m);
+    };
+    const altoArriba = () => {
+      const subnav = document.querySelector<HTMLElement>('[data-subnav]');
+      return 72 + (subnav?.offsetHeight ?? 0);
+    };
+
+    const mm = gsap.matchMedia();
+
+    // Computadora: escena fija; cada integrante entra al bajar
+    mm.add('(min-width: 1024px) and (prefers-reduced-motion: no-preference)', () => {
+      const arriba = altoArriba();
+      seccion.classList.add('modo-pin');
+      seccion.style.setProperty('--arriba', `${arriba}px`);
+      gsap.set(miembros.slice(1), { autoAlpha: 0 });
+      gsap.set(seccion.querySelectorAll('.lienzo'), { clipPath: 'inset(0% 0% 0% 0% round 2rem)' });
+
+      const tl = gsap.timeline({
+        defaults: { ease: 'power3.inOut' },
+        scrollTrigger: {
+          trigger: escenario,
+          start: `top top+=${arriba}`,
+          end: () => `+=${Math.max(1, n - 1) * window.innerHeight * 0.95}`,
+          pin: true,
+          scrub: 0.9,
+          snap: n > 1 ? { snapTo: 'labels', duration: { min: 0.25, max: 0.7 }, delay: 0.08, ease: 'power2.inOut' } : undefined,
+          invalidateOnRefresh: true,
+          onUpdate: (st) => activar(Math.round(st.progress * (n - 1))),
+        },
+      });
+      tl.addLabel('m0');
+      for (let i = 1; i < n; i++) {
+        const a = miembros[i - 1];
+        const b = miembros[i];
+        const s = `s${i}`;
+        tl.addLabel(s, '+=0.25')
+          .to(a.querySelectorAll('.t-linea'), { y: -60, autoAlpha: 0, stagger: 0.04, duration: 0.5, ease: 'power2.in' }, s)
+          .to(a.querySelector('.lienzo'), { clipPath: 'inset(0% 0% 100% 0% round 2rem)', duration: 0.6 }, s)
+          .to(a.querySelector('.capa'), { scale: 1.25, rotation: 5, duration: 0.6 }, s)
+          .to(a.querySelector('.marco'), { rotation: 60, scale: 0.6, autoAlpha: 0, duration: 0.6 }, s)
+          .to(a.querySelector('.numero'), { yPercent: -70, autoAlpha: 0, duration: 0.6 }, s)
+          .to(a.querySelector('.orbita'), { scale: 1.5, autoAlpha: 0, duration: 0.6 }, s)
+          .to(a.querySelectorAll('.flotante'), { y: -160, autoAlpha: 0, duration: 0.5 }, s)
+          .set(a, { autoAlpha: 0 }, `${s}+=0.6`)
+          .set(b, { autoAlpha: 1 }, `${s}+=0.3`)
+          .fromTo(b.querySelector('.lienzo'), { clipPath: 'inset(100% 0% 0% 0% round 2rem)' }, { clipPath: 'inset(0% 0% 0% 0% round 2rem)', duration: 0.75 }, `${s}+=0.3`)
+          .fromTo(b.querySelector('.capa'), { scale: 1.4, rotation: -8 }, { scale: 1, rotation: 0, duration: 0.95, ease: 'power3.out' }, `${s}+=0.3`)
+          .fromTo(b.querySelector('.marco'), { rotation: -70, scale: 0.5, autoAlpha: 0 }, { rotation: 9, scale: 1, autoAlpha: 0.85, duration: 0.85, ease: 'back.out(1.6)' }, `${s}+=0.38`)
+          .fromTo(b.querySelector('.numero'), { yPercent: 70, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 0.6, duration: 0.7 }, `${s}+=0.38`)
+          .fromTo(b.querySelector('.orbita'), { scale: 0.6, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, duration: 0.8 }, `${s}+=0.38`)
+          .fromTo(b.querySelectorAll('.t-linea'), { y: 70, autoAlpha: 0 }, { y: 0, autoAlpha: 1, stagger: 0.06, duration: 0.6, ease: 'power3.out' }, `${s}+=0.45`)
+          .fromTo(b.querySelectorAll('.flotante'), { y: 160, autoAlpha: 0, scale: 0.7 }, { y: 0, autoAlpha: 1, scale: 1, stagger: 0.1, duration: 0.7, ease: 'back.out(1.4)' }, `${s}+=0.5`)
+          .addLabel(`m${i}`);
+      }
+      tl.to({}, { duration: 0.25 });
+
+      // El riel lleva al integrante elegido con el mismo desplazamiento suave de la página
+      const st = tl.scrollTrigger!;
+      const alClic = (e: Event) => {
+        const i = Number((e.currentTarget as HTMLElement).dataset.ir);
+        const destino = st.start + (st.end - st.start) * (tl.labels[`m${i}`] / tl.duration());
+        const lenis = (window as unknown as { lenis?: { scrollTo: (y: number, o?: object) => void } }).lenis;
+        if (lenis) lenis.scrollTo(destino, { duration: 1.2 });
+        else window.scrollTo({ top: destino, behavior: 'smooth' });
+      };
+      botones.forEach((b) => b.addEventListener('click', alClic));
+      activar(0);
+
+      return () => {
+        seccion.classList.remove('modo-pin');
+        botones.forEach((b) => b.removeEventListener('click', alClic));
+      };
+    });
+
+    // Celular y tableta: cada integrante entra cuando aparece en pantalla
+    mm.add('(max-width: 1023px) and (prefers-reduced-motion: no-preference)', () => {
+      miembros.forEach((m, i) => {
+        const tl = gsap.timeline({
+          defaults: { ease: 'power3.out' },
+          scrollTrigger: { trigger: m, start: 'top 78%', once: true, onEnter: () => setTimeout(() => activar(i), 250) },
+        });
+        tl.fromTo(m.querySelector('.lienzo'), { clipPath: 'circle(0% at 50% 50%)' }, { clipPath: 'circle(80% at 50% 50%)', duration: 1.1, ease: 'expo.out' })
+          .fromTo(m.querySelector('.capa'), { scale: 1.45, rotation: -8 }, { scale: 1, rotation: 0, duration: 1.3 }, 0)
+          .fromTo(m.querySelector('.marco'), { rotation: -80, scale: 0.4, autoAlpha: 0 }, { rotation: 9, scale: 1, autoAlpha: 0.85, duration: 1, ease: 'back.out(1.7)' }, 0.1)
+          .fromTo(m.querySelector('.numero'), { yPercent: 60, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 0.6, duration: 0.9 }, 0.15)
+          .fromTo(m.querySelector('.orbita'), { scale: 0.5, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, duration: 1 }, 0.15)
+          .fromTo(m.querySelectorAll('.flotante'), { y: 80, autoAlpha: 0, scale: 0.6 }, { y: 0, autoAlpha: 1, scale: 1, stagger: 0.1, duration: 0.8, ease: 'back.out(1.5)' }, 0.35)
+          .fromTo(m.querySelectorAll('.t-linea'), { y: 40, autoAlpha: 0 }, { y: 0, autoAlpha: 1, stagger: 0.07, duration: 0.7 }, 0.3);
+      });
+    });
+  }
+</script>

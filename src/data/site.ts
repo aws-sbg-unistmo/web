@@ -70,16 +70,28 @@ export const servicios = [
   'Amazon API Gateway', 'AWS IAM', 'Amazon RDS', 'Amazon SageMaker', 'Amazon VPC', 'AWS Amplify',
 ];
 
-// Core Team. Para agregar a alguien basta con sumar un objeto. "foto" es opcional (una imagen cuadrada en public/img/equipo/).
-export type Integrante = { nombre: string; rol: string; carrera?: string; linkedin?: string; instagram?: string; github?: string; web?: string; foto?: string };
+// Core Team. Para agregar a alguien basta con sumar un objeto.
+// "fotos": la primera es la principal (vertical 4:5, en public/img/equipo/); las demás flotan alrededor.
+export type Red = { tipo: 'linkedin' | 'instagram' | 'github' | 'youtube' | 'tiktok' | 'x' | 'facebook' | 'web'; url: string };
+export type Integrante = { nombre: string; rol: string; carrera?: string; descripcion?: string; fotos?: string[]; redes?: Red[] };
 export const equipo: Integrante[] = [
   {
     nombre: 'Jean Paul Gallegos Cruz',
-    rol: 'Group Leader',
-    linkedin: 'https://www.linkedin.com/in/jeanpaulgc',
+    rol: 'Student Builder Group Leader',
+    carrera: 'Ingeniería en Computación',
+    descripcion:
+      'Fundé el AWS Student Builder Group de la UNISTMO. También soy Google Student Ambassador ’26 y parte de Nexis Oaxaca Tech. Comparto lo que aprendo en los programas tech: cloud, seguridad y backend.',
+    fotos: ['/img/equipo/jean-paul.webp', '/img/equipo/jean-paul-2.webp', '/img/equipo/jean-paul-3.webp'],
+    redes: [
+      { tipo: 'linkedin', url: 'https://www.linkedin.com/in/jeanpaulgc' },
+      { tipo: 'github', url: 'https://github.com/Jean1722343' },
+      { tipo: 'instagram', url: 'https://www.instagram.com/jpgallegosc' },
+      { tipo: 'tiktok', url: 'https://www.tiktok.com/@jpgallegosc' },
+      { tipo: 'facebook', url: 'https://www.facebook.com/profile.php?id=61593415306721' },
+    ],
   },
-  { nombre: 'Joan Garfias', rol: 'Core Team', instagram: 'https://www.instagram.com/joangarfias_/' },
-  { nombre: 'Jeovani Pacheco Bautista', rol: 'Core Team', instagram: 'https://www.instagram.com/jeovanipachecobautista/' },
+  { nombre: 'Joan Garfias', rol: 'Core Team', redes: [{ tipo: 'instagram', url: 'https://www.instagram.com/joangarfias_/' }] },
+  { nombre: 'Jeovani Pacheco Bautista', rol: 'Core Team', redes: [{ tipo: 'instagram', url: 'https://www.instagram.com/jeovanipachecobautista/' }] },
   { nombre: 'Gerónimo', rol: 'Core Team' },
 ];
 
