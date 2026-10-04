@@ -1,6 +1,7 @@
 ---
 import Icono from './Icono.astro';
-import { anuncio, navegacion, site } from '../data/site';
+import LogoRed from './LogoRed.astro';
+import { anuncio, navegacion, redes, site } from '../data/site';
 
 const ruta = Astro.url.pathname;
 const activo = (url: string) => (url === '/' ? ruta === '/' : ruta.startsWith(url));
@@ -47,9 +48,14 @@ const activo = (url: string) => (url === '/' ? ruta === '/' : ruta.startsWith(ur
         Únete en Meetup <Icono nombre="externo" class="size-4" />
       </a>
 
-      <button id="boton-menu" class="rounded-lg p-2 text-white lg:hidden" aria-expanded="false" aria-controls="menu-movil" aria-label="Abrir menú">
-        <Icono nombre="menu" class="size-7" />
-      </button>
+      <div class="flex items-center gap-1.5 lg:hidden">
+        <a href={site.meetup} target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 rounded-full bg-magenta px-3.5 py-2 text-sm font-semibold text-marino shadow-[0_0_24px_-8px_var(--color-magenta)] active:scale-95">
+          Únete <Icono nombre="externo" class="size-3.5" />
+        </a>
+        <button id="boton-menu" class="rounded-lg p-2 text-white" aria-expanded="false" aria-controls="menu-movil" aria-label="Abrir menú">
+          <Icono nombre="menu" class="size-7" />
+        </button>
+      </div>
     </div>
   </div>
 </header>
@@ -68,6 +74,16 @@ const activo = (url: string) => (url === '/' ? ruta === '/' : ruta.startsWith(ur
   <a href={site.meetup} target="_blank" rel="noopener" class="mt-8 inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-magenta py-4 font-semibold text-marino">
     Únete en Meetup <Icono nombre="externo" class="size-4" />
   </a>
+  <p class="mt-8 text-sm font-semibold text-white">Síguenos en</p>
+  <ul class="mt-3 flex flex-wrap gap-3" data-redes>
+    {redes.map((r) => (
+      <li>
+        <a href={r.url} target="_blank" rel="noopener" aria-label={`${r.nombre} (se abre en otra pestaña)`} class="red-animada block rounded-full">
+          <LogoRed red={r.tipo} class="size-11" />
+        </a>
+      </li>
+    ))}
+  </ul>
 </div>
 
 <style>
@@ -91,6 +107,9 @@ const activo = (url: string) => (url === '/' ? ruta === '/' : ruta.startsWith(ur
   /* Al bajar, el aviso se esconde subiendo todo el header (transform: no mueve el resto de la página) */
   #cabecera { transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1); }
   #cabecera.con-anuncio.con-fondo { transform: translateY(-2.25rem); }
+  @media (max-width: 1023px) {
+    :global(html.cabecera-oculta) #cabecera.con-fondo { transform: translateY(-100%); }
+  }
   .barra-nav { transition: background-color 0.2s ease, box-shadow 0.2s ease, backdrop-filter 0.2s ease; }
   #cabecera.con-fondo .barra-nav {
     background: color-mix(in srgb, var(--color-marino) 88%, transparent);
@@ -105,7 +124,19 @@ const activo = (url: string) => (url === '/' ? ruta === '/' : ruta.startsWith(ur
 
 <script>
   const cabecera = document.getElementById('cabecera')!;
-  const actualizar = () => cabecera.classList.toggle('con-fondo', window.scrollY > 24);
+  const raiz = document.documentElement;
+  const pantallaChica = window.matchMedia('(max-width: 1023px)');
+  let ultimoY = window.scrollY;
+  const actualizar = () => {
+    const y = window.scrollY;
+    cabecera.classList.toggle('con-fondo', y > 24);
+    // Celular: al bajar se esconde la barra para dejar más espacio; al subir (o arriba del todo) vuelve
+    if (pantallaChica.matches && !raiz.style.overflow) {
+      if (y < 160 || y < ultimoY - 6) raiz.classList.remove('cabecera-oculta');
+      else if (y > ultimoY + 6) raiz.classList.add('cabecera-oculta');
+    } else raiz.classList.remove('cabecera-oculta');
+    if (Math.abs(y - ultimoY) > 6) ultimoY = y;
+  };
   actualizar();
   window.addEventListener('scroll', actualizar, { passive: true });
 
