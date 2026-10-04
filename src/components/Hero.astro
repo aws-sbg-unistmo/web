@@ -14,7 +14,7 @@ import { site } from '../data/site';
         loop
         playsinline
         preload="auto"
-        poster="/img/portada.jpg"
+        data-poster="/img/portada.jpg"
         aria-hidden="true"
       >
         <source data-src="/video/portada-1280.webm" type="video/webm" />
@@ -30,6 +30,7 @@ import { site } from '../data/site';
             v.parentNode.remove();
             return;
           }
+          v.poster = v.dataset.poster;
           var grande = innerWidth * Math.min(devicePixelRatio || 1, 2) > 1700;
           v.querySelectorAll('source').forEach(function (s) {
             s.src = grande ? s.dataset.src.replace('-1280.', '-1920.') : s.dataset.src;

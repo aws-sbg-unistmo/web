@@ -26,7 +26,7 @@ for await (const ruta of archivos(dist)) {
   let texto;
   if (ruta.endsWith('.html')) {
     texto = (await readFile(ruta, 'utf8')).replace(
-      /\b(href|src|poster|data-src|content|action)="\/(?!\/)/g,
+      /\b(href|src|poster|data-src|data-poster|content|action)="\/(?!\/)/g,
       (_, attr) => `${attr}="${base}/`,
     );
   } else if (ruta.endsWith('.css')) {
