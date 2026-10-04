@@ -89,10 +89,10 @@ const columnas = [
 
     <nav aria-label="Síguenos en redes sociales" class="col-span-2 max-lg:order-2 max-lg:mb-8 lg:col-span-1">
       <h2 class="titulo text-sm font-semibold">Síguenos en</h2>
-      <ul class="mt-4 flex flex-wrap gap-3 lg:flex-col lg:gap-2.5">
+      <ul class="mt-4 flex flex-wrap gap-3 lg:flex-col lg:gap-2.5" data-redes>
         {redes.map((r) => (
           <li>
-            <a href={r.url} target="_blank" rel="noopener" title={r.nombre} class="red-pie group inline-flex items-center gap-2.5 text-sm text-suave/85 hover:text-white">
+            <a href={r.url} target="_blank" rel="noopener" title={r.nombre} class="red-animada group inline-flex items-center gap-2.5 rounded-full text-sm text-suave/85 hover:text-white">
               <LogoRed red={r.tipo} class="size-11 lg:size-7" />
               <span class="sr-only lg:not-sr-only group-hover:underline group-hover:underline-offset-4">{r.nombre}</span>
             </a>
@@ -119,6 +119,4 @@ const columnas = [
 <style>
   .pie-plegable summary::-webkit-details-marker { display: none; }
   .pie-plegable[open] :global(.flecha-pie) { rotate: -90deg; }
-  .red-pie :global(.logo-red) { transition: translate 0.25s ease; }
-  .red-pie:hover :global(.logo-red) { translate: 0 -2px; }
 </style>

@@ -35,10 +35,10 @@ import { redes, site } from '../data/site';
         </a>
         <a href="/contacto/?motivo=core-team" class="boton boton-secundario" data-magnetico>Quiero participar</a>
       </div>
-      <ul class="mt-10 flex flex-wrap gap-2.5 sm:gap-3" aria-label="Nuestras redes sociales">
+      <ul class="mt-10 flex flex-wrap gap-2.5 sm:gap-3" aria-label="Nuestras redes sociales" data-redes>
         {redes.map((r) => (
           <li>
-            <a href={r.url} target="_blank" rel="noopener" aria-label={`${r.nombre} (se abre en otra pestaña)`} title={r.nombre} class="red-llamado block rounded-full">
+            <a href={r.url} target="_blank" rel="noopener" aria-label={`${r.nombre} (se abre en otra pestaña)`} data-nombre={r.nombre} class="red-animada block rounded-full">
               <LogoRed red={r.tipo} class="size-10 sm:size-11" />
             </a>
           </li>
@@ -47,11 +47,6 @@ import { redes, site } from '../data/site';
     </div>
   </div>
 </section>
-
-<style>
-  .red-llamado { transition: translate 0.25s ease, box-shadow 0.25s ease; }
-  .red-llamado:hover { translate: 0 -3px; box-shadow: 0 10px 24px -10px rgb(0 0 0 / 0.8); }
-</style>
 
 <script>
   import '../scripts/videos';

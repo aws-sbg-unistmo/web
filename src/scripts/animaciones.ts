@@ -6,6 +6,7 @@
 //   data-tilt              tarjeta que se inclina con el cursor y brilla donde está el mouse
 //   data-magnetico         botón que se acerca al cursor
 //   data-palabras          título que entra palabra por palabra
+//   data-redes             botones de redes que entran en ola (estilos .red-animada en global.css)
 // Con "reducir movimiento" activado en el sistema, todo se muestra sin animar.
 import Lenis from 'lenis';
 import { gsap } from 'gsap';
@@ -189,3 +190,16 @@ if (reducir) {
     });
   }
 }
+
+// Botones de redes: entran uno tras otro (con rebote) cuando la lista se ve en pantalla
+todos('[data-redes]').forEach((lista) => {
+  Array.from(lista.children).forEach((li, i) => (li as HTMLElement).style.setProperty('--i', String(i)));
+  if (reducir) return;
+  lista.classList.add('preparado');
+  const observador = new IntersectionObserver(([e]) => {
+    if (!e.isIntersecting) return;
+    lista.classList.add('visible');
+    observador.disconnect();
+  }, { threshold: 0.4 });
+  observador.observe(lista);
+});

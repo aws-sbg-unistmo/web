@@ -122,7 +122,7 @@ const duracion = Math.max(30, ronda.length * 6);
           <ul class="mt-6 grid gap-2 sm:grid-cols-2">
             {a.redes.map((r) => (
               <li>
-                <a href={r.url} target="_blank" rel="noopener" class="flex items-center gap-3 rounded-2xl border border-linea bg-marino/60 p-2.5 pr-4 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:border-white/30">
+                <a href={r.url} target="_blank" rel="noopener" class="red-animada flex items-center gap-3 rounded-2xl border border-linea bg-marino/60 p-2.5 pr-4 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:border-white/30">
                   <LogoRed red={r.tipo} class="size-9" />
                   <span class="min-w-0">
                     <span class="block leading-tight">{nombreRed[r.tipo]}</span>

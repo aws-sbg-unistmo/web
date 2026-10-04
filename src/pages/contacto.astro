@@ -142,10 +142,10 @@ const perfiles = [
 
       <div class="tarjeta p-6">
         <p class="text-xs font-semibold uppercase tracking-widest text-suave/70">Síguenos en</p>
-        <ul class="mt-4 grid grid-cols-2 gap-2">
+        <ul class="mt-4 grid grid-cols-2 gap-2" data-redes>
           {redes.map((r) => (
             <li>
-              <a href={r.url} target="_blank" rel="noopener" class="flex items-center gap-3 rounded-2xl border border-linea bg-marino/60 p-2 pr-3 transition hover:-translate-y-0.5 hover:border-white/30">
+              <a href={r.url} target="_blank" rel="noopener" class="red-animada flex items-center gap-3 rounded-2xl border border-linea bg-marino/60 p-2 pr-3 transition hover:-translate-y-0.5 hover:border-white/30">
                 <LogoRed red={r.tipo} class="size-9" />
                 <span class="min-w-0">
                   <span class="block text-sm font-semibold leading-tight text-white">{r.nombre}</span>

@@ -265,6 +265,76 @@ html {
 .puntos-carrusel button[aria-current='true'] { min-width: 2rem; }
 .puntos-carrusel button[aria-current='true']::before { width: 1.5rem; background: var(--color-magenta); }
 
+/* Botones de redes sociales (.red-animada envuelve un LogoRed):
+   - al pasar el cursor: saltan, brillan con el color de su red, el logo se menea, sale una onda y un destello;
+   - al tocarlos se hunden; con data-nombre muestran el nombre arriba (solo con cursor);
+   - en listas [data-redes]: entran uno tras otro con rebote y cada tanto les cruza un destello en ola. */
+.red-animada { position: relative; -webkit-tap-highlight-color: transparent; }
+.red-animada .logo-red {
+  position: relative;
+  overflow: hidden;
+  transition: translate 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), scale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease;
+}
+.red-animada .logo-red::before {
+  content: '';
+  position: absolute;
+  inset: -30%;
+  background: linear-gradient(115deg, transparent 38%, rgb(255 255 255 / 0.6) 50%, transparent 62%);
+  translate: -110% 0;
+  pointer-events: none;
+}
+.red-animada:hover .logo-red,
+.red-animada:focus-visible .logo-red {
+  translate: 0 -5px;
+  scale: 1.14;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--marca) 35%, transparent), 0 14px 30px -6px color-mix(in srgb, var(--marca) 75%, transparent);
+  animation: onda-red 0.9s ease-out;
+}
+.red-animada:hover .logo-red::before,
+.red-animada:focus-visible .logo-red::before { animation: destello-red 0.7s ease forwards; }
+.red-animada:hover .logo-red svg,
+.red-animada:focus-visible .logo-red svg { animation: meneo-red 0.6s ease; }
+.red-animada:active .logo-red { scale: 0.9; translate: 0 0; transition-duration: 0.12s; }
+@keyframes onda-red {
+  from { box-shadow: 0 0 0 0 color-mix(in srgb, var(--marca) 70%, transparent), 0 14px 30px -6px color-mix(in srgb, var(--marca) 75%, transparent); }
+  to { box-shadow: 0 0 0 16px transparent, 0 14px 30px -6px color-mix(in srgb, var(--marca) 75%, transparent); }
+}
+@keyframes destello-red { from { translate: -110% 0; } to { translate: 110% 0; } }
+@keyframes meneo-red {
+  25% { rotate: -16deg; scale: 1.1; }
+  55% { rotate: 10deg; }
+  80% { rotate: -5deg; }
+}
+/* Nombre de la red arriba del botón */
+@media (hover: hover) {
+  .red-animada[data-nombre]::after {
+    content: attr(data-nombre);
+    position: absolute;
+    bottom: calc(100% + 0.6rem);
+    left: 50%;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.5rem;
+    background: var(--color-marino-2);
+    border: 1px solid var(--color-linea);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0;
+    translate: -50% 6px;
+    pointer-events: none;
+    transition: opacity 0.2s ease, translate 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .red-animada[data-nombre]:hover::after { opacity: 1; translate: -50% 0; }
+}
+/* Entrada en ola (el script agrega .preparado y luego .visible) */
+[data-redes].preparado:not(.visible) > li { opacity: 0; scale: 0.4; translate: 0 14px; }
+[data-redes].visible > li { animation: entra-red 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) both; animation-delay: calc(var(--i, 0) * 80ms); }
+@keyframes entra-red { from { opacity: 0; scale: 0.4; translate: 0 14px; } }
+/* Destello en reposo que recorre la fila cada pocos segundos */
+[data-redes].visible .red-animada:not(:hover) .logo-red::before { animation: brillo-reposo-red 5.5s ease-in-out infinite; animation-delay: calc(1.2s + var(--i, 0) * 0.14s); }
+@keyframes brillo-reposo-red { 0%, 82% { translate: -110% 0; } 100% { translate: 110% 0; } }
+
 /* Las anclas no quedan debajo del header ni de la barra "En esta página" */
 main section[id] { scroll-margin-top: 8.5rem; }
 
