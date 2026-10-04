@@ -82,7 +82,7 @@ import { site } from '../data/site';
       {site.usarMascota && (
         <>
           <!-- En celular el video se muestra aquí, en una tarjeta, en lugar de ir detrás del texto -->
-          <div id="tarjeta-video" class="entrada relative mt-8 aspect-[16/11] overflow-hidden rounded-3xl border border-linea shadow-[0_30px_80px_-30px_rgba(255,87,233,0.45)] md:hidden" style="--d:0.5s" aria-hidden="true">
+          <div id="tarjeta-video" class="entrada relative mt-8 aspect-[5/4] overflow-hidden rounded-3xl border border-linea shadow-[0_30px_80px_-30px_rgba(255,87,233,0.45)] md:hidden" style="--d:0.5s" aria-hidden="true">
             <div class="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-16 bg-gradient-to-t from-marino/80 to-transparent"></div>
           </div>
           <script is:inline>
@@ -90,14 +90,14 @@ import { site } from '../data/site';
               var tarjeta = document.getElementById('tarjeta-video');
               var video = document.getElementById('video-portada');
               if (!tarjeta || !video || !matchMedia('(max-width: 767px)').matches) return;
-              video.className = 'absolute inset-0 size-full object-cover object-[74%_center]';
+              video.className = 'absolute inset-0 size-full object-cover object-right';
               tarjeta.prepend(video);
             })();
           </script>
         </>
       )}
 
-      <div class="entrada mt-6 inline-flex max-w-full items-center gap-3 rounded-xl border border-linea bg-marino/70 px-4 py-3 font-mono text-xs backdrop-blur sm:mt-10 sm:text-sm" style="--d:0.55s">
+      <div class="entrada mt-6 hidden max-w-full items-center gap-3 rounded-xl sm:inline-flex border border-linea bg-marino/70 px-4 py-3 font-mono text-xs backdrop-blur sm:mt-10 sm:text-sm" style="--d:0.55s">
         <span class="text-menta">~/unistmo</span>
         <span class="text-magenta">$</span>
         <span id="escritura" class="text-white"></span><span class="cursor-terminal -ml-2 text-magenta">▍</span>
@@ -132,6 +132,8 @@ import { site } from '../data/site';
       mask-image: linear-gradient(to right, transparent, #000 30%);
     }
   }
+  /* En la tarjeta del celular el video se acerca al jaguar (está en el tercio derecho del cuadro) */
+  #tarjeta-video video { scale: 1.25; transform-origin: 100% 65%; }
   .cursor-terminal { animation: parpadeo 1s steps(1) infinite; }
   @keyframes parpadeo { 50% { opacity: 0; } }
   .rueda { animation: rueda 1.8s ease-in-out infinite; }

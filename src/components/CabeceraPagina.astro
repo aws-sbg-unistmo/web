@@ -1,6 +1,6 @@
 ---
 // Encabezado de las páginas internas: migas de pan, etiqueta, título animado, descripción y el jaguar.
-// Con "video", el jaguar aparece en un video en bucle: en escritorio de fondo a la derecha, en celular en una tarjeta.
+// Con "video", el jaguar aparece en un video en bucle de fondo a la derecha (desde tabletas; en celular no, para no saturar).
 import Icono from './Icono.astro';
 import Palabras from './Palabras.astro';
 import { site } from '../data/site';
@@ -25,7 +25,7 @@ const medidas: Record<string, [number, number]> = {
 const [anchoPose, altoPose] = (pose && medidas[pose]) || [600, 900];
 const conVideo = Boolean(video && site.usarMascota);
 ---
-<section class:list={['relative isolate overflow-hidden pb-16 pt-40', conVideo && 'md:flex md:min-h-[38rem] md:items-end']}>
+<section class:list={['relative isolate overflow-hidden pb-12 pt-36 md:pb-16 md:pt-40', conVideo && 'md:flex md:min-h-[38rem] md:items-end']}>
   <div class="rejilla absolute inset-0 -z-10 opacity-30 [mask-image:radial-gradient(ellipse_at_top,#000,transparent_70%)]"></div>
   <div class="absolute -top-40 left-1/2 -z-10 h-96 w-[56rem] -translate-x-1/2 rounded-full bg-morado/20 blur-3xl"></div>
   <div class="mx-auto grid w-full max-w-7xl items-end gap-10 px-5 md:grid-cols-[1fr_auto]">
@@ -40,12 +40,12 @@ const conVideo = Boolean(video && site.usarMascota);
         </nav>
       )}
       <p class="chip entrada">{etiqueta}</p>
-      <Palabras como="h1" texto={titulo} resaltar={resaltar} inmediato class="mt-5 text-5xl font-bold leading-[1.05] md:text-6xl" />
+      <Palabras como="h1" texto={titulo} resaltar={resaltar} inmediato class="mt-5 text-[2.6rem] font-bold leading-[1.05] sm:text-5xl md:text-6xl" />
       <p class="entrada mt-6 text-lg leading-relaxed" style="--d:0.3s">{descripcion}</p>
 
-      {/* Celular: tarjeta debajo del texto. Escritorio: fondo de la cabecera, pegado a la derecha y fundido con el texto */}
+      {/* Solo en tabletas y computadoras: fondo de la cabecera, pegado a la derecha y fundido con el texto */}
       {conVideo && (
-        <div class="video-cabecera entrada relative mt-8 aspect-[4/3] overflow-hidden rounded-3xl border border-linea shadow-[0_30px_80px_-30px_rgba(255,87,233,0.45)] md:absolute md:inset-y-0 md:right-0 md:left-auto md:-z-20 md:mt-0 md:aspect-video md:h-full md:w-auto md:max-w-full md:rounded-none md:border-0 md:shadow-none" style="--d:0.4s" aria-hidden="true">
+        <div class="video-cabecera entrada relative mt-8 hidden aspect-[4/3] overflow-hidden rounded-3xl border border-linea shadow-[0_30px_80px_-30px_rgba(255,87,233,0.45)] md:absolute md:block md:inset-y-0 md:right-0 md:left-auto md:-z-20 md:mt-0 md:aspect-video md:h-full md:w-auto md:max-w-full md:rounded-none md:border-0 md:shadow-none" style="--d:0.4s" aria-hidden="true">
           <video class="video-diferido absolute inset-0 size-full object-cover object-[88%_center] md:object-right" muted loop playsinline preload="none" poster={`/img/cabecera-${video}.jpg`}>
             <source data-src={`/video/${video}-1280.webm`} type="video/webm" />
             <source data-src={`/video/${video}-1280.mp4`} type="video/mp4" />

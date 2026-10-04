@@ -70,7 +70,7 @@ const codigo = [
     ]}
   />
 
-  <section id="mision" class="mx-auto grid max-w-7xl gap-6 px-5 pt-20 md:grid-cols-2" data-stagger>
+  <section id="mision" class="mx-auto grid max-w-7xl gap-6 px-5 pt-20 md:grid-cols-2" data-stagger data-carrusel>
     <article class="tarjeta p-8" data-tilt>
       <p class="font-mono text-xs uppercase tracking-[0.2em] text-magenta">Misión</p>
       <p class="titulo mt-4 text-2xl font-semibold leading-snug">
@@ -103,7 +103,7 @@ const codigo = [
         </a>
       </div>
     </div>
-    <div class="mt-12 grid gap-6 md:grid-cols-3" data-stagger>
+    <div class="mt-12 grid gap-6 md:grid-cols-3" data-stagger data-carrusel>
       {pilares.map((p) => (
         <article class="tarjeta p-7" data-tilt style={`--acento:${p.c}`}>
           <span class="grid size-12 place-items-center rounded-xl" style="background:color-mix(in srgb,var(--acento) 15%,transparent);color:var(--acento)">
@@ -135,7 +135,7 @@ const codigo = [
   <section class="mx-auto mt-28 max-w-7xl px-5">
     <p class="chip" data-reveal>// Lo que nos mueve</p>
     <Palabras texto="Nuestros valores" resaltar={['valores']} class="mt-5 text-4xl font-bold md:text-5xl" />
-    <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4" data-stagger>
+    <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4" data-stagger data-carrusel>
       {valores.map((v, i) => (
         <article class="tarjeta p-7" data-tilt>
           <span class="font-mono text-sm text-magenta">0{i + 1}</span>

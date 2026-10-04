@@ -1,6 +1,8 @@
 ---
 // Pie de página con la estructura del de aws.amazon.com: banda "Volver arriba", columnas de enlaces y aviso legal.
+// En celular las columnas se pliegan (como en aws.amazon.com) y las redes quedan en una fila de logos.
 import Icono from './Icono.astro';
+import LogoRed from './LogoRed.astro';
 import { redes, site } from '../data/site';
 import { recursos } from '../data/contenido';
 const anio = new Date().getFullYear();
@@ -30,10 +32,6 @@ const columnas = [
     titulo: 'Recursos de AWS',
     enlaces: recursos.slice(0, 5).map((r) => ({ texto: r.nombre, url: r.url, externo: true })),
   },
-  {
-    titulo: 'Síguenos',
-    enlaces: redes.map((r) => ({ texto: r.nombre, url: r.url, externo: true })),
-  },
 ] as { titulo: string; enlaces: { texto: string; url: string; externo?: boolean }[] }[];
 ---
 <footer class="relative mt-32 overflow-hidden">
@@ -43,8 +41,8 @@ const columnas = [
 
   <div class="pointer-events-none absolute -bottom-40 left-1/2 h-80 w-[60rem] -translate-x-1/2 rounded-full bg-magenta/10 blur-3xl"></div>
 
-  <div class="relative mx-auto grid max-w-7xl grid-cols-2 gap-x-6 gap-y-12 px-5 py-16 lg:grid-cols-[1.5fr_repeat(4,1fr)] lg:gap-x-8">
-    <div class="col-span-2 lg:col-span-1">
+  <div class="relative mx-auto grid max-w-7xl grid-cols-2 gap-x-6 px-5 py-12 lg:grid-cols-[1.5fr_repeat(4,1fr)] lg:gap-x-8 lg:gap-y-12 lg:py-16">
+    <div class="col-span-2 max-lg:order-1 max-lg:mb-10 lg:col-span-1">
       <a href="/" class="flex items-center gap-3">
         <img src="/img/logo-192.png" alt="" width="48" height="48" class="size-12 rounded-xl ring-1 ring-white/15" loading="lazy" />
         <span class="titulo text-xl font-semibold">AWS SBG <span class="text-magenta">UNISTMO</span></span>
@@ -59,10 +57,9 @@ const columnas = [
       </a>
     </div>
 
-    {columnas.map((c) => (
-      <nav aria-label={c.titulo}>
-        <h2 class="titulo text-sm font-semibold">{c.titulo}</h2>
-        <ul class="mt-4 space-y-2.5 text-sm">
+    {columnas.map((c) => {
+      const lista = () => (
+        <ul class="space-y-2.5 text-sm max-lg:space-y-3 max-lg:pb-5 lg:mt-4">
           {c.enlaces.map((e) => (
             <li>
               <a href={e.url} target={e.externo ? '_blank' : undefined} rel={e.externo ? 'noopener' : undefined} class="group inline-flex items-center gap-1.5 text-suave/85 hover:text-white hover:underline hover:underline-offset-4">
@@ -72,8 +69,37 @@ const columnas = [
             </li>
           ))}
         </ul>
-      </nav>
-    ))}
+      );
+      return (
+        <>
+          <nav aria-label={c.titulo} class="hidden lg:block">
+            <h2 class="titulo text-sm font-semibold">{c.titulo}</h2>
+            {lista()}
+          </nav>
+          <details class="pie-plegable col-span-2 border-b border-linea max-lg:order-3 lg:hidden">
+            <summary class="flex cursor-pointer list-none items-center justify-between py-4 text-sm font-semibold text-white">
+              {c.titulo}
+              <Icono nombre="chevron" class="flecha-pie size-4 rotate-90 text-suave transition-transform" />
+            </summary>
+            <nav aria-label={c.titulo}>{lista()}</nav>
+          </details>
+        </>
+      );
+    })}
+
+    <nav aria-label="Síguenos" class="col-span-2 max-lg:order-2 max-lg:mb-8 lg:col-span-1">
+      <h2 class="titulo text-sm font-semibold">Síguenos</h2>
+      <ul class="mt-4 flex flex-wrap gap-3 lg:flex-col lg:gap-2.5">
+        {redes.map((r) => (
+          <li>
+            <a href={r.url} target="_blank" rel="noopener" title={r.nombre} class="red-pie group inline-flex items-center gap-2.5 text-sm text-suave/85 hover:text-white">
+              <LogoRed red={r.tipo} class="size-11 lg:size-7" />
+              <span class="sr-only lg:not-sr-only group-hover:underline group-hover:underline-offset-4">{r.nombre}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
   </div>
 
   <div class="relative border-t border-linea">
@@ -89,3 +115,10 @@ const columnas = [
     </div>
   </div>
 </footer>
+
+<style>
+  .pie-plegable summary::-webkit-details-marker { display: none; }
+  .pie-plegable[open] :global(.flecha-pie) { rotate: -90deg; }
+  .red-pie :global(.logo-red) { transition: translate 0.25s ease; }
+  .red-pie:hover :global(.logo-red) { translate: 0 -2px; }
+</style>

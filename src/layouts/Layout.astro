@@ -61,7 +61,7 @@ const imagenSocial = new URL('img/og.jpg', base ?? Astro.url).href;
     <Footer />
 
     <!-- En celular, botón fijo y discreto para unirse: aparece pasando la portada, se esconde mientras bajas
-         y vuelve cuando te detienes o subes. Al llegar al pie desaparece. -->
+         y vuelve cuando te detienes o subes. Desaparece en el llamado final (ya tiene su botón) y en el pie. -->
     {conCtaMovil && <a
       id="cta-movil"
       href={site.meetup}
@@ -86,8 +86,14 @@ const imagenSocial = new URL('img/og.jpg', base ?? Astro.url).href;
           const mostrar = window.scrollY > window.innerHeight * 0.8 && !cercaDelPie && !bajando;
           cta.classList.toggle('translate-y-28', !mostrar);
         };
-        const pie = document.querySelector('footer');
-        if (pie) new IntersectionObserver(([e]) => { cercaDelPie = e.isIntersecting; mover(); }).observe(pie);
+        // Zonas donde estorbaría: el pie y las secciones marcadas con data-sin-cta
+        const visibles = new Set<Element>();
+        const observador = new IntersectionObserver((entradas) => {
+          entradas.forEach((e) => (e.isIntersecting ? visibles.add(e.target) : visibles.delete(e.target)));
+          cercaDelPie = visibles.size > 0;
+          mover();
+        });
+        document.querySelectorAll('footer, [data-sin-cta]').forEach((z) => observador.observe(z));
         window.addEventListener('scroll', () => {
           const y = window.scrollY;
           bajando = y > ultimoY + 2;

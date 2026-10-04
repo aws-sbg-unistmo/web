@@ -118,16 +118,18 @@ const confeti = Array.from({ length: 16 }, (_, k) => ({ a: (k / 16) * 360 + (k %
                 </div>
                 <h3 class="titulo mt-3 pr-20 text-2xl font-semibold lg:pr-0">{nv.t}</h3>
                 <p class="mt-2 leading-relaxed">{nv.resumen}</p>
-                <p class="mt-4 text-xs font-semibold uppercase tracking-widest text-suave/70">Referencias</p>
-                <ul class="mt-2 flex flex-wrap gap-1.5">
-                  {nv.referencias.map((r) => (
-                    <li>
-                      <a href={r.url} target="_blank" rel="noopener" class="referencia inline-flex items-center gap-1.5 rounded-full border border-linea bg-marino/60 px-2.5 py-1 text-xs text-white transition-colors">
-                        {r.texto} <Icono nombre="externo" class="size-3" />
-                      </a>
-                    </li>
-                  ))}
-                </ul>
+                <div class="extra">
+                  <p class="mt-4 text-xs font-semibold uppercase tracking-widest text-suave/70">Referencias</p>
+                  <ul class="mt-2 flex flex-wrap gap-1.5">
+                    {nv.referencias.map((r) => (
+                      <li>
+                        <a href={r.url} target="_blank" rel="noopener" class="referencia inline-flex items-center gap-1.5 rounded-full border border-linea bg-marino/60 px-2.5 py-1 text-xs text-white transition-colors">
+                          {r.texto} <Icono nombre="externo" class="size-3" />
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
               <div class="pieza extra">
                 <p class="text-xs font-semibold uppercase tracking-widest text-suave/70">Qué aprendes</p>
@@ -135,7 +137,7 @@ const confeti = Array.from({ length: 16 }, (_, k) => ({ a: (k / 16) * 360 + (k %
                   {nv.aprendes.map((a) => <li class="flex gap-2.5 text-sm"><Icono nombre="check" class="mt-0.5 size-4 shrink-0 text-menta" />{a}</li>)}
                 </ul>
               </div>
-              <div class="pieza space-y-4 md:col-span-2 lg:col-span-1">
+              <div class="pieza extra space-y-4 md:col-span-2 lg:col-span-1">
                 <div>
                   <p class="text-xs font-semibold uppercase tracking-widest text-suave/70">Servicios</p>
                   <ul class="mt-3 flex flex-wrap gap-2">
@@ -148,7 +150,7 @@ const confeti = Array.from({ length: 16 }, (_, k) => ({ a: (k / 16) * 360 + (k %
                 </div>
               </div>
               <button type="button" class="ver-mas hidden items-center justify-center gap-2 rounded-full border border-linea py-2.5 text-sm font-semibold text-white md:col-span-2" aria-expanded="false" data-ver-mas>
-                <span class="texto-ver">Ver qué aprendes y el proyecto</span>
+                <span class="texto-ver">Ver detalles del nivel</span>
                 <Icono nombre="chevron" class="flecha-ver size-4 rotate-90 transition-transform" />
               </button>
             </article>
@@ -169,7 +171,7 @@ const confeti = Array.from({ length: 16 }, (_, k) => ({ a: (k / 16) * 360 + (k %
   @media (max-width: 1023px) {
     .ruta-mapa.con-js .ver-mas { display: flex; }
     .ruta-mapa.con-js .nivel-panel:not(.abierto) .extra { display: none; }
-    .ruta-mapa.con-js .nivel-panel.abierto .flecha-ver { rotate: -90deg; }
+    .ruta-mapa.con-js .nivel-panel.abierto :global(.flecha-ver) { rotate: -90deg; }
     .ruta-mapa.con-js .nivel-panel.abierto .extra { animation: desplegar 0.45s cubic-bezier(0.2, 0.7, 0.2, 1); }
   }
   @keyframes desplegar { from { opacity: 0; translate: 0 -8px; } }
@@ -262,7 +264,7 @@ const confeti = Array.from({ length: 16 }, (_, k) => ({ a: (k / 16) * 360 + (k %
         const panel = b.closest<HTMLElement>('[data-panel]')!;
         const abierto = panel.classList.toggle('abierto');
         b.setAttribute('aria-expanded', String(abierto));
-        b.querySelector('.texto-ver')!.textContent = abierto ? 'Ver menos' : 'Ver qué aprendes y el proyecto';
+        b.querySelector('.texto-ver')!.textContent = abierto ? 'Ver menos' : 'Ver detalles del nivel';
         ScrollTrigger.refresh();
       });
     });

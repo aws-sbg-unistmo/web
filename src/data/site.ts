@@ -26,13 +26,13 @@ export const anuncio = {
 };
 
 export const redes = [
-  { nombre: 'Instagram', usuario: '@aws.unistmo', url: 'https://www.instagram.com/aws.unistmo/' },
-  { nombre: 'TikTok', usuario: '@awssbg_unistmo', url: 'https://www.tiktok.com/@awssbg_unistmo' },
-  { nombre: 'Facebook', usuario: 'AWS SBG Unistmo', url: 'https://www.facebook.com/profile.php?id=61594785430906' },
-  { nombre: 'YouTube', usuario: '@aws_sbg.unistmo', url: 'https://www.youtube.com/@aws_sbg.unistmo' },
-  { nombre: 'LinkedIn', usuario: 'AWS SBG UNISTMO', url: 'https://www.linkedin.com/company/aws-sbg-unistmo/' },
-  { nombre: 'GitHub', usuario: 'aws-sbg-unistmo', url: 'https://github.com/aws-sbg-unistmo' },
-];
+  { tipo: 'instagram', nombre: 'Instagram', usuario: '@aws.unistmo', url: 'https://www.instagram.com/aws.unistmo/' },
+  { tipo: 'tiktok', nombre: 'TikTok', usuario: '@awssbg_unistmo', url: 'https://www.tiktok.com/@awssbg_unistmo' },
+  { tipo: 'facebook', nombre: 'Facebook', usuario: 'AWS SBG Unistmo', url: 'https://www.facebook.com/profile.php?id=61594785430906' },
+  { tipo: 'youtube', nombre: 'YouTube', usuario: '@aws_sbg.unistmo', url: 'https://www.youtube.com/@aws_sbg.unistmo' },
+  { tipo: 'linkedin', nombre: 'LinkedIn', usuario: 'AWS SBG UNISTMO', url: 'https://www.linkedin.com/company/aws-sbg-unistmo/' },
+  { tipo: 'github', nombre: 'GitHub', usuario: 'aws-sbg-unistmo', url: 'https://github.com/aws-sbg-unistmo' },
+] as const;
 
 export const navegacion = [
   { texto: 'Inicio', url: '/' },

@@ -80,9 +80,9 @@ const quitarAcentos = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').
     </div>
 
     <h3 class="titulo mt-20 text-2xl font-semibold md:text-3xl" data-reveal>Seis ventajas de la nube</h3>
-    <div class="mt-8 grid gap-px overflow-hidden rounded-3xl border border-linea bg-linea sm:grid-cols-2 lg:grid-cols-3" data-stagger>
+    <div class="mt-8 grid gap-px overflow-hidden rounded-3xl border border-linea bg-linea max-md:rounded-none max-md:border-0 max-md:bg-transparent sm:grid-cols-2 lg:grid-cols-3" data-stagger data-carrusel>
       {ventajas.map((v, i) => (
-        <article class="bg-marino-2 p-7 transition-colors hover:bg-[#222c38]">
+        <article class="bg-marino-2 p-7 transition-colors hover:bg-[#222c38] max-md:rounded-2xl max-md:border max-md:border-linea">
           <span class="font-mono text-sm text-magenta">0{i + 1}</span>
           <h4 class="titulo mt-3 text-lg font-semibold">{v.t}</h4>
           <p class="mt-2 text-sm leading-relaxed">{v.d}</p>
@@ -101,7 +101,7 @@ const quitarAcentos = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').
         que usan los diagramas de arquitectura de AWS.
       </p>
     </div>
-    <div class="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3" data-stagger>
+    <div class="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3" data-stagger data-carrusel>
       {temas.map((t) => (
         <article class="tarjeta overflow-hidden" style={`--cat:${categorias[t.categoria].color}`}>
           <div class="h-1" style="background:var(--cat)"></div>
@@ -137,7 +137,7 @@ const quitarAcentos = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').
       <span class="absolute bottom-4 left-[7px] top-4 w-0.5 origin-top bg-gradient-to-b from-naranja via-morado to-menta md:left-[15px]" data-linea aria-hidden="true"></span>
       <ol class="space-y-8">
         {niveles.map((nv) => (
-          <li class="relative" style={`--acento:${nv.c}`} data-reveal>
+          <li class="nivel relative" style={`--acento:${nv.c}`} data-reveal>
             <span class="absolute -left-8 top-8 grid size-4 place-items-center rounded-full border-2 bg-marino md:-left-12 md:size-8" style="border-color:var(--acento)" aria-hidden="true">
               <span class="size-1.5 rounded-full md:size-2.5" style="background:var(--acento)"></span>
             </span>
@@ -156,7 +156,7 @@ const quitarAcentos = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').
                     ))}
                   </ul>
                 </div>
-                <div class="space-y-5">
+                <div class="plegable space-y-5">
                   <div>
                     <p class="text-xs font-semibold uppercase tracking-widest text-suave/70">Servicios</p>
                     <ul class="mt-3 flex flex-wrap gap-2">
@@ -168,6 +168,10 @@ const quitarAcentos = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').
                     <p class="mt-2 text-sm leading-relaxed">{nv.proyecto}</p>
                   </div>
                 </div>
+                <button type="button" class="ver-nivel hidden w-full items-center justify-center gap-2 rounded-full border border-linea py-2.5 text-sm font-semibold text-white" aria-expanded="false">
+                  <span class="texto-ver">Ver servicios y proyecto</span>
+                  <Icono nombre="chevron" class="flecha-ver size-4 rotate-90 transition-transform" />
+                </button>
               </div>
             </article>
           </li>
@@ -186,7 +190,7 @@ const quitarAcentos = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').
         En el grupo armamos sesiones de estudio para prepararlas juntos.
       </p>
     </div>
-    <div class="mt-12 grid gap-6 lg:grid-cols-2" data-stagger>
+    <div class="mt-12 grid gap-6 lg:grid-cols-2" data-stagger data-carrusel>
       {certificaciones.map((c, i) => (
         <article class="tarjeta flex flex-col p-7 md:p-9" data-tilt>
           <div class="flex items-start justify-between gap-4">
@@ -225,7 +229,7 @@ const quitarAcentos = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').
       </div>
     </div>
     <p id="conteo-glosario" class="mt-6 text-sm text-suave/70" aria-live="polite">{glosario.length} términos</p>
-    <dl id="lista-glosario" class="mt-4 grid gap-4 md:grid-cols-2">
+    <dl id="lista-glosario" class="recortado mt-4 grid gap-4 md:grid-cols-2">
       {glosario.map((g) => (
         <div class="termino rounded-2xl border border-linea bg-marino-2 p-5 transition-colors hover:border-magenta/50" data-buscar={quitarAcentos(`${g.t} ${g.d}`)}>
           <dt class="titulo text-lg font-semibold">{g.t}</dt>
@@ -233,6 +237,9 @@ const quitarAcentos = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').
         </div>
       ))}
     </dl>
+    <button type="button" id="ver-glosario" class="mt-4 hidden w-full items-center justify-center gap-2 rounded-full border border-linea py-3 text-sm font-semibold text-white">
+      Ver los {glosario.length} términos <Icono nombre="chevron" class="size-4 rotate-90" />
+    </button>
     <p id="sin-resultados" class="mt-4 rounded-2xl border border-dashed border-linea p-6 text-center" hidden>
       No encontramos ese término. Pregúntanos en el próximo evento o en nuestras redes.
     </p>
@@ -245,7 +252,7 @@ const quitarAcentos = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').
       <Palabras texto="Sigue aprendiendo por tu cuenta" resaltar={['aprendiendo']} class="mt-5 text-4xl font-bold leading-tight md:text-5xl" />
       <p class="mt-5 text-lg leading-relaxed" data-reveal>Sitios oficiales de AWS, gratuitos o con mucho contenido sin costo.</p>
     </div>
-    <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" data-stagger>
+    <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" data-stagger data-carrusel>
       {recursos.map((r) => (
         <a href={r.url} target="_blank" rel="noopener" class="tarjeta group flex flex-col p-7" data-tilt>
           <span class="insignia self-start" style="--color-insignia:var(--color-azul)">{r.etiqueta}</span>
@@ -276,5 +283,44 @@ const quitarAcentos = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').
     });
     if (conteo) conteo.textContent = visibles === 1 ? '1 término' : `${visibles} términos`;
     if (vacio) vacio.hidden = visibles > 0;
+    // Al buscar se busca en todos los términos, no solo en los 6 que se ven en celular
+    lista?.classList.toggle('recortado', !q && !glosarioAbierto);
+    verGlosario?.classList.toggle('oculto', Boolean(q) || glosarioAbierto);
+  });
+
+  // Celular: el glosario muestra 6 términos y el resto con un botón
+  const lista = document.getElementById('lista-glosario');
+  const verGlosario = document.getElementById('ver-glosario');
+  let glosarioAbierto = false;
+  document.getElementById('glosario')?.classList.add('con-js');
+  verGlosario?.addEventListener('click', () => {
+    glosarioAbierto = true;
+    lista?.classList.remove('recortado');
+    verGlosario.classList.add('oculto');
+    terminos[6]?.querySelector('dt')?.setAttribute('tabindex', '-1');
+    (terminos[6]?.querySelector('dt') as HTMLElement | null)?.focus();
+  });
+
+  // Celular: cada nivel de la ruta muestra lo que aprendes y despliega los servicios y el proyecto
+  document.getElementById('ruta')?.classList.add('con-js');
+  document.querySelectorAll<HTMLButtonElement>('#ruta .ver-nivel').forEach((b) => {
+    b.addEventListener('click', () => {
+      const nivel = b.closest('.nivel')!;
+      const abierto = nivel.classList.toggle('abierto');
+      b.setAttribute('aria-expanded', String(abierto));
+      b.querySelector('.texto-ver')!.textContent = abierto ? 'Ver menos' : 'Ver servicios y proyecto';
+    });
   });
 </script>
+
+<style>
+  @media (max-width: 767px) {
+    #ruta.con-js .ver-nivel { display: flex; }
+    #ruta.con-js .nivel:not(.abierto) .plegable { display: none; }
+    #ruta.con-js .nivel.abierto .plegable { animation: desplegar 0.4s cubic-bezier(0.2, 0.7, 0.2, 1); }
+    #ruta.con-js .nivel.abierto :global(.flecha-ver) { rotate: -90deg; }
+    #glosario.con-js #ver-glosario:not(.oculto) { display: flex; }
+    #glosario.con-js #lista-glosario.recortado .termino:nth-child(n + 7) { display: none; }
+  }
+  @keyframes desplegar { from { opacity: 0; translate: 0 -8px; } }
+</style>

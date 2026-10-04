@@ -138,9 +138,9 @@ const duracion = Math.max(30, ronda.length * 6);
   ))}
 
   <div class="mx-auto mt-10 max-w-7xl px-5">
-    <div class="grid gap-px overflow-hidden rounded-3xl border border-linea bg-linea sm:grid-cols-2 lg:grid-cols-4" data-stagger>
+    <div class="grid gap-px overflow-hidden rounded-3xl border border-linea bg-linea max-md:rounded-none max-md:border-0 max-md:bg-transparent sm:grid-cols-2 lg:grid-cols-4" data-stagger data-carrusel>
       {tipos.map((t) => (
-        <article class="bg-marino-2 p-7 transition-colors hover:bg-[#222c38]" style={`--acento:${t.c}`}>
+        <article class="bg-marino-2 p-7 transition-colors hover:bg-[#222c38] max-md:rounded-2xl max-md:border max-md:border-linea" style={`--acento:${t.c}`}>
           <span class="grid size-11 place-items-center rounded-xl" style="background:color-mix(in srgb,var(--acento) 15%,transparent);color:var(--acento)"><Icono nombre={t.icono} class="size-5" /></span>
           <h3 class="titulo mt-5 text-lg font-semibold">{t.t}</h3>
           <p class="mt-2 text-sm leading-relaxed">{t.d}</p>

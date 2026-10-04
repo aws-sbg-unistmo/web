@@ -67,13 +67,19 @@ const dos = (n: number) => String(n).padStart(2, '0');
                   ))}
                 </dl>
               )}
+              {p.ficha && p.ficha.length > 1 && (
+                <button type="button" class="t-linea ver-ficha mx-auto mt-4 hidden items-center gap-1.5 text-sm font-semibold text-white" aria-expanded="false">
+                  <span class="texto-ficha">Ver más de {p.nombre.split(' ')[0]}</span>
+                  <Icono nombre="chevron" class="flecha-ficha size-4 rotate-90 transition-transform" />
+                </button>
+              )}
               {p.redes && p.redes.length > 0 && (
                 <ul class="t-linea mt-7 flex flex-wrap justify-center gap-2 lg:justify-start">
                   {p.redes.map((r) => (
                     <li>
-                      <a href={r.url} target="_blank" rel="noopener" class="red inline-flex items-center gap-2 rounded-full border border-linea bg-marino/60 py-1.5 pl-1.5 pr-3.5 text-sm text-suave backdrop-blur transition hover:-translate-y-0.5 hover:border-white/30 hover:text-white" aria-label={`${nombreRed[r.tipo]} de ${p.nombre}`}>
-                        <LogoRed red={r.tipo} class="size-7" />
-                        {nombreRed[r.tipo]}
+                      <a href={r.url} target="_blank" rel="noopener" class="red inline-flex items-center gap-2 rounded-full border border-linea bg-marino/60 py-1.5 pl-1.5 pr-3.5 text-sm text-suave backdrop-blur transition hover:-translate-y-0.5 hover:border-white/30 hover:text-white max-lg:border-0 max-lg:bg-transparent max-lg:p-0" aria-label={`${nombreRed[r.tipo]} de ${p.nombre}`}>
+                        <LogoRed red={r.tipo} class="size-7 max-lg:size-11" />
+                        <span class="max-lg:sr-only">{nombreRed[r.tipo]}</span>
                       </a>
                     </li>
                   ))}
@@ -135,6 +141,12 @@ const dos = (n: number) => String(n).padStart(2, '0');
 </section>
 
 <style>
+  /* Celular: ficha corta (el resto se abre con «Ver más») */
+  @media (max-width: 1023px) {
+    .equipo-js .ver-ficha { display: inline-flex; }
+    .equipo-js .miembro:not(.ficha-abierta) .ficha > div:nth-child(n + 2) { display: none; }
+    .miembro.ficha-abierta :global(.flecha-ficha) { rotate: -90deg; }
+  }
   /* Marco inclinado en degradado detrás de la foto */
   .marco {
     background: linear-gradient(135deg, var(--acento), color-mix(in srgb, var(--acento) 30%, var(--color-morado)));
@@ -216,6 +228,19 @@ const dos = (n: number) => String(n).padStart(2, '0');
     const miembros = Array.from(seccion.querySelectorAll<HTMLElement>('[data-miembro]'));
     const botones = Array.from(seccion.querySelectorAll<HTMLButtonElement>('[data-ir]'));
     const n = miembros.length;
+
+    // Celular: la ficha muestra el primer bloque y el resto con un botón
+    seccion.classList.add('equipo-js');
+    seccion.querySelectorAll<HTMLButtonElement>('.ver-ficha').forEach((b) => {
+      b.addEventListener('click', () => {
+        const miembro = b.closest<HTMLElement>('[data-miembro]')!;
+        const abierto = miembro.classList.toggle('ficha-abierta');
+        b.setAttribute('aria-expanded', String(abierto));
+        const nombre = miembro.querySelector('.nombre-h')?.getAttribute('aria-label')?.split(' ')[0] ?? '';
+        b.querySelector('.texto-ficha')!.textContent = abierto ? 'Ver menos' : `Ver más de ${nombre}`;
+        ScrollTrigger.refresh();
+      });
+    });
     const signos = '!<>-_\\/[]{}=+*^?#01';
 
     // El nombre se "descifra" letra por letra

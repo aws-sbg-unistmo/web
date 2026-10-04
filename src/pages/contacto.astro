@@ -34,7 +34,6 @@ const perfiles = [
     boton: 'Quiero ser parte del Core Team', motivo: 'core-team',
   },
 ] as const;
-const tipoRed = (n: string) => n.toLowerCase() as 'instagram' | 'tiktok' | 'facebook' | 'youtube' | 'linkedin' | 'github';
 ---
 <Layout titulo="Contacto" descripcion="Escríbenos: charlas, talleres, alianzas, colaboraciones o dudas sobre AWS SBG UNISTMO.">
   <CabeceraPagina
@@ -64,7 +63,7 @@ const tipoRed = (n: string) => n.toLowerCase() as 'instagram' | 'tiktok' | 'face
     </div>
   </section>
 
-  <section class="mx-auto mt-16 grid max-w-7xl gap-8 px-5 lg:grid-cols-[1.45fr_1fr]">
+  <section class="mx-auto mt-16 grid max-w-7xl grid-cols-1 gap-8 px-5 lg:grid-cols-[1.45fr_1fr]">
     <div id="formulario" class="tarjeta relative min-w-0 scroll-mt-36 overflow-hidden p-6 md:p-10" data-reveal>
       <div class="pointer-events-none absolute -right-24 -top-24 size-72 rounded-full bg-magenta/10 blur-3xl" aria-hidden="true"></div>
       <div class="relative">
@@ -147,7 +146,7 @@ const tipoRed = (n: string) => n.toLowerCase() as 'instagram' | 'tiktok' | 'face
           {redes.map((r) => (
             <li>
               <a href={r.url} target="_blank" rel="noopener" class="flex items-center gap-3 rounded-2xl border border-linea bg-marino/60 p-2 pr-3 transition hover:-translate-y-0.5 hover:border-white/30">
-                <LogoRed red={tipoRed(r.nombre)} class="size-9" />
+                <LogoRed red={r.tipo} class="size-9" />
                 <span class="min-w-0">
                   <span class="block text-sm font-semibold leading-tight text-white">{r.nombre}</span>
                   <span class="block truncate text-xs text-suave/70">{r.usuario}</span>

@@ -38,37 +38,39 @@ const flujos: { titulo: string; color: string; nodos: Nodo[] }[] = [
   },
 ];
 ---
-<div class="space-y-6" data-stagger>
+<div class="min-w-0 space-y-6" data-stagger>
   <ul class="flex flex-wrap gap-x-5 gap-y-2 text-xs" aria-label="Colores por categoría">
     {(['redes', 'almacenamiento', 'computo', 'bases'] as const).map((c) => (
       <li class="inline-flex items-center gap-2"><span class="size-2.5 rounded-sm" style={`background:${categorias[c].color}`}></span>{categorias[c].nombre}</li>
     ))}
   </ul>
-  {flujos.map((flujo) => (
-    <div class="tarjeta p-6 md:p-8" style={`--acento:${flujo.color}`}>
-      <p class="font-mono text-xs uppercase tracking-[0.2em]" style="color:var(--acento)">{flujo.titulo}</p>
-      <ol class="mt-6 flex items-start md:items-center">
-        {flujo.nodos.map((n, i) => (
-          <>
-            {i > 0 && <li class="conector" aria-hidden="true"><span></span></li>}
-            <li class="nodo flex min-w-0 flex-1 flex-col items-center gap-2 text-center md:gap-3 md:rounded-2xl md:border md:border-linea md:bg-marino/70 md:p-4">
-              {n.categoria ? (
-                <Mosaico categoria={n.categoria} icono={n.icono} />
-              ) : (
-                <span class="grid size-12 shrink-0 place-items-center rounded-xl border border-linea bg-marino-2 text-suave">
-                  <Icono nombre={n.icono} class="size-6" />
+  <div class="space-y-6 max-md:space-y-0" data-carrusel>
+    {flujos.map((flujo) => (
+      <div class="tarjeta p-6 md:p-8" style={`--acento:${flujo.color}`}>
+        <p class="font-mono text-xs uppercase tracking-[0.2em]" style="color:var(--acento)">{flujo.titulo}</p>
+        <ol class="mt-6 flex items-start md:items-center">
+          {flujo.nodos.map((n, i) => (
+            <>
+              {i > 0 && <li class="conector" aria-hidden="true"><span></span></li>}
+              <li class="nodo flex min-w-0 flex-1 flex-col items-center gap-2 text-center md:gap-3 md:rounded-2xl md:border md:border-linea md:bg-marino/70 md:p-4">
+                {n.categoria ? (
+                  <Mosaico categoria={n.categoria} icono={n.icono} />
+                ) : (
+                  <span class="grid size-12 shrink-0 place-items-center rounded-xl border border-linea bg-marino-2 text-suave">
+                    <Icono nombre={n.icono} class="size-6" />
+                  </span>
+                )}
+                <span>
+                  <span class="titulo block text-[11px] font-semibold leading-tight md:text-sm">{n.nombre}</span>
+                  <span class="hidden text-xs text-suave/80 md:block">{n.rol}</span>
                 </span>
-              )}
-              <span>
-                <span class="titulo block text-[11px] font-semibold leading-tight md:text-sm">{n.nombre}</span>
-                <span class="hidden text-xs text-suave/80 md:block">{n.rol}</span>
-              </span>
-            </li>
-          </>
-        ))}
-      </ol>
-    </div>
-  ))}
+              </li>
+            </>
+          ))}
+        </ol>
+      </div>
+    ))}
+  </div>
 </div>
 
 <style>

@@ -123,7 +123,7 @@ const preguntas = [
   <!-- Para quién -->
   <section class="relative mx-auto mt-20 max-w-7xl px-5 md:mt-32">
     <div class="grid items-center gap-14 lg:grid-cols-[1fr_1.1fr]">
-      <div class="relative order-2 mx-auto w-full max-w-md lg:order-1">
+      <div class="relative order-2 mx-auto w-full max-w-md max-md:hidden lg:order-1">
         <div class="absolute inset-[12%] rounded-full bg-magenta/25 blur-3xl" aria-hidden="true"></div>
         <div class="absolute left-1/2 top-1/2 aspect-square w-[88%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-magenta/30 girar" aria-hidden="true"></div>
         {site.usarMascota ? (
@@ -150,7 +150,7 @@ const preguntas = [
           ))}
         </ul>
 
-        <div class="mt-8" data-reveal>
+        <div class="mt-8 hidden md:block" data-reveal>
           <p class="text-xs font-semibold uppercase tracking-widest text-suave/70">Carreras del Campus Tehuantepec</p>
           <ul class="mt-3 flex flex-wrap gap-2">
             {universidad.carrerasTehuantepec.map((c) => (
