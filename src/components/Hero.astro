@@ -5,10 +5,10 @@ import { site } from '../data/site';
 ---
 <section id="portada" class="relative isolate flex min-h-[100svh] items-center overflow-hidden">
   {site.usarMascota && (
-    <div id="capa-video" class="absolute -inset-4 -z-30">
+    <div id="capa-video" class="absolute -inset-4 -z-30 max-md:hidden">
       <video
         id="video-portada"
-        class="absolute inset-0 size-full object-cover object-[72%_center] max-md:object-[96%_center] max-md:opacity-45"
+        class="absolute inset-0 size-full object-cover object-[72%_center]"
         autoplay
         muted
         loop
@@ -17,21 +17,28 @@ import { site } from '../data/site';
         poster="/img/portada.jpg"
         aria-hidden="true"
       >
-        <source src="/video/portada-1280.webm" type="video/webm" />
-        <source src="/video/portada-1280.mp4" type="video/mp4" />
+        <source data-src="/video/portada-1280.webm" type="video/webm" />
+        <source data-src="/video/portada-1280.mp4" type="video/mp4" />
       </video>
       <script is:inline>
-        // Se decide la versión del video antes de que empiece a descargarse (sin bajar dos veces)
+        // El video se elige aquí, antes de descargar nada: en celular no se usa (se quita),
+        // en pantallas grandes se usa la versión de 1920 px y con movimiento reducido no se reproduce solo.
         (function () {
           var v = document.getElementById('video-portada');
           if (!v) return;
+          if (matchMedia('(max-width: 767px)').matches) {
+            v.parentNode.remove();
+            return;
+          }
+          var grande = innerWidth * Math.min(devicePixelRatio || 1, 2) > 1700;
+          v.querySelectorAll('source').forEach(function (s) {
+            s.src = grande ? s.dataset.src.replace('-1280.', '-1920.') : s.dataset.src;
+          });
           if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
             v.removeAttribute('autoplay');
             v.preload = 'none';
-          } else if (innerWidth * Math.min(devicePixelRatio || 1, 2) > 1700) {
-            v.querySelectorAll('source').forEach(function (s) { s.src = s.src.replace('-1280.', '-1920.'); });
-            v.load();
           }
+          v.load();
         })();
       </script>
     </div>
@@ -79,24 +86,6 @@ import { site } from '../data/site';
         <span class="inline-flex items-center gap-1.5"><span class="text-menta">✓</span> Para todas las carreras</span>
       </p>
 
-      {site.usarMascota && (
-        <>
-          <!-- En celular el video se muestra aquí, en una tarjeta, en lugar de ir detrás del texto -->
-          <div id="tarjeta-video" class="entrada relative mt-8 aspect-[5/4] overflow-hidden rounded-3xl border border-linea shadow-[0_30px_80px_-30px_rgba(255,87,233,0.45)] md:hidden" style="--d:0.5s" aria-hidden="true">
-            <div class="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-16 bg-gradient-to-t from-marino/80 to-transparent"></div>
-          </div>
-          <script is:inline>
-            (function () {
-              var tarjeta = document.getElementById('tarjeta-video');
-              var video = document.getElementById('video-portada');
-              if (!tarjeta || !video || !matchMedia('(max-width: 767px)').matches) return;
-              video.className = 'absolute inset-0 size-full object-cover object-right';
-              tarjeta.prepend(video);
-            })();
-          </script>
-        </>
-      )}
-
       <div class="entrada mt-6 hidden max-w-full items-center gap-3 rounded-xl sm:inline-flex border border-linea bg-marino/70 px-4 py-3 font-mono text-xs backdrop-blur sm:mt-10 sm:text-sm" style="--d:0.55s">
         <span class="text-menta">~/unistmo</span>
         <span class="text-magenta">$</span>
@@ -132,8 +121,6 @@ import { site } from '../data/site';
       mask-image: linear-gradient(to right, transparent, #000 30%);
     }
   }
-  /* En la tarjeta del celular el video se acerca al jaguar (está en el tercio derecho del cuadro) */
-  #tarjeta-video video { scale: 1.25; transform-origin: 100% 65%; }
   .cursor-terminal { animation: parpadeo 1s steps(1) infinite; }
   @keyframes parpadeo { 50% { opacity: 0; } }
   .rueda { animation: rueda 1.8s ease-in-out infinite; }

@@ -45,7 +45,7 @@ const imagenSocial = new URL('img/og.jpg', base ?? Astro.url).href;
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="preload" as="font" type="font/woff2" href={fuenteTitulos} crossorigin />
     <link rel="preload" as="font" type="font/woff2" href={fuenteTexto} crossorigin />
-    {precargar && <link rel="preload" as="image" href={precargar} fetchpriority="high" />}
+    {precargar && <link rel="preload" as="image" href={precargar} fetchpriority="high" media="(min-width: 768px)" />}
   </head>
   <body class="min-h-dvh overflow-x-clip font-sans antialiased selection:bg-magenta selection:text-marino">
     <!-- Barra de progreso de lectura y luz que sigue al cursor -->
