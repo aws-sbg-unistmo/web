@@ -1,7 +1,7 @@
 // Arranque del CMS del grupo:
 // 1. Condición "Es su tarjeta": cada integrante (rol Author) edita y publica solo la tarjeta con su correo.
 // 2. Permisos del rol Author: su tarjeta, sus eventos y sus alianzas, incluido publicar.
-// 3. Datos iniciales (equipo y alianzas de la página) la primera vez, con sus fotos.
+// 3. Datos iniciales (equipo, voluntarios y alianzas de la página) la primera vez, con sus fotos.
 // 4. Token de solo lectura "web" para que GitHub Actions lea el contenido al compilar.
 // 5. Al publicar o borrar algo, pide a GitHub que recompile la página (si hay GITHUB_TOKEN_DESPLIEGUE, un token
 //    fine-grained con permiso "Actions: Read and write": solo puede lanzar el flujo, no cambiar el código).
@@ -9,7 +9,9 @@ import type { Core } from '@strapi/strapi';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const TIPOS = ['api::integrante.integrante', 'api::evento.evento', 'api::alianza.alianza'] as const;
+const TIPOS = ['api::integrante.integrante', 'api::voluntario.voluntario', 'api::evento.evento', 'api::alianza.alianza'] as const;
+// Tarjetas de personas: cada quien edita solo la suya (mismo correo)
+const TARJETAS: readonly string[] = ['api::integrante.integrante', 'api::voluntario.voluntario'];
 const ACCIONES = ['create', 'read', 'update', 'delete', 'publish'].map((a) => `plugin::content-manager.explorer.${a}`);
 
 const mime = (archivo: string) =>
@@ -28,7 +30,7 @@ async function registrarCondicion(strapi: Core.Strapi) {
 // Se aplica una sola vez (queda marcado en la base). Después se puede ajustar desde Ajustes → Roles.
 async function permisosAutor(strapi: Core.Strapi) {
   const almacen = strapi.store({ type: 'core', name: 'aws-sbg' });
-  if (await almacen.get({ key: 'permisos-autor-v1' })) return;
+  if (await almacen.get({ key: 'permisos-autor-v2' })) return;
   const rol = await strapi.service('admin::role').findOne({ code: 'strapi-author' });
   if (!rol) return;
   const actuales = await strapi.service('admin::permission').findMany({ where: { role: { id: rol.id } } });
@@ -38,15 +40,15 @@ async function permisosAutor(strapi: Core.Strapi) {
       action,
       subject,
       properties: {},
-      conditions: subject === 'api::integrante.integrante' ? ['admin::is-creator', 'api::es-su-tarjeta'] : ['admin::is-creator'],
+      conditions: TARJETAS.includes(subject) ? ['admin::is-creator', 'api::es-su-tarjeta'] : ['admin::is-creator'],
     })),
   );
   await strapi.service('admin::role').assignPermissions(rol.id, [
     ...ajenos.map(({ action, subject, properties, conditions }: Record<string, unknown>) => ({ action, subject, properties, conditions })),
     ...nuevos,
   ]);
-  await almacen.set({ key: 'permisos-autor-v1', value: true });
-  strapi.log.info('Rol Author: puede editar y publicar su tarjeta, sus eventos y sus alianzas.');
+  await almacen.set({ key: 'permisos-autor-v2', value: true });
+  strapi.log.info('Rol Author: puede editar y publicar su tarjeta (de integrante o voluntario), sus eventos y sus alianzas.');
 }
 
 // Se carga una sola vez (queda marcado en la base). Si el servidor se reinicia a la mitad, al volver
@@ -101,6 +103,33 @@ async function datosIniciales(strapi: Core.Strapi) {
 
   await almacen.set({ key: 'datos-iniciales-v1', value: true });
   strapi.log.info(`Datos iniciales: ${datos.equipo?.length ?? 0} integrantes y ${datos.alianzas?.length ?? 0} alianzas.`);
+}
+
+// Voluntarios iniciales (se agregaron después de los datos iniciales, por eso llevan su propia marca)
+async function voluntariosIniciales(strapi: Core.Strapi) {
+  const almacen = strapi.store({ type: 'core', name: 'aws-sbg' });
+  if (await almacen.get({ key: 'datos-voluntarios-v1' })) return;
+  const archivo = path.join(process.cwd(), 'datos-iniciales.json');
+  if (!fs.existsSync(archivo)) return;
+  const { voluntarios = [] } = JSON.parse(fs.readFileSync(archivo, 'utf8'));
+  for (const [i, v] of voluntarios.entries()) {
+    if (await strapi.documents('api::voluntario.voluntario').findFirst({ filters: { nombre: v.nombre } })) continue;
+    const ruta = v.fotos?.[0] && path.resolve(process.cwd(), v.fotos[0]);
+    let foto: number | undefined;
+    if (ruta && fs.existsSync(ruta)) {
+      const [subido] = await strapi.plugin('upload').service('upload').upload({
+        data: {},
+        files: { filepath: ruta, originalFilename: path.basename(ruta), mimetype: mime(ruta), size: fs.statSync(ruta).size },
+      });
+      foto = subido?.id;
+    }
+    await strapi.documents('api::voluntario.voluntario').create({
+      data: { nombre: v.nombre, rol: v.rol, carrera: v.carrera, descripcion: v.descripcion, correoEditor: v.correoEditor, foto, redes: v.redes ?? [], orden: (i + 1) * 10 },
+      status: 'published',
+    });
+  }
+  await almacen.set({ key: 'datos-voluntarios-v1', value: true });
+  strapi.log.info(`Voluntarios iniciales: ${voluntarios.length}.`);
 }
 
 // Token de solo lectura para compilar la página. Se guarda una vez en .tmp/token-web.txt (no se sube a git).
@@ -159,6 +188,8 @@ export default {
     await tokenWeb(strapi);
     avisarAGitHub(strapi);
     // Sin await: subir las fotos iniciales tarda, y Heroku exige que el servidor responda en menos de 60 s
-    datosIniciales(strapi).catch((error) => strapi.log.error(`Datos iniciales: ${(error as Error).message}`));
+    datosIniciales(strapi)
+      .then(() => voluntariosIniciales(strapi))
+      .catch((error) => strapi.log.error(`Datos iniciales: ${(error as Error).message}`));
   },
 };

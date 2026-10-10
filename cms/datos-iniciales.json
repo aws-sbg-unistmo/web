@@ -146,5 +146,30 @@
         }
       ]
     }
+  ],
+  "voluntarios": [
+    {
+      "nombre": "Jeovani Pacheco Rueda",
+      "rol": "Voluntario",
+      "carrera": "Programador full stack",
+      "descripcion": "Programador full stack en Onexo y estudiante de la UNISTMO en Tehuantepec. Apoya en los talleres y en los proyectos del grupo.",
+      "fotos": [
+        "datos-iniciales/jeovani.webp"
+      ],
+      "redes": [
+        {
+          "tipo": "linkedin",
+          "url": "https://www.linkedin.com/in/jeovanipacheco/"
+        },
+        {
+          "tipo": "github",
+          "url": "https://github.com/JeovaniPacheco"
+        },
+        {
+          "tipo": "instagram",
+          "url": "https://www.instagram.com/jeovanipachecobautista/"
+        }
+      ]
+    }
   ]
 }

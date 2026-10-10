@@ -1,0 +1,55 @@
+{
+  "kind": "collectionType",
+  "collectionName": "voluntarios",
+  "info": {
+    "singularName": "voluntario",
+    "pluralName": "voluntarios",
+    "displayName": "Voluntario",
+    "description": "Personas que ayudan al grupo con su tiempo. Es un rol sin beneficios: no reciben nada del grupo ni de AWS."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "nombre": {
+      "type": "string",
+      "required": true,
+      "maxLength": 80
+    },
+    "rol": {
+      "type": "string",
+      "required": true,
+      "maxLength": 60,
+      "default": "Voluntario"
+    },
+    "carrera": {
+      "type": "string",
+      "maxLength": 80
+    },
+    "descripcion": {
+      "type": "text",
+      "maxLength": 420
+    },
+    "correoEditor": {
+      "type": "email",
+      "private": true
+    },
+    "foto": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "redes": {
+      "type": "component",
+      "repeatable": true,
+      "component": "equipo.red"
+    },
+    "orden": {
+      "type": "integer",
+      "default": 10
+    }
+  }
+}

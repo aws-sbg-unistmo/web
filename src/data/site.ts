@@ -126,7 +126,7 @@ const equipoLocal: Integrante[] = [
 ];
 
 // Voluntarios: ayudan con su tiempo y conocimiento. Es un rol sin beneficios (ver Nosotros → Voluntariado).
-export const voluntarios: Integrante[] = [
+const voluntariosLocal: Integrante[] = [
   {
     nombre: 'Jeovani Pacheco Rueda',
     rol: 'Voluntario',
@@ -168,3 +168,4 @@ const alianzasLocal: Alianza[] = [
 // Lo que viene de Strapi tiene prioridad; si está vacío, se usa lo escrito arriba
 export const equipo: Integrante[] = cms.equipo.length ? (cms.equipo as Integrante[]) : equipoLocal;
 export const alianzas: Alianza[] = cms.alianzas.length ? (cms.alianzas as Alianza[]) : alianzasLocal;
+export const voluntarios: Integrante[] = cms.voluntarios?.length ? (cms.voluntarios as Integrante[]) : voluntariosLocal;

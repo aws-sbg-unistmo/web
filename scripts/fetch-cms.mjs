@@ -1,4 +1,4 @@
-// Lee el contenido editable de Strapi (equipo, eventos y alianzas) y lo guarda en src/data/cms.json.
+// Lee el contenido editable de Strapi (equipo, voluntarios, eventos y alianzas) y lo guarda en src/data/cms.json.
 // Las imágenes se descargan a public/cms/ para servirlas desde el mismo sitio (S3 + CloudFront) y no depender de Strapi.
 //
 // Variables: STRAPI_URL (p. ej. https://d123.cloudfront.net) y STRAPI_TOKEN (token de solo lectura de Strapi).
@@ -46,8 +46,9 @@ const redes = (r) => (r ?? []).filter((x) => x?.tipo && x?.url).map((x) => ({ ti
 
 try {
   await fs.mkdir(MEDIOS, { recursive: true });
-  const [integrantes, eventos, alianzas] = await Promise.all([
+  const [integrantes, voluntarios, eventos, alianzas] = await Promise.all([
     api('integrantes?populate=*&sort=orden:asc&pagination[pageSize]=100'),
+    api('voluntarios?populate=*&sort=orden:asc&pagination[pageSize]=100'),
     api('eventos?populate=*&sort=inicio:asc&pagination[pageSize]=200'),
     api('alianzas?populate=*&sort=orden:asc&pagination[pageSize]=100'),
   ]);
@@ -62,6 +63,16 @@ try {
         ficha: (p.ficha ?? []).map((b) => ({ titulo: b.titulo, items: lista(b.elementos) })).filter((b) => b.items.length),
         fotos: (await Promise.all([p.foto, ...(p.fotosExtra ?? [])].map(imagen))).filter(Boolean),
         redes: redes(p.redes),
+      })),
+    ),
+    voluntarios: await Promise.all(
+      voluntarios.map(async (v) => ({
+        nombre: v.nombre,
+        rol: v.rol,
+        carrera: v.carrera || undefined,
+        descripcion: v.descripcion || undefined,
+        fotos: [await imagen(v.foto)].filter(Boolean),
+        redes: redes(v.redes),
       })),
     ),
     eventos: await Promise.all(
@@ -89,7 +100,7 @@ try {
     ),
   };
   await fs.writeFile(SALIDA, `${JSON.stringify(datos, null, 2)}\n`);
-  console.log(`Strapi: ${datos.equipo.length} integrantes, ${datos.eventos.length} eventos, ${datos.alianzas.length} alianzas.`);
+  console.log(`Strapi: ${datos.equipo.length} integrantes, ${datos.voluntarios.length} voluntarios, ${datos.eventos.length} eventos, ${datos.alianzas.length} alianzas.`);
 } catch (error) {
   // Si Strapi falla, la compilación sigue con el contenido anterior
   console.warn(`No se pudo leer Strapi (${error.message}); se conserva ${SALIDA}.`);

@@ -592,6 +592,57 @@ export interface ApiIntegranteIntegrante extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiVoluntarioVoluntario extends Struct.CollectionTypeSchema {
+  collectionName: 'voluntarios';
+  info: {
+    description: 'Personas que ayudan al grupo con su tiempo. Es un rol sin beneficios: no reciben nada del grupo ni de AWS.';
+    displayName: 'Voluntario';
+    pluralName: 'voluntarios';
+    singularName: 'voluntario';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    carrera: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 80;
+      }>;
+    correoEditor: Schema.Attribute.Email & Schema.Attribute.Private;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    descripcion: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 420;
+      }>;
+    foto: Schema.Attribute.Media<'images'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::voluntario.voluntario'
+    > &
+      Schema.Attribute.Private;
+    nombre: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 80;
+      }>;
+    orden: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<10>;
+    publishedAt: Schema.Attribute.DateTime;
+    redes: Schema.Attribute.Component<'equipo.red', true>;
+    rol: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }> &
+      Schema.Attribute.DefaultTo<'Voluntario'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface PluginContentReleasesRelease
   extends Struct.CollectionTypeSchema {
   collectionName: 'strapi_releases';
@@ -1106,6 +1157,7 @@ declare module '@strapi/strapi' {
       'api::alianza.alianza': ApiAlianzaAlianza;
       'api::evento.evento': ApiEventoEvento;
       'api::integrante.integrante': ApiIntegranteIntegrante;
+      'api::voluntario.voluntario': ApiVoluntarioVoluntario;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;
