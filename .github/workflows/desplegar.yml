@@ -265,16 +265,14 @@ jobs:
           h() { curl -sS --fail-with-body -H "Authorization: Bearer $HEROKU_API_KEY" -H "Content-Type: application/json" "$@"; }
           h -X PATCH "https://api.heroku.com/apps/$APP/formation" -H "Accept: application/vnd.heroku+json; version=3.docker-releases" \
             -d "{\"updates\":[{\"type\":\"web\",\"docker_image\":\"$ID\"}]}" > /tmp/respuesta.json ||
-            { echo "::error::Heroku no aceptó la versión nueva: $(tr -d "
-" < /tmp/respuesta.json)"; exit 1; }
+            { echo "::error::Heroku no aceptó la versión nueva: $(jq -c . /tmp/respuesta.json 2>/dev/null || cat /tmp/respuesta.json)"; exit 1; }
       - name: Encender el dyno
         run: |
           # Eco (US$5) o Basic (US$7), según la variable HEROKU_DYNO; los dos entran en el crédito del Student Pack
           curl -sS --fail-with-body -X PATCH "https://api.heroku.com/apps/$APP/formation/web" \
             -H "Accept: application/vnd.heroku+json; version=3" -H "Authorization: Bearer $HEROKU_API_KEY" -H "Content-Type: application/json" \
             -d '{"quantity":1,"size":"${{ vars.HEROKU_DYNO || 'eco' }}"}' > /tmp/respuesta.json ||
-            { echo "::error::Heroku no encendió el dyno: $(tr -d "
-" < /tmp/respuesta.json)"; exit 1; }
+            { echo "::error::Heroku no encendió el dyno: $(jq -c . /tmp/respuesta.json 2>/dev/null || cat /tmp/respuesta.json)"; exit 1; }
       - name: Dirección del CMS
         run: |
           echo "CMS en Heroku: ${{ steps.app.outputs.url }}admin" >> "$GITHUB_STEP_SUMMARY"
