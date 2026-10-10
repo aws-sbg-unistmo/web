@@ -12,23 +12,33 @@ import Bordado from './Bordado.astro';
 import { niveles } from '../data/contenido';
 import { site } from '../data/site';
 
-// Camino en un lienzo de 1200×320: cada nivel en un punto, unidos por curvas suaves
+// Camino en un lienzo de 1200×320. Pasa por puntos de paso irregulares (como una carretera de verdad, que sube,
+// baja y da vueltas) y los niveles son los puntos marcados con «n». La curva es un Catmull-Rom convertido a Bézier.
 const ancho = 1200;
 const alto = 320;
-const puntos = [[110, 238], [355, 92], [600, 238], [845, 92], [1090, 238]].slice(0, niveles.length);
-let camino = `M -30 ${puntos[0][1]} L ${puntos[0][0]} ${puntos[0][1]}`;
-for (let i = 1; i < puntos.length; i++) {
-  const [ax, ay] = puntos[i - 1];
-  const [bx, by] = puntos[i];
-  const dx = (bx - ax) / 2;
-  camino += ` C ${ax + dx} ${ay} ${bx - dx} ${by} ${bx} ${by}`;
+const paso: [number, number, 'n'?][] = [
+  [-30, 262], [110, 250, 'n'], [196, 266], [250, 214], [272, 150], [330, 100, 'n'], [402, 84], [452, 116], [478, 178],
+  [530, 220], [604, 204, 'n'], [650, 168], [690, 108], [756, 70], [860, 82, 'n'], [918, 112], [944, 168], [998, 222],
+  [1090, 236, 'n'], [1230, 238],
+];
+const puntos = paso.filter((p) => p[2]).map(([x, y]) => [x, y]).slice(0, niveles.length);
+let camino = `M ${paso[0][0]} ${paso[0][1]}`;
+for (let i = 0; i < paso.length - 1; i++) {
+  const p0 = paso[i - 1] ?? paso[i];
+  const p1 = paso[i];
+  const p2 = paso[i + 1];
+  const p3 = paso[i + 2] ?? p2;
+  const c = (a: number, b: number, d: number) => Math.round((a + (b - d) / 6) * 10) / 10;
+  camino += ` C ${c(p1[0], p2[0], p0[0])} ${c(p1[1], p2[1], p0[1])} ${c(p2[0], p1[0], p3[0])} ${c(p2[1], p1[1], p3[1])} ${p2[0]} ${p2[1]}`;
 }
-camino += ` L ${ancho + 30} ${puntos[puntos.length - 1][1]}`;
+// Paisaje del Istmo: aerogeneradores de La Ventosa (x, y de la base, altura) y cerros al fondo
+const molinos = [[520, 92, 46], [566, 72, 56], [618, 96, 42], [1006, 132, 40], [1048, 112, 50], [1186, 122, 38]];
+const cerros = 'M -40 320 L -40 286 Q 60 248 150 280 Q 230 300 310 276 Q 400 244 470 278 Q 560 312 650 280 Q 740 250 820 284 Q 900 306 990 278 Q 1080 252 1160 282 Q 1210 296 1240 290 L 1240 320 Z';
 const colores = ['#ff9900', '#ff57e9', '#ad5cff', '#42b4ff', '#00e582'];
 // Confeti de la meta: ángulo y distancia de cada pedacito
 const confeti = Array.from({ length: 16 }, (_, k) => ({ a: (k / 16) * 360 + (k % 2) * 11, d: 70 + (k % 4) * 22, c: colores[k % colores.length] }));
 // Jardín de flores istmeñas bajo las curvas del camino: x, y, tamaño, color
-const flores = [[330, 262, 1, 0], [372, 284, 0.7, 1], [300, 292, 0.55, 3], [822, 262, 1, 2], [866, 286, 0.7, 4], [792, 290, 0.55, 1]];
+const flores = [[352, 232, 1, 0], [392, 256, 0.7, 1], [322, 262, 0.55, 3], [818, 214, 1, 2], [858, 240, 0.7, 4], [790, 246, 0.55, 1]];
 // Meta: franja de cuadros que cruza el camino después del último nivel
 const [mx, my] = puntos[puntos.length - 1];
 ---
@@ -72,6 +82,25 @@ const [mx, my] = puntos[puntos.length - 1];
               <rect width="10" height="10" fill="#f4f4f5" /><rect width="5" height="5" fill="#161d26" /><rect x="5" y="5" width="5" height="5" fill="#161d26" />
             </pattern>
           </defs>
+          <!-- Paisaje: cerros, aerogeneradores girando y el letrero de salida -->
+          <path d={cerros} class="cerros" />
+          {molinos.map(([x, y, h], k) => (
+            <g class="molino" transform={`translate(${x} ${y})`}>
+              <path d={`M -1.6 0 L -0.7 ${-h} L 0.7 ${-h} L 1.6 0 Z`} />
+              <g transform={`translate(0 ${-h})`}>
+                <g>
+                  {[0, 120, 240].map((r) => <path d={`M 0 0 Q 2.6 ${-h * 0.22} 0 ${-h * 0.5} Q -1.4 ${-h * 0.22} 0 0 Z`} transform={`rotate(${r})`} />)}
+                  <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur={`${3.2 + k * 0.7}s`} repeatCount="indefinite" />
+                </g>
+                <circle r="2.2" class="buje" />
+              </g>
+            </g>
+          ))}
+          <g class="letrero" transform="translate(42 214)">
+            <rect x="-1.2" y="0" width="2.4" height="26" />
+            <rect x="-26" y="-18" width="52" height="18" rx="3" class="tabla" />
+            <text x="0" y="-5.5" text-anchor="middle">SALIDA</text>
+          </g>
           <!-- Jardín bajo las curvas -->
           {flores.map(([x, y, s, c], k) => (
             <g class="flor-ruta" transform={`translate(${x} ${y}) scale(${s})`} style={`--c:${colores[c]};--k:${k}`}>
@@ -217,6 +246,13 @@ const [mx, my] = puntos[puntos.length - 1];
   .linea-central { fill: none; stroke: #f5c542; stroke-width: 3; stroke-dasharray: 16 14; opacity: 0.6; }
   .avance { fill: none; stroke: url(#degradado-ruta); stroke-width: 5; stroke-linecap: round; filter: drop-shadow(0 0 8px rgb(255 87 233 / 0.55)); }
   .meta-cuadros { opacity: 0.85; }
+  /* Paisaje del Istmo */
+  .cerros { fill: url(#degradado-ruta); opacity: 0.06; }
+  .molino { fill: #8a96a8; opacity: 0.55; }
+  .molino .buje { fill: #c9ccd1; }
+  .letrero rect { fill: #6b7686; }
+  .letrero .tabla { fill: #ff9900; }
+  .letrero text { fill: #161d26; font: 700 9px ui-monospace, monospace; letter-spacing: 1px; }
   /* Huellas del jaguar: aparecen conforme avanza */
   .huellas :global(use) { fill: #ff57e9; opacity: 0; transition: opacity 0.35s ease; }
   .huellas :global(use.pisada) { opacity: 0.5; }
@@ -269,7 +305,7 @@ const [mx, my] = puntos[puntos.length - 1];
 
   /* Etiquetas y botones de cada nivel */
   .boton-hito { cursor: pointer; }
-  .boton-hito.abajo .etiqueta-hito { top: calc(100% + 0.25rem); }
+  .boton-hito.abajo .etiqueta-hito { top: calc(100% + 0.7rem); }
   .boton-hito.arriba .etiqueta-hito { bottom: calc(100% + 0.25rem); }
   .etiqueta-hito { opacity: 0.55; transition: opacity 0.3s ease, translate 0.3s ease; }
   .boton-hito:hover .etiqueta-hito,

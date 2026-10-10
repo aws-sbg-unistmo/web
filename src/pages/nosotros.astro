@@ -43,11 +43,11 @@ const historia = [
   },
 ];
 const codigo = [
-  { t: 'Respeto para todas las personas', d: 'Sin importar carrera, nivel, género, origen o forma de pensar.' },
-  { t: 'Cero acoso', d: 'No toleramos acoso, discriminación ni comentarios ofensivos, en persona ni en línea.' },
-  { t: 'Preguntar está bien', d: 'No hay preguntas tontas. Ayudamos con paciencia a quien va empezando.' },
-  { t: 'Cuida las cuentas', d: 'Nunca compartas contraseñas ni llaves de acceso, y apaga lo que no uses para evitar cobros.' },
-  { t: 'Da crédito', d: 'Si usas el código, las ideas o el trabajo de alguien más, menciónalo.' },
+  { t: 'Respeto para todas las personas', d: 'Sin importar carrera, nivel, género, origen o forma de pensar.', icono: 'corazon', c: 'var(--color-magenta)' },
+  { t: 'Cero acoso', d: 'No toleramos acoso, discriminación ni comentarios ofensivos, en persona ni en línea.', icono: 'mano', c: 'var(--color-naranja)' },
+  { t: 'Preguntar está bien', d: 'No hay preguntas tontas. Ayudamos con paciencia a quien va empezando.', icono: 'info', c: 'var(--color-azul)' },
+  { t: 'Cuida las cuentas', d: 'Nunca compartas contraseñas ni llaves de acceso, y apaga lo que no uses para evitar cobros.', icono: 'escudo', c: 'var(--color-menta)' },
+  { t: 'Da crédito', d: 'Si usas el código, las ideas o el trabajo de alguien más, menciónalo.', icono: 'chispa', c: 'var(--color-morado)' },
 ];
 ---
 <Layout titulo="Nosotros" precargar="/img/cabecera-nosotros.jpg" descripcion="Quiénes somos: el AWS Student Builder Group de la Universidad del Istmo, Campus Tehuantepec.">
@@ -223,7 +223,8 @@ const codigo = [
   <Alianzas />
 
   <!-- Código de conducta -->
-  <section id="codigo" class="mx-auto mt-28 max-w-7xl px-5">
+  <section id="codigo" class="relative mx-auto mt-28 max-w-7xl px-5">
+    <OrillasLaterales />
     <div class="grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
       <div class="lg:sticky lg:top-40 lg:self-start">
         <p class="chip" data-reveal>// Código de conducta</p>
@@ -231,26 +232,35 @@ const codigo = [
         <p class="mt-5 leading-relaxed" data-reveal>
           Aplica en eventos, talleres, redes y cualquier espacio del grupo. Al participar, aceptas cuidarlo con nosotros.
         </p>
-        <div class="mt-8 flex gap-4 rounded-2xl border border-linea bg-marino-2 p-5" data-reveal>
-          <Icono nombre="escudo" class="size-6 shrink-0 text-menta" />
-          <p class="text-sm leading-relaxed">
+        <div class="aviso-codigo relative mt-8 flex gap-4 overflow-hidden rounded-2xl border border-menta/30 bg-marino-2 p-5" data-reveal>
+          <span class="pointer-events-none absolute -left-10 -top-10 size-32 rounded-full bg-menta/15 blur-2xl" aria-hidden="true"></span>
+          <span class="relative grid size-10 shrink-0 place-items-center rounded-xl bg-menta/15 text-menta"><Icono nombre="escudo" class="size-5" /></span>
+          <p class="relative text-sm leading-relaxed">
             ¿Viste algo que no está bien? Escríbenos a{' '}
             <a href={`mailto:${site.correo}`} class="font-semibold text-white underline underline-offset-4 hover:text-magenta">{site.correo}</a>.
             Lo atendemos con discreción.
           </p>
         </div>
         {site.usarMascota && (
-          <img src="/img/mascota/20-seguridad.webp" alt="" width="622" height="900" loading="lazy" class="mx-auto mt-10 hidden h-64 w-auto drop-shadow-[0_20px_50px_rgba(0,200,180,0.2)] lg:block" data-reveal />
+          <div class="guardian relative mx-auto mt-10 hidden w-fit lg:block" data-reveal>
+            <span class="guardian-escudo absolute left-1/2 top-[55%] size-60 -translate-x-1/2 -translate-y-1/2 rounded-full" aria-hidden="true"></span>
+            <img src="/img/mascota/20-seguridad.webp" alt="" width="622" height="900" loading="lazy" class="relative h-64 w-auto drop-shadow-[0_20px_40px_rgba(0,0,0,0.5)]" />
+          </div>
         )}
       </div>
-      <ol class="space-y-4" data-stagger>
+      <ol class="acuerdos tcs space-y-4" data-en-vista>
         {codigo.map((c, i) => (
-          <li class="tarjeta flex gap-5 p-6">
-            <span class="titulo grid size-10 shrink-0 place-items-center rounded-xl bg-magenta/12 font-bold text-magenta">{i + 1}</span>
-            <div>
+          <li class="acuerdo tc tarjeta relative flex items-center gap-5 overflow-hidden p-6 pr-24 md:pr-28" style={`--c:${c.c};--i:${i}`}>
+            <span class="tc-luz pointer-events-none absolute -left-12 -top-12 size-36 rounded-full blur-3xl" aria-hidden="true"></span>
+            <span class="tc-num titulo pointer-events-none absolute -bottom-8 left-3 select-none text-7xl font-bold" aria-hidden="true">{i + 1}</span>
+            <span class="tc-icono relative grid size-12 shrink-0 place-items-center rounded-2xl"><Icono nombre={c.icono} class="size-6" /></span>
+            <div class="relative">
               <h3 class="titulo text-lg font-semibold">{c.t}</h3>
               <p class="mt-1 text-sm leading-relaxed">{c.d}</p>
             </div>
+            <span class="sello absolute right-4 top-1/2 grid size-16 -translate-y-1/2 place-items-center rounded-full text-center font-mono text-[0.55rem] font-bold uppercase leading-tight tracking-wider md:right-6 md:size-[4.5rem]" aria-hidden="true">
+              <span><Icono nombre="check" class="mx-auto size-5" />Acuerdo</span>
+            </span>
           </li>
         ))}
       </ol>
@@ -270,7 +280,9 @@ const codigo = [
   @keyframes orbita-pilar { to { rotate: 360deg; } }
   .pilar-paso { color: var(--acento); }
   .pilar-barra { background: linear-gradient(90deg, var(--acento), transparent); transform-origin: left; }
-  .pilar-enlace { right: -1.45rem; background: var(--color-marino); color: var(--color-suave); box-shadow: inset 0 0 0 1px var(--color-linea); }
+  /* Cada paso queda encima del siguiente para que su flecha no se esconda; la flecha va centrada en el hueco */
+  .pilar { z-index: calc(5 - var(--i)); }
+  .pilar-enlace { right: calc(-0.75rem - 1.125rem); background: var(--color-marino); color: var(--color-suave); box-shadow: inset 0 0 0 1px var(--color-linea), 0 0 0 5px var(--color-marino); }
   .pilares.preparado:not(.en-vista) .pilar { opacity: 0; }
   .pilares.en-vista .pilar { animation: sube-pilar 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(var(--i) * 0.22s); }
   .pilares.en-vista .pilar-icono { animation: salta-icono 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both; animation-delay: calc(0.25s + var(--i) * 0.22s); }
@@ -296,4 +308,32 @@ const codigo = [
   @media (prefers-reduced-motion: reduce) {
     .medalla-texto, .medalla-aro, .pilar-orbita { animation: none; }
   }
+</style>
+
+<style>
+  .tc { transition: border-color 0.4s ease, translate 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease; }
+  .tc:hover { border-color: color-mix(in srgb, var(--c) 55%, transparent); translate: 0 -6px; box-shadow: 0 28px 56px -34px var(--c); }
+  .tc-luz { background: var(--c); opacity: 0.1; transition: opacity 0.4s ease, scale 0.6s ease; }
+  .tc:hover .tc-luz { opacity: 0.28; scale: 1.25; }
+  .tc-icono { background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--c); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 35%, transparent); transition: rotate 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), scale 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .tc:hover .tc-icono { rotate: -10deg; scale: 1.1; }
+  .tc-num { color: transparent; -webkit-text-stroke: 1px color-mix(in srgb, var(--c) 35%, transparent); transition: -webkit-text-stroke-color 0.4s ease; }
+  .tc:hover .tc-num { -webkit-text-stroke-color: var(--c); }
+  .tc-linea { background: linear-gradient(90deg, var(--c), transparent); transform: scaleX(0.25); transform-origin: left; transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1); }
+  .tc:hover .tc-linea { transform: scaleX(1); }
+  .tcs.preparado:not(.en-vista) .tc { opacity: 0; }
+  .tcs.en-vista .tc { animation: entra-tc 0.75s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(var(--i) * 0.12s); }
+  @keyframes entra-tc { from { opacity: 0; transform: translateY(32px); } }
+
+  /* Código de conducta: cada acuerdo recibe su sello al aparecer */
+  .sello { color: var(--c); border: 2px dashed color-mix(in srgb, var(--c) 70%, transparent); background: color-mix(in srgb, var(--c) 8%, transparent); rotate: -12deg; }
+  .acuerdos.preparado:not(.en-vista) .sello { opacity: 0; }
+  .acuerdos.en-vista .sello { animation: sellar 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; animation-delay: calc(0.45s + var(--i) * 0.18s); }
+  @keyframes sellar { from { opacity: 0; scale: 2.2; rotate: -40deg; } }
+  .tc:hover .sello { rotate: 0deg; transition: rotate 0.4s ease; }
+  .guardian-escudo { background: radial-gradient(circle, color-mix(in srgb, var(--color-menta) 28%, transparent), transparent 65%); animation: escudo-latido 3s ease-in-out infinite; }
+  .guardian-escudo::after { content: ''; position: absolute; inset: 10%; border-radius: 50%; border: 1px dashed color-mix(in srgb, var(--color-menta) 50%, transparent); animation: gira-escudo 18s linear infinite; }
+  @keyframes escudo-latido { 50% { scale: 1.08; opacity: 0.8; } }
+  @keyframes gira-escudo { to { rotate: 360deg; } }
+  @media (prefers-reduced-motion: reduce) { .guardian-escudo, .guardian-escudo::after { animation: none; } }
 </style>

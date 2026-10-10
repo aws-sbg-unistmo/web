@@ -2,7 +2,11 @@
 // "Nuestra casa": la UNISTMO con fotos (licencia libre, con crédito), lema, datos, mapa del campus y cómo llegar.
 import Icono from './Icono.astro';
 import Palabras from './Palabras.astro';
+import OrillasLaterales from './OrillasLaterales.astro';
 import { universidad } from '../data/contenido';
+import { site } from '../data/site';
+
+const coloresDato = ['var(--color-magenta)', 'var(--color-morado)', 'var(--color-azul)', 'var(--color-menta)'];
 
 const { lat, lon } = universidad.coordenadas;
 const mapa = `https://www.openstreetmap.org/export/embed.html?bbox=${lon - 0.014},${lat - 0.008},${lon + 0.014},${lat + 0.008}&layer=mapnik&marker=${lat},${lon}`;
@@ -11,7 +15,8 @@ const verOsm = `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=16/${
 const [principal] = universidad.fotos;
 const tehuantepec = universidad.campus.find((c) => c.aqui)!;
 ---
-<section id="universidad" class="mx-auto mt-28 max-w-7xl px-5">
+<section id="universidad" class="relative mx-auto mt-28 max-w-7xl px-5">
+  <OrillasLaterales />
   <div class="max-w-3xl">
     <p class="chip" data-reveal>// Nuestra casa</p>
     <Palabras texto="La Universidad del Istmo" resaltar={['Istmo']} class="mt-5 text-4xl font-bold leading-tight md:text-5xl" />
@@ -21,8 +26,12 @@ const tehuantepec = universidad.campus.find((c) => c.aqui)!;
   <div class="mt-12 grid gap-6 lg:grid-cols-[1.35fr_1fr]">
     <figure class="tarjeta group overflow-hidden" data-reveal>
       <div class="relative overflow-hidden">
-        <img src={principal.src} alt={principal.titulo} width={principal.ancho} height={principal.alto} loading="lazy" class="aspect-[16/8] w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
-        <span class="insignia absolute left-4 top-4 bg-marino/80! backdrop-blur" style="--color-insignia:var(--color-magenta)">Aquí estamos</span>
+        <img src={principal.src} alt={principal.titulo} width={principal.ancho} height={principal.alto} loading="lazy" class="foto-campus aspect-[16/8] w-full object-cover" />
+        <span class="pointer-events-none absolute inset-0 bg-gradient-to-t from-marino/70 via-transparent to-transparent" aria-hidden="true"></span>
+        <span class="aqui absolute left-4 top-4 inline-flex items-center gap-2 rounded-full bg-marino/80 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white backdrop-blur">
+          <span class="punto-aqui relative size-2.5 rounded-full bg-magenta"></span>Aquí estamos
+        </span>
+        <span class="absolute bottom-4 left-4 font-mono text-xs uppercase tracking-[0.2em] text-white/80">Santo Domingo Tehuantepec, Oax.</span>
       </div>
       <figcaption class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 p-5">
         <span class="titulo font-semibold">{principal.titulo}</span>
@@ -34,19 +43,22 @@ const tehuantepec = universidad.campus.find((c) => c.aqui)!;
     </figure>
 
     <div class="grid gap-6">
-      <div class="tarjeta relative overflow-hidden p-7" data-reveal>
+      <div class="lema tarjeta relative overflow-hidden p-7" data-reveal>
         <div class="absolute -right-10 -top-10 size-40 rounded-full bg-morado/20 blur-3xl" aria-hidden="true"></div>
+        <span class="comillas titulo pointer-events-none absolute -right-2 -top-6 select-none text-[7rem] font-bold leading-none" aria-hidden="true">»</span>
+        <svg viewBox="-12 -12 24 24" class="flor-lema absolute bottom-5 right-5 size-7" aria-hidden="true"><g fill="var(--color-magenta)">{[0, 60, 120, 180, 240, 300].map((r) => <ellipse cx="0" cy="-6" rx="2.6" ry="5" transform={`rotate(${r})`} />)}</g><circle r="2.6" fill="var(--color-naranja)" /></svg>
         <p class="relative text-xs font-semibold uppercase tracking-widest text-suave/70">Lema de la universidad</p>
         <p class="titulo relative mt-3 text-2xl font-semibold italic" lang="la">«{universidad.lema.latin}»</p>
-        <p class="relative mt-1 text-sm italic text-magenta" lang="zap">{universidad.lema.zapoteco}</p>
+        <p class="relative mt-1 text-base font-medium italic text-magenta" lang="zap">{universidad.lema.zapoteco}</p>
         <p class="relative mt-3 text-sm">Significa: <strong class="text-white">{universidad.lema.significado}</strong>, en latín y en zapoteco.</p>
       </div>
-      <dl class="grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-linea bg-linea" data-reveal>
-        {universidad.datos.map((d) => (
-          <div class="bg-marino-2 p-5">
+      <dl class="grid grid-cols-2 gap-3" data-stagger>
+        {universidad.datos.map((d, i) => (
+          <div class="dato tarjeta relative overflow-hidden p-5" style={`--c:${coloresDato[i % coloresDato.length]}`}>
+            <span class="dato-luz pointer-events-none absolute -right-8 -top-8 size-24 rounded-full blur-2xl" aria-hidden="true"></span>
             <dt class="sr-only">{d.texto}</dt>
-            <dd class="titulo text-3xl font-bold">{d.valor}</dd>
-            <dd class="mt-1 text-xs leading-snug text-suave/80">{d.texto}</dd>
+            <dd class="titulo relative text-3xl font-bold" style="color:var(--c)">{/^\d+$/.test(String(d.valor)) ? <span data-contar={d.valor}>{d.valor}</span> : d.valor}</dd>
+            <dd class="relative mt-1 text-xs leading-snug text-suave/80">{d.texto}</dd>
           </div>
         ))}
       </dl>
@@ -63,10 +75,15 @@ const tehuantepec = universidad.campus.find((c) => c.aqui)!;
         referrerpolicy="no-referrer"
         class="mapa absolute inset-0 size-full"
       ></iframe>
+      <span class="pin-mapa pointer-events-none absolute left-1/2 top-1/2 size-20 -translate-x-1/2 -translate-y-1/2 rounded-full" aria-hidden="true"></span>
+      <span class="pointer-events-none absolute inset-0 shadow-[inset_0_0_60px_20px_var(--color-marino-2)]" aria-hidden="true"></span>
     </div>
-    <div class="p-7 md:p-8">
+    <div class="relative overflow-hidden p-7 md:p-8">
+      {site.usarMascota && (
+        <img src="/img/mascota/sm/18-mochila.webp" alt="" width="190" height="300" loading="lazy" class="camina-jaguar pointer-events-none absolute -right-2 top-4 hidden h-28 w-auto opacity-90 sm:block" />
+      )}
       <p class="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-magenta"><Icono nombre="lugar" class="size-4" /> Campus Tehuantepec</p>
-      <address class="titulo mt-3 text-lg font-semibold not-italic leading-snug">{tehuantepec.direccion}</address>
+      <address class="titulo mt-3 text-lg font-semibold not-italic leading-snug sm:pr-24">{tehuantepec.direccion}</address>
       <p class="mt-3 text-sm leading-relaxed">
         Al sur de la ciudad de Tehuantepec, en la región del Istmo de Oaxaca. Nuestros eventos suelen ser aquí; el salón exacto
         viene en cada evento de Meetup.
@@ -79,7 +96,7 @@ const tehuantepec = universidad.campus.find((c) => c.aqui)!;
       <p class="mt-8 text-xs font-semibold uppercase tracking-widest text-suave/70">Los 3 campus de la UNISTMO</p>
       <ul class="mt-3 divide-y divide-linea">
         {universidad.campus.map((c) => (
-          <li class="flex items-start gap-3 py-3">
+          <li class:list={['campus-item flex items-start gap-3 rounded-xl px-2 py-3 transition-colors hover:bg-linea/40', c.aqui && 'campus-aqui']}>
             <span class:list={['mt-0.5 grid size-8 shrink-0 place-items-center rounded-lg', c.aqui ? 'bg-magenta text-marino' : 'bg-linea text-suave']}><Icono nombre="lugar" class="size-4" /></span>
             <span class="flex-1 text-sm">
               <span class="titulo flex flex-wrap items-center gap-2 font-semibold">Campus {c.nombre} {c.aqui && <span class="insignia" style="--color-insignia:var(--color-magenta)">Nuestro grupo</span>}</span>
@@ -97,4 +114,28 @@ const tehuantepec = universidad.campus.find((c) => c.aqui)!;
 <style>
   /* El mapa de OpenStreetMap es claro: se invierte para que combine con el tema oscuro */
   .mapa { filter: invert(0.9) hue-rotate(180deg) saturate(0.7) brightness(0.95); }
+  /* Foto con acercamiento lento (Ken Burns) y punto que late */
+  .foto-campus { animation: acercar 22s ease-in-out infinite alternate; }
+  @keyframes acercar { from { scale: 1; } to { scale: 1.08; translate: -1% -1%; } }
+  .punto-aqui::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--color-magenta); animation: latir-aqui 1.8s ease-out infinite; }
+  @keyframes latir-aqui { to { scale: 3; opacity: 0; } }
+  /* Lema: comillas gigantes y flor que gira */
+  .comillas { color: transparent; -webkit-text-stroke: 1px color-mix(in srgb, var(--color-morado) 35%, transparent); }
+  .flor-lema { animation: gira-flor-lema 10s linear infinite; filter: drop-shadow(0 0 6px var(--color-magenta)); }
+  @keyframes gira-flor-lema { to { rotate: 360deg; } }
+  .lema { transition: border-color 0.4s ease; }
+  .lema:hover { border-color: color-mix(in srgb, var(--color-magenta) 45%, transparent); }
+  /* Datos de color */
+  .dato { transition: border-color 0.4s ease, translate 0.4s ease; }
+  .dato:hover { border-color: color-mix(in srgb, var(--c) 55%, transparent); translate: 0 -4px; }
+  .dato-luz { background: var(--c); opacity: 0.15; }
+  /* Mapa: aro que late sobre el campus */
+  .pin-mapa { border: 2px solid var(--color-magenta); box-shadow: 0 0 30px var(--color-magenta); animation: radar-mapa 2.4s ease-out infinite; }
+  @keyframes radar-mapa { from { scale: 0.3; opacity: 1; } to { scale: 1.6; opacity: 0; } }
+  .camina-jaguar { filter: drop-shadow(0 12px 20px rgb(0 0 0 / 0.5)); animation: caminar 1.6s ease-in-out infinite; }
+  @keyframes caminar { 50% { translate: 0 -3px; rotate: 2deg; } }
+  .campus-aqui { background: color-mix(in srgb, var(--color-magenta) 8%, transparent); }
+  @media (prefers-reduced-motion: reduce) {
+    .foto-campus, .punto-aqui::after, .flor-lema, .pin-mapa, .camina-jaguar { animation: none; }
+  }
 </style>

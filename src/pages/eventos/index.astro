@@ -22,12 +22,13 @@ const pasos = [
   { icono: 'laptop', t: 'Llegas y construyes', d: 'Presentamos el tema y luego manos a la obra, con ayuda del equipo en todo momento.' },
   { icono: 'libro', t: 'Te llevas el material', d: 'Compartimos las guías para que repitas el ejercicio en casa y sigas avanzando.' },
 ];
+// Qué llevar a un taller: cada cosa con su ilustración (public/img/llevar) y su color
 const llevar = [
-  { icono: 'laptop', t: 'Tu laptop y su cargador', d: 'Para los talleres. Cualquier sistema operativo funciona.' },
-  { icono: 'globo', t: 'Un navegador actualizado', d: 'Chrome, Edge o Firefox. Todo se hace desde la web.' },
-  { icono: 'correo', t: 'Acceso a tu correo', d: 'Por si hay que confirmar algo durante el taller.' },
-  { icono: 'chispa', t: 'Curiosidad', d: 'No necesitas experiencia: te explicamos todo desde cero.' },
-] as const;
+  { img: 'laptop', t: 'Tu laptop y su cargador', d: 'Cualquier sistema operativo funciona.', c: 'var(--color-magenta)', w: 300, h: 300 },
+  { img: 'navegador', t: 'Un navegador actualizado', d: 'Chrome, Edge o Firefox: todo es desde la web.', c: 'var(--color-azul)', w: 300, h: 300 },
+  { img: 'correo', t: 'Acceso a tu correo', d: 'Por si hay que confirmar algo en el taller.', c: 'var(--color-morado)', w: 300, h: 300 },
+  { img: 'curiosidad', t: 'Curiosidad', d: 'No necesitas experiencia: te explicamos desde cero.', c: 'var(--color-naranja)', w: 300, h: 300 },
+];
 const preguntas = [
   { p: '¿Cuánto cuestan los eventos?', r: 'Nada. Todos los eventos del grupo son gratuitos.' },
   { p: '¿Tengo que registrarme?', r: 'Sí, en Meetup. Así apartas tu lugar, sabemos cuántas personas van y te llegan los avisos si algo cambia.' },
@@ -96,24 +97,35 @@ const preguntas = [
       ))}
     </ol>
 
-    <div class="mt-20 grid items-center gap-10 lg:grid-cols-[1fr_auto]">
+    <!-- Qué llevar: lista para palomear -->
+    <div class="mochila mt-20 grid items-center gap-10 lg:grid-cols-[auto_1fr]" data-mochila>
+      {site.usarMascota && (
+        <div class="relative mx-auto hidden lg:block" data-reveal>
+          <span class="globo-mochila absolute -top-4 left-1/2 z-10 w-max -translate-x-1/2 rounded-2xl border border-linea bg-marino-2 px-4 py-2 text-sm font-semibold text-white">
+            <span class="texto-falta">¿Ya tienes todo?</span><span class="texto-listo hidden">¡Listo para el taller!</span>
+          </span>
+          <img src="/img/mascota/18-mochila.webp" alt="" width="569" height="900" loading="lazy" class="jaguar-mochila mt-10 h-72 w-auto" />
+        </div>
+      )}
       <div>
-        <h2 class="titulo text-2xl font-semibold" data-reveal>Qué llevar a un taller</h2>
-        <ul class="mt-8 grid gap-4 sm:grid-cols-2" data-stagger>
-          {llevar.map((l) => (
-            <li class="flex gap-4 rounded-2xl border border-linea bg-marino-2 p-5">
-              <span class="grid size-11 shrink-0 place-items-center rounded-xl bg-menta/12 text-menta"><Icono nombre={l.icono} class="size-5" /></span>
-              <span>
-                <span class="titulo block font-semibold">{l.t}</span>
-                <span class="mt-1 block text-sm leading-relaxed">{l.d}</span>
-              </span>
+        <div class="flex flex-wrap items-end justify-between gap-4">
+          <h2 class="titulo text-2xl font-semibold" data-reveal>Qué llevar a un taller</h2>
+          <p class="font-mono text-xs text-suave/70" aria-live="polite"><span data-listos>0</span>/{llevar.length} listos · toca para palomear</p>
+        </div>
+        <ul class="llevar mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4" data-en-vista>
+          {llevar.map((l, i) => (
+            <li style={`--c:${l.c};--i:${i}`}>
+              <button type="button" class="cosa tarjeta group relative flex h-full w-full flex-col items-center overflow-hidden p-4 text-center md:p-5" aria-pressed="false" data-cosa>
+                <span class="cosa-luz pointer-events-none absolute left-1/2 top-6 size-32 -translate-x-1/2 rounded-full blur-3xl" aria-hidden="true"></span>
+                <img src={`/img/llevar/${l.img}.webp`} alt="" width={l.w} height={l.h} loading="lazy" class="cosa-img relative h-24 w-auto md:h-28" />
+                <span class="titulo relative mt-3 text-sm font-semibold text-white md:text-base">{l.t}</span>
+                <span class="relative mt-1 text-xs leading-relaxed">{l.d}</span>
+                <span class="cosa-check absolute right-3 top-3 grid size-7 place-items-center rounded-full" aria-hidden="true"><Icono nombre="check" class="size-4" /></span>
+              </button>
             </li>
           ))}
         </ul>
       </div>
-      {site.usarMascota && (
-        <img src="/img/mascota/18-mochila.webp" alt="" width="569" height="900" loading="lazy" class="mx-auto hidden h-72 w-auto lg:block" data-reveal />
-      )}
     </div>
 
     {pasados.length > 0 && (
@@ -165,3 +177,40 @@ const preguntas = [
   @keyframes enciende-num { to { background: var(--color-magenta); color: var(--color-marino); } }
   @keyframes sube-paso { from { opacity: 0; transform: translateY(24px); } }
 </style>
+
+<style>
+  /* Qué llevar: cada cosa flota, se ilumina con su color y se palomea al tocarla */
+  .cosa { cursor: pointer; transition: border-color 0.35s ease, translate 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .cosa:hover { border-color: color-mix(in srgb, var(--c) 55%, transparent); translate: 0 -5px; }
+  .cosa-luz { background: var(--c); opacity: 0.18; transition: opacity 0.4s ease; }
+  .cosa:hover .cosa-luz, .cosa[aria-pressed='true'] .cosa-luz { opacity: 0.38; }
+  .cosa-img { filter: drop-shadow(0 14px 18px rgb(0 0 0 / 0.45)); animation: flota-cosa 4s ease-in-out infinite; animation-delay: calc(var(--i) * -1s); transition: scale 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .cosa:hover .cosa-img { scale: 1.1; }
+  @keyframes flota-cosa { 50% { translate: 0 -6px; rotate: -2deg; } }
+  .cosa-check { color: transparent; box-shadow: inset 0 0 0 2px var(--color-linea); transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, scale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .cosa[aria-pressed='true'] { border-color: color-mix(in srgb, var(--c) 70%, transparent); }
+  .cosa[aria-pressed='true'] .cosa-check { background: var(--c); color: var(--color-marino); box-shadow: 0 0 16px var(--c); scale: 1.15; }
+  .llevar.preparado:not(.en-vista) li { opacity: 0; }
+  .llevar.en-vista li { animation: entra-cosa 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both; animation-delay: calc(var(--i) * 0.12s); }
+  @keyframes entra-cosa { from { opacity: 0; transform: translateY(30px) scale(0.92); } }
+  .globo-mochila { box-shadow: 0 12px 30px -12px rgb(0 0 0 / 0.6); }
+  .globo-mochila::after { content: ''; position: absolute; left: 50%; bottom: -7px; width: 12px; height: 12px; translate: -50% 0; rotate: 45deg; background: var(--color-marino-2); border-right: 1px solid var(--color-linea); border-bottom: 1px solid var(--color-linea); }
+  .mochila.completa .texto-falta { display: none; }
+  .mochila.completa .texto-listo { display: inline; color: var(--color-menta); }
+  .mochila.completa .jaguar-mochila { animation: brinco 0.7s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  @keyframes brinco { 40% { translate: 0 -18px; rotate: -4deg; } }
+  @media (prefers-reduced-motion: reduce) { .cosa-img { animation: none; } }
+</style>
+
+<script>
+  // Palomear lo que ya tienes para el taller
+  const mochila = document.querySelector<HTMLElement>('[data-mochila]');
+  const cosas = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-cosa]'));
+  const listos = document.querySelector('[data-listos]');
+  cosas.forEach((c) => c.addEventListener('click', () => {
+    c.setAttribute('aria-pressed', String(c.getAttribute('aria-pressed') !== 'true'));
+    const n = cosas.filter((x) => x.getAttribute('aria-pressed') === 'true').length;
+    if (listos) listos.textContent = String(n);
+    mochila?.classList.toggle('completa', n === cosas.length);
+  }));
+</script>
