@@ -1,4 +1,5 @@
 ---
+import Bordado from '../components/Bordado.astro';
 import Layout from '../layouts/Layout.astro';
 import Hero from '../components/Hero.astro';
 import Cinta from '../components/Cinta.astro';
@@ -76,6 +77,7 @@ const preguntas = [
   </section>
 
   <div class="mt-12 md:mt-16"><Cinta /></div>
+  <Bordado class="mt-10 md:mt-14" />
 
   <!-- Qué hacemos -->
   <section id="que-hacemos" class="mx-auto max-w-7xl px-5 pt-20 md:pt-28">
@@ -127,7 +129,7 @@ const preguntas = [
         <div class="absolute inset-[12%] rounded-full bg-magenta/25 blur-3xl" aria-hidden="true"></div>
         <div class="absolute left-1/2 top-1/2 aspect-square w-[88%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-magenta/30 girar" aria-hidden="true"></div>
         {site.usarMascota ? (
-          <img src="/img/mascota/06-nube-brillante.webp" alt="El jaguar del grupo sostiene una nube brillante" width="641" height="900" loading="lazy" class="flotar relative mx-auto h-72 w-auto sm:h-80 lg:h-[26rem] drop-shadow-[0_30px_60px_rgba(255,87,233,0.25)]" data-parallax="0.12" />
+          <img src="/img/mascota/06-nube-brillante.webp" alt="El jaguar del grupo, con guayabera bordada, sostiene una nube brillante" width="513" height="900" loading="lazy" class="flotar relative mx-auto h-72 w-auto sm:h-80 lg:h-[26rem] drop-shadow-[0_30px_60px_rgba(255,87,233,0.25)]" data-parallax="0.12" />
         ) : (
           <img src="/img/logo-512.png" alt="" width="512" height="512" loading="lazy" class="relative mx-auto size-80 rounded-3xl" />
         )}
@@ -208,7 +210,7 @@ const preguntas = [
           </a>
         </div>
         {site.usarMascota && (
-          <img src="/img/mascota/08-leyendo.webp" alt="" width="743" height="900" loading="lazy" class="mx-auto h-40 w-auto md:h-64" />
+          <img src="/img/mascota/08-leyendo.webp" alt="" width="744" height="900" loading="lazy" class="mx-auto h-40 w-auto md:h-64" />
         )}
       </div>
     )}

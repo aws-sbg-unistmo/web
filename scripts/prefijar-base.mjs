@@ -28,9 +28,9 @@ for await (const ruta of archivos(dist)) {
     texto = (await readFile(ruta, 'utf8')).replace(
       /\b(href|src|poster|data-src|data-poster|content|action)="\/(?!\/)/g,
       (_, attr) => `${attr}="${base}/`,
-    );
+    ).replace(/url\((['"]?)\/(?!\/)/g, `url($1${base}/`);
   } else if (ruta.endsWith('.css')) {
-    texto = (await readFile(ruta, 'utf8')).replace(/url\(\/(?!\/)/g, `url(${base}/`);
+    texto = (await readFile(ruta, 'utf8')).replace(/url\((['"]?)\/(?!\/)/g, `url($1${base}/`);
   } else if (ruta.endsWith('.xml')) {
     // Sitemap: https://host/pagina/ -> https://host/<base>/pagina/
     texto = (await readFile(ruta, 'utf8')).replace(/<loc>(https?:\/\/[^/<]+)\/(?!sitemap)/g, (m, host) => `<loc>${host}${base}/`);

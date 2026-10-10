@@ -1,10 +1,12 @@
 ---
 import Icono from './Icono.astro';
 import LogoRed from './LogoRed.astro';
+import Bordado from './Bordado.astro';
 import Palabras from './Palabras.astro';
 import { redes, site } from '../data/site';
 ---
-<section class="relative mx-auto mt-20 max-w-7xl px-5 md:mt-32">
+<Bordado class="mt-20 md:mt-28" />
+<section class="relative mx-auto mt-10 max-w-7xl px-5 md:mt-14">
   <div class="relative isolate overflow-hidden rounded-[2rem] border border-linea" data-reveal>
     {site.usarMascota && (
       <video

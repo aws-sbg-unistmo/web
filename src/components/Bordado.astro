@@ -1,0 +1,54 @@
+---
+// Bordado de tehuana en neón (flores de fibra óptica y circuitos): el toque regional y tecnológico del sitio.
+//   franja: banda horizontal entre secciones, con un destello que la recorre
+//   orilla: columna de flores que se asoma por un lado (decorativa)
+interface Props {
+  tipo?: 'franja' | 'orilla';
+  lado?: 'izq' | 'der';
+  class?: string;
+}
+const { tipo = 'franja', lado = 'der', class: clase = '' } = Astro.props;
+---
+{tipo === 'franja' ? (
+  <div class:list={['bordado-franja', clase]} aria-hidden="true"></div>
+) : (
+  <img
+    src={lado === 'der' ? '/img/istmo/bordado-columna-2.webp' : '/img/istmo/bordado-columna.webp'}
+    alt=""
+    width="250"
+    height="520"
+    loading="lazy"
+    decoding="async"
+    aria-hidden="true"
+    class:list={['bordado-orilla pointer-events-none select-none', lado === 'der' ? 'orilla-der' : 'orilla-izq', clase]}
+  />
+)}
+
+<style>
+  .bordado-franja {
+    position: relative;
+    height: 3.5rem;
+    background: url('/img/istmo/bordado-franja.webp') repeat-x center / auto 100%;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+    opacity: 0.75;
+    animation: pulso-bordado 7s ease-in-out infinite;
+  }
+  /* Destello que recorre el bordado, como una señal que viaja por la fibra */
+  .bordado-franja::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 40%, rgb(255 255 255 / 0.35) 50%, transparent 60%) no-repeat;
+    background-size: 40% 100%;
+    animation: senal-bordado 5s linear infinite;
+    mix-blend-mode: overlay;
+  }
+  @keyframes pulso-bordado { 50% { opacity: 0.55; } }
+  @keyframes senal-bordado { from { background-position: -60% 0; } to { background-position: 160% 0; } }
+  @media (min-width: 768px) { .bordado-franja { height: 4.5rem; } }
+
+  .bordado-orilla { position: absolute; width: auto; }
+  .orilla-der { -webkit-mask-image: linear-gradient(to left, #000 35%, transparent); mask-image: linear-gradient(to left, #000 35%, transparent); }
+  .orilla-izq { -webkit-mask-image: linear-gradient(to right, #000 35%, transparent); mask-image: linear-gradient(to right, #000 35%, transparent); }
+</style>

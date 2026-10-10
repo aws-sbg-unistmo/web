@@ -3,6 +3,7 @@
 // En celular las columnas se pliegan (como en aws.amazon.com) y las redes quedan en una fila de logos.
 import Icono from './Icono.astro';
 import LogoRed from './LogoRed.astro';
+import Bordado from './Bordado.astro';
 import { redes, site } from '../data/site';
 import { recursos } from '../data/contenido';
 const anio = new Date().getFullYear();
@@ -40,6 +41,8 @@ const columnas = [
   </a>
 
   <div class="pointer-events-none absolute -bottom-40 left-1/2 h-80 w-[60rem] -translate-x-1/2 rounded-full bg-magenta/10 blur-3xl"></div>
+  <Bordado tipo="orilla" lado="izq" class="-left-16 bottom-0 hidden h-[30rem] opacity-30 lg:block" />
+  <Bordado tipo="orilla" lado="der" class="-right-16 bottom-0 hidden h-[30rem] opacity-30 lg:block" />
 
   <div class="relative mx-auto grid max-w-7xl grid-cols-2 gap-x-6 px-5 py-12 lg:grid-cols-[1.5fr_repeat(4,1fr)] lg:gap-x-8 lg:gap-y-12 lg:py-16">
     <div class="col-span-2 max-lg:order-1 max-lg:mb-10 lg:col-span-1">

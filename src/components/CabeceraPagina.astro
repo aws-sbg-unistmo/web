@@ -3,6 +3,7 @@
 // Con "video", el jaguar aparece en un video en bucle de fondo a la derecha (desde tabletas; en celular no, para no saturar).
 import Icono from './Icono.astro';
 import Palabras from './Palabras.astro';
+import Bordado from './Bordado.astro';
 import { site } from '../data/site';
 
 interface Props {
@@ -19,14 +20,15 @@ interface Props {
 const { etiqueta, titulo, resaltar = [], descripcion, pose, video, migas } = Astro.props;
 // Medidas reales de cada pose (ancho × alto) para que el navegador reserve el espacio exacto
 const medidas: Record<string, [number, number]> = {
-  '01-saludando': [582, 900], '03-celebrando': [662, 900], '06-nube-brillante': [641, 900], '07-sentado-en-servidor': [737, 900],
-  '08-leyendo': [743, 900], '09-lupa': [762, 900], '10-pensando': [455, 900], '12-audifonos': [492, 900],
+  '01-saludando': [520, 900], '03-celebrando': [620, 900], '06-nube-brillante': [513, 900], '07-sentado-en-servidor': [565, 900],
+  '08-leyendo': [744, 900], '09-lupa': [589, 900], '10-pensando': [384, 900], '12-audifonos': [582, 900],
 };
 const [anchoPose, altoPose] = (pose && medidas[pose]) || [600, 900];
 const conVideo = Boolean(video && site.usarMascota);
 ---
 <section class:list={['relative isolate overflow-hidden pb-12 pt-36 md:pb-16 md:pt-40', conVideo && 'md:flex md:min-h-[38rem] md:items-end']}>
   <div class="rejilla absolute inset-0 -z-10 opacity-30 [mask-image:radial-gradient(ellipse_at_top,#000,transparent_70%)]"></div>
+  <Bordado tipo="orilla" lado="der" class="-right-20 top-28 -z-10 h-[24rem] opacity-50 md:hidden" />
   <div class="absolute -top-40 left-1/2 -z-10 h-96 w-[56rem] -translate-x-1/2 rounded-full bg-morado/20 blur-3xl"></div>
   <div class="mx-auto grid w-full max-w-7xl items-end gap-10 px-5 md:grid-cols-[1fr_auto]">
     <div class="max-w-3xl">
