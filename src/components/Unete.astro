@@ -1,0 +1,115 @@
+---
+// «Quiero ser parte»: tres pasos para unirse al grupo (Meetup → comunidad de WhatsApp → primer evento).
+// Los QR se generan al compilar y llevan directo a cada enlace (site.meetup y site.whatsapp): la invitación de
+// WhatsApp no caduca mientras ningún admin la restablezca; si cambia, basta con actualizar site.whatsapp.
+// En celular los pasos van uno debajo de otro y sin QR (se toca el botón).
+import QRCode from 'qrcode';
+import Icono from './Icono.astro';
+import Palabras from './Palabras.astro';
+import { site } from '../data/site';
+
+interface Props {
+  class?: string;
+}
+const { class: clase = '' } = Astro.props;
+const qr = (url: string) =>
+  QRCode.toString(url, { type: 'svg', errorCorrectionLevel: 'Q', margin: 0, color: { dark: '#161d26', light: '#ffffff' } });
+const pasos = [
+  {
+    t: 'Únete al grupo en Meetup',
+    d: 'Ahí publicamos cada taller y charla. Te registras con un clic y te llega el aviso.',
+    boton: 'Unirme en Meetup',
+    url: site.meetup,
+    externo: true,
+    c: 'var(--color-magenta)',
+    qr: await qr(site.meetup),
+    etiqueta: 'Meetup del grupo',
+  },
+  {
+    t: 'Entra a la comunidad de WhatsApp',
+    d: 'Avisos, dudas y oportunidades con estudiantes del Istmo: 📢 Avisos, 💬 General y 🚀 Oportunidades.',
+    boton: 'Unirme a WhatsApp',
+    url: site.whatsapp,
+    externo: true,
+    c: '#25d366',
+    qr: await qr(site.whatsapp),
+    etiqueta: 'comunidad de WhatsApp',
+  },
+  {
+    t: 'Ven a tu primer evento',
+    d: 'Elige un taller o una charla y llega con tu laptop. Es gratis y no necesitas experiencia.',
+    boton: 'Ver eventos',
+    url: '/eventos/',
+    externo: false,
+    c: 'var(--color-azul)',
+    qr: '',
+    etiqueta: '',
+  },
+];
+---
+<section id="unete" class:list={['unete relative mx-auto max-w-7xl px-5', clase]}>
+  <div class="mx-auto max-w-2xl text-center">
+    <p class="chip" data-reveal>// Únete</p>
+    <Palabras texto="Quiero ser parte de la comunidad" resaltar={['comunidad']} class="mt-5 text-4xl font-bold leading-tight md:text-5xl" />
+    <p class="mt-5 text-lg leading-relaxed" data-reveal>Tres pasos y ya eres del grupo. Abierto a cualquier carrera y semestre.</p>
+  </div>
+
+  <ol class="pasos-unete relative mt-14 grid gap-6 lg:grid-cols-3 lg:gap-8" data-en-vista>
+    <span class="riel-unete pointer-events-none absolute hidden lg:block" aria-hidden="true"><span class="viajero-unete"></span></span>
+    {pasos.map((p, i) => (
+      <li class="paso-unete relative" style={`--c:${p.c};--i:${i}`}>
+        <article class="tarjeta-unete tarjeta relative flex h-full flex-col overflow-hidden p-6 md:p-7">
+          <span class="luz-unete pointer-events-none absolute -right-16 -top-16 size-48 rounded-full blur-3xl" aria-hidden="true"></span>
+          <div class="relative flex items-center gap-4">
+            <span class="num-unete titulo grid size-12 shrink-0 place-items-center rounded-full text-lg font-bold">{i + 1}</span>
+            <h3 class="titulo text-xl font-semibold leading-snug">{p.t}</h3>
+          </div>
+          <p class="relative mt-4 text-sm leading-relaxed">{p.d}</p>
+
+          {p.qr ? (
+            <div class="relative mt-6 hidden items-center gap-4 md:mt-auto md:flex md:pt-6">
+              <div class="qr-unete relative size-36 shrink-0 rounded-2xl bg-white p-3" role="img" aria-label={`Código QR de la ${p.etiqueta}`}>
+                <Fragment set:html={p.qr} />
+                <img src="/img/logo-192.png" alt="" width="28" height="28" class="absolute left-1/2 top-1/2 size-8 -translate-x-1/2 -translate-y-1/2 rounded-md ring-2 ring-white" />
+              </div>
+              <p class="font-mono text-[0.68rem] uppercase leading-relaxed tracking-[0.16em] text-suave/70">Escanéalo<br />con tu celular</p>
+            </div>
+          ) : (
+            site.usarMascota && (
+              <img src="/img/mascota/sm/18-mochila.webp" alt="" width="190" height="300" loading="lazy" class="jaguar-unete relative mx-auto mt-4 hidden h-36 w-auto md:mt-auto md:block md:pt-4" />
+            )
+          )}
+
+          <a href={p.url} {...(p.externo ? { target: '_blank', rel: 'noopener' } : {})} class="boton-unete relative mt-6 inline-flex items-center justify-center gap-2 self-start rounded-full px-5 py-3 text-sm font-semibold md:self-stretch">
+            {p.boton} <Icono nombre={p.externo ? 'externo' : 'flecha'} class="size-4" />
+          </a>
+        </article>
+      </li>
+    ))}
+  </ol>
+</section>
+
+<style>
+  .qr-unete :global(svg) { width: 100%; height: 100%; display: block; }
+  .tarjeta-unete { transition: border-color 0.4s ease, translate 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease; }
+  .tarjeta-unete:hover { border-color: color-mix(in srgb, var(--c) 55%, transparent); translate: 0 -6px; box-shadow: 0 28px 56px -34px var(--c); }
+  .luz-unete { background: var(--c); opacity: 0.12; transition: opacity 0.4s ease; }
+  .tarjeta-unete:hover .luz-unete { opacity: 0.3; }
+  .num-unete { color: var(--c); background: color-mix(in srgb, var(--c) 14%, var(--color-marino)); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--c) 60%, transparent), 0 0 24px -6px var(--c); }
+  .boton-unete { color: var(--color-marino); background: var(--c); box-shadow: 0 12px 30px -12px var(--c); transition: box-shadow 0.3s ease, translate 0.3s ease; }
+  .boton-unete:hover { box-shadow: 0 16px 38px -8px var(--c); translate: 0 -2px; }
+  .jaguar-unete { filter: drop-shadow(0 14px 22px rgb(0 0 0 / 0.5)); animation: camina-unete 1.8s ease-in-out infinite; }
+  @keyframes camina-unete { 50% { translate: 0 -4px; rotate: 2deg; } }
+
+  /* Riel que une los tres pasos (computadora): una luz viaja del 1 al 3 */
+  .riel-unete { left: calc(16.66% + 1.5rem); right: calc(16.66% + 1.5rem); top: 3.25rem; height: 2px; z-index: 0; background: repeating-linear-gradient(90deg, var(--color-linea) 0 8px, transparent 8px 16px); }
+  .paso-unete { z-index: 1; }
+  .viajero-unete { position: absolute; top: -4px; left: 0; width: 10px; height: 10px; border-radius: 50%; background: #25d366; box-shadow: 0 0 14px #25d366; animation: viaja-unete 4s ease-in-out infinite; }
+  @keyframes viaja-unete { 0% { left: 0; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: calc(100% - 10px); opacity: 0; } }
+
+  /* Entrada en orden */
+  .pasos-unete.preparado:not(.en-vista) .paso-unete { opacity: 0; }
+  .pasos-unete.en-vista .paso-unete { animation: entra-unete 0.75s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(var(--i) * 0.18s); }
+  @keyframes entra-unete { from { opacity: 0; transform: translateY(32px); } }
+  @media (prefers-reduced-motion: reduce) { .jaguar-unete, .viajero-unete { animation: none; } }
+</style>
