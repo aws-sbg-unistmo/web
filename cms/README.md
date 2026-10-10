@@ -57,8 +57,8 @@ El dyno Eco se duerme cuando nadie lo usa; no afecta a la página, que solo lee 
 
 ### Cloudinary (fotos del CMS), gratis y sin tarjeta
 1. Crea una cuenta gratis en https://cloudinary.com/users/register_free. No pide tarjeta.
-2. En el panel (Dashboard, o Settings → API Keys), copia la **API environment variable**, la que empieza con `cloudinary://`.
-3. En Heroku → `aws-sbg-unistmo-cms` → Settings → Config Vars, agrega `CLOUDINARY_URL` con ese valor.
+2. En el panel (Settings → API Keys), copia el **API Secret**. También sirve la «API environment variable» completa (`cloudinary://…`).
+3. En Heroku → `aws-sbg-unistmo-cms` → Settings → Config Vars, agrega `CLOUDINARY_URL` con ese valor. Si pegas solo el secret, la cuenta (`ecmkeirx`) y el API Key ya vienen en `config/plugins.ts`; se cambian con `CLOUDINARY_CLOUD_NAME` y `CLOUDINARY_API_KEY`.
 4. Opcional: `CLOUDINARY_FOLDER` para cambiar la carpeta. Por defecto es `aws-sbg-unistmo`, y así la misma cuenta sirve para otros proyectos.
 
 El plan gratis da 25 créditos al mes (≈ 25 GB entre almacenamiento y descargas). Para las fotos del equipo y los eventos sobra.
