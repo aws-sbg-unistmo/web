@@ -52,7 +52,16 @@ Lo despliega GitHub Actions (trabajo `cms-heroku`) en cuanto existe la variable 
 - La base de datos vive en Heroku Postgres (Essential-0).
 - Las fotos se guardan en Cloudinary (`CLOUDINARY_URL`), porque el disco de Heroku se borra en cada reinicio.
 
-Costo: dyno Basic US$7 + Postgres US$5 = US$12 al mes, que cubre el crédito.
+Costo: dyno Eco US$5 (variable `HEROKU_DYNO=eco`) + Postgres US$5 = US$10 al mes. El crédito de US$13 lo cubre: pagas 0.
+El dyno Eco se duerme cuando nadie lo usa; no afecta a la página, que solo lee Strapi al compilarse.
+
+### Cloudinary (fotos del CMS), gratis y sin tarjeta
+1. Crea una cuenta gratis en https://cloudinary.com/users/register_free. No pide tarjeta.
+2. En el panel (Dashboard, o Settings → API Keys), copia la **API environment variable**, la que empieza con `cloudinary://`.
+3. En Heroku → `aws-sbg-unistmo-cms` → Settings → Config Vars, agrega `CLOUDINARY_URL` con ese valor.
+4. Opcional: `CLOUDINARY_FOLDER` para cambiar la carpeta. Por defecto es `aws-sbg-unistmo`, y así la misma cuenta sirve para otros proyectos.
+
+El plan gratis da 25 créditos al mes (≈ 25 GB entre almacenamiento y descargas). Para las fotos del equipo y los eventos sobra.
 Los pasos están en el README principal, en «Activarlo en Heroku».
 
 ## En AWS

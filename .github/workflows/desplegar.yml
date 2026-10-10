@@ -215,7 +215,7 @@ jobs:
 
   # ------------------------------------------------------------------ CMS (Strapi) en Heroku
   # Se activa con la variable HEROKU_APP (nombre de la app) y el secreto HEROKU_API_KEY.
-  # Con el GitHub Student Developer Pack, Heroku da US$13 al mes: dyno Basic (US$7) + Postgres Essential-0 (US$5).
+  # Con el GitHub Student Developer Pack, Heroku da US$13 al mes: dyno Eco (US$5, variable HEROKU_DYNO) + Postgres Essential-0 (US$5).
   # Configura la app (contenedor y variables) y publica la imagen solo si cambió cms/ o si aún no hay ninguna.
   cms-heroku:
     if: vars.HEROKU_APP != '' && github.event_name != 'schedule' && inputs.origen != 'cms'
@@ -266,7 +266,7 @@ jobs:
           h -X PATCH "https://api.heroku.com/apps/$APP/formation" -H "Accept: application/vnd.heroku+json; version=3.docker-releases" \
             -d "{\"updates\":[{\"type\":\"web\",\"docker_image\":\"$ID\"}]}" > /dev/null
           h -X PATCH "https://api.heroku.com/apps/$APP/formation/web" -H "Accept: application/vnd.heroku+json; version=3" \
-            -d '{"quantity":1,"size":"${{ vars.HEROKU_DYNO || 'basic' }}"}' > /dev/null
+            -d '{"quantity":1,"size":"${{ vars.HEROKU_DYNO || 'eco' }}"}' > /dev/null
       - name: Dirección del CMS
         run: |
           echo "CMS en Heroku: ${{ steps.app.outputs.url }}admin" >> "$GITHUB_STEP_SUMMARY"

@@ -117,8 +117,8 @@ Puede vivir en dos lugares. Elige uno:
 
 | | Heroku (recomendado) | AWS |
 |---|---|---|
-| Costo | US$0 con el GitHub Student Developer Pack (US$13 al mes de crédito durante 24 meses); después ~US$12 al mes | ~US$11 al mes |
-| Qué usa | Dyno Basic (US$7) + Heroku Postgres Essential-0 (US$5) + Cloudinary gratis para las fotos | EC2 t4g.micro + IP pública + disco + CloudFront |
+| Costo | US$0 con el GitHub Student Developer Pack (US$13 al mes de crédito durante 24 meses); después ~US$10 al mes | ~US$11 al mes |
+| Qué usa | Dyno Eco (US$5, variable `HEROKU_DYNO=eco`) + Heroku Postgres Essential-0 (US$5) + Cloudinary gratis para las fotos | EC2 t4g.micro + IP pública + disco + CloudFront |
 | Requisito | Tarjeta de crédito o débito para canjear la oferta (no se cobra mientras no pases de US$13) | Haber terminado «Publicar en AWS» |
 
 ### Activarlo en Heroku (una sola vez)
