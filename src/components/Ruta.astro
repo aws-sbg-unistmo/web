@@ -8,6 +8,7 @@
 import Icono from './Icono.astro';
 import Mosaico from './Mosaico.astro';
 import Palabras from './Palabras.astro';
+import Bordado from './Bordado.astro';
 import { niveles } from '../data/contenido';
 import { site } from '../data/site';
 
@@ -26,11 +27,18 @@ camino += ` L ${ancho + 30} ${puntos[puntos.length - 1][1]}`;
 const colores = ['#ff9900', '#ff57e9', '#ad5cff', '#42b4ff', '#00e582'];
 // Confeti de la meta: ángulo y distancia de cada pedacito
 const confeti = Array.from({ length: 16 }, (_, k) => ({ a: (k / 16) * 360 + (k % 2) * 11, d: 70 + (k % 4) * 22, c: colores[k % colores.length] }));
+// Jardín de flores istmeñas bajo las curvas del camino: x, y, tamaño, color
+const flores = [[330, 262, 1, 0], [372, 284, 0.7, 1], [300, 292, 0.55, 3], [822, 262, 1, 2], [866, 286, 0.7, 4], [792, 290, 0.55, 1]];
+// Meta: franja de cuadros que cruza el camino después del último nivel
+const [mx, my] = puntos[puntos.length - 1];
 ---
 <section id="ruta" class="ruta-mapa relative mt-16" data-ruta>
   <div class="escena-ruta relative" data-escena-ruta>
     <div class="fondo-ruta pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
       <div class="rejilla absolute -inset-x-20 inset-y-0 opacity-15 [mask-image:radial-gradient(ellipse_at_50%_55%,#000,transparent_70%)]" data-fondo-ruta></div>
+      <!-- Orillas bordadas a los lados (solo en pantallas anchas) -->
+      <Bordado tipo="orilla" lado="izq" class="orilla-ruta left-0 top-1/2 h-[78%] -translate-y-1/2" />
+      <Bordado tipo="orilla" lado="der" class="orilla-ruta right-0 top-1/2 h-[78%] -translate-y-1/2" />
     </div>
 
     <div class="mx-auto flex h-full max-w-7xl flex-col justify-center px-5 py-14 lg:py-8">
@@ -52,11 +60,34 @@ const confeti = Array.from({ length: 16 }, (_, k) => ({ a: (k / 16) * 360 + (k %
             <linearGradient id="degradado-ruta" x1="0" y1="0" x2={ancho} y2="0" gradientUnits="userSpaceOnUse">
               {colores.map((c, i) => <stop offset={`${(i / (colores.length - 1)) * 100}%`} stop-color={c} />)}
             </linearGradient>
-            <clipPath id="recorte-viajero"><circle r="22" /></clipPath>
+            <clipPath id="recorte-viajero"><circle r="26" /></clipPath>
+            <g id="huella-jaguar">
+              <ellipse cx="0" cy="2.6" rx="4.2" ry="3.6" />
+              <ellipse cx="-4.6" cy="-2.6" rx="1.6" ry="2" />
+              <ellipse cx="-1.6" cy="-4.9" rx="1.6" ry="2.1" />
+              <ellipse cx="1.8" cy="-4.9" rx="1.6" ry="2.1" />
+              <ellipse cx="4.7" cy="-2.5" rx="1.6" ry="2" />
+            </g>
+            <pattern id="cuadros-meta" width="10" height="10" patternUnits="userSpaceOnUse">
+              <rect width="10" height="10" fill="#f4f4f5" /><rect width="5" height="5" fill="#161d26" /><rect x="5" y="5" width="5" height="5" fill="#161d26" />
+            </pattern>
           </defs>
+          <!-- Jardín bajo las curvas -->
+          {flores.map(([x, y, s, c], k) => (
+            <g class="flor-ruta" transform={`translate(${x} ${y}) scale(${s})`} style={`--c:${colores[c]};--k:${k}`}>
+              <g class="flor-giro">
+                {[0, 60, 120, 180, 240, 300].map((r) => <ellipse cx="0" cy="-9" rx="4.6" ry="8" transform={`rotate(${r})`} />)}
+                <circle r="4.4" class="centro-flor" />
+              </g>
+            </g>
+          ))}
+          <path d={camino} class="sombra-camino" />
           <path d={camino} class="borde-camino" />
           <path d={camino} class="camino" />
+          <path d={camino} class="avance-luz" data-avance />
           <path d={camino} class="linea-central" />
+          <rect x={mx + 46} y={my - 23} width="12" height="46" fill="url(#cuadros-meta)" class="meta-cuadros" rx="1.5" />
+          <g class="huellas" data-huellas></g>
           <path d={camino} class="avance" data-avance />
           {puntos.map(([x, y], i) => (
             <g class="hito" transform={`translate(${x} ${y})`} style={`--c:${colores[i]}`} data-hito={i}>
@@ -69,9 +100,11 @@ const confeti = Array.from({ length: 16 }, (_, k) => ({ a: (k / 16) * 360 + (k %
           ))}
           {Array.from({ length: 7 }, (_, k) => <circle r={7 - k * 0.8} class="estela" style={`opacity:${0.55 - k * 0.07}`} data-estela={k} />)}
           <g class="viajero" data-viajero>
-            <circle r="40" class="brillo-viajero" />
-            <circle r="27" fill="#161d26" stroke="url(#degradado-ruta)" stroke-width="3" />
-            <image href="/img/logo-192.png" x="-22" y="-22" width="44" height="44" clip-path="url(#recorte-viajero)" />
+            <g class="paso-viajero">
+              <circle r="44" class="brillo-viajero" />
+              <circle r="30" fill="#2a2140" stroke="url(#degradado-ruta)" stroke-width="3.5" />
+              <image href="/img/mascota/cara.webp" x="-26" y="-25" width="52" height="52" clip-path="url(#recorte-viajero)" />
+            </g>
           </g>
         </svg>
         {puntos.map(([x, y], i) => (
@@ -177,10 +210,29 @@ const confeti = Array.from({ length: 16 }, (_, k) => ({ a: (k / 16) * 360 + (k %
   @keyframes desplegar { from { opacity: 0; translate: 0 -8px; } }
 
   /* Camino del mapa */
-  .borde-camino { fill: none; stroke: #2b3542; stroke-width: 46; stroke-linecap: round; }
-  .camino { fill: none; stroke: #19212b; stroke-width: 40; stroke-linecap: round; }
-  .linea-central { fill: none; stroke: #3a4655; stroke-width: 2; stroke-dasharray: 12 14; }
-  .avance { fill: none; stroke: url(#degradado-ruta); stroke-width: 8; stroke-linecap: round; filter: drop-shadow(0 0 8px rgb(255 87 233 / 0.55)); }
+  .sombra-camino { fill: none; stroke: #000; stroke-width: 74; stroke-linecap: round; opacity: 0.35; filter: blur(10px); }
+  .borde-camino { fill: none; stroke: #6b7686; stroke-width: 52; stroke-linecap: round; }
+  .camino { fill: none; stroke: #1b232d; stroke-width: 46; stroke-linecap: round; }
+  .avance-luz { fill: none; stroke: url(#degradado-ruta); stroke-width: 46; stroke-linecap: round; opacity: 0.16; }
+  .linea-central { fill: none; stroke: #f5c542; stroke-width: 3; stroke-dasharray: 16 14; opacity: 0.6; }
+  .avance { fill: none; stroke: url(#degradado-ruta); stroke-width: 5; stroke-linecap: round; filter: drop-shadow(0 0 8px rgb(255 87 233 / 0.55)); }
+  .meta-cuadros { opacity: 0.85; }
+  /* Huellas del jaguar: aparecen conforme avanza */
+  .huellas :global(use) { fill: #ff57e9; opacity: 0; transition: opacity 0.35s ease; }
+  .huellas :global(use.pisada) { opacity: 0.5; }
+  /* Flores del jardín: se mecen y brillan */
+  .flor-ruta { fill: var(--c); opacity: 0.75; filter: drop-shadow(0 0 6px var(--c)); }
+  .flor-giro { animation: mecer-flor 4s ease-in-out infinite alternate; animation-delay: calc(var(--k) * -0.7s); transform-box: fill-box; transform-origin: center; }
+  .centro-flor { fill: #ff9900; }
+  @keyframes mecer-flor { from { rotate: -12deg; } to { rotate: 12deg; } }
+  /* El jaguar da saltitos mientras viaja */
+  .paso-viajero { animation: saltito 0.9s ease-in-out infinite; }
+  @keyframes saltito { 50% { translate: 0 -3px; } }
+  /* Orillas bordadas: solo cuando sobra espacio a los lados */
+  :global(.orilla-ruta) { display: none; opacity: 0.32; }
+  .escena-ruta :global(.orilla-ruta.orilla-izq) { -webkit-mask-image: linear-gradient(to right, #000 30%, transparent), linear-gradient(transparent, #000 18%, #000 82%, transparent); mask-image: linear-gradient(to right, #000 30%, transparent), linear-gradient(transparent, #000 18%, #000 82%, transparent); -webkit-mask-composite: source-in; mask-composite: intersect; }
+  .escena-ruta :global(.orilla-ruta.orilla-der) { -webkit-mask-image: linear-gradient(to left, #000 30%, transparent), linear-gradient(transparent, #000 18%, #000 82%, transparent); mask-image: linear-gradient(to left, #000 30%, transparent), linear-gradient(transparent, #000 18%, #000 82%, transparent); -webkit-mask-composite: source-in; mask-composite: intersect; }
+  @media (min-width: 1440px) { :global(.orilla-ruta) { display: block; } }
   .halo-hito { fill: var(--c); opacity: 0; transition: opacity 0.4s ease; }
   .aro-hito { fill: #161d26; stroke: #3a4655; stroke-width: 2; transition: stroke 0.4s ease; }
   .nucleo-hito { fill: #1e2732; transition: fill 0.4s ease; }
@@ -252,7 +304,9 @@ const confeti = Array.from({ length: 16 }, (_, k) => ({ a: (k / 16) * 360 + (k %
     const paneles = Array.from(seccion.querySelectorAll<HTMLElement>('[data-panel]'));
     const hitos = Array.from(seccion.querySelectorAll<SVGGElement>('[data-hito]'));
     const botones = Array.from(seccion.querySelectorAll<HTMLButtonElement>('[data-ir-nivel]'));
-    const avance = seccion.querySelector<SVGPathElement>('[data-avance]');
+    const capas = Array.from(seccion.querySelectorAll<SVGPathElement>('[data-avance]'));
+    const avance = capas[0];
+    const grupoHuellas = seccion.querySelector<SVGGElement>('[data-huellas]');
     const viajero = seccion.querySelector<SVGGElement>('[data-viajero]');
     const n = paneles.length;
     const mm = gsap.matchMedia();
@@ -291,7 +345,25 @@ const confeti = Array.from({ length: 16 }, (_, k) => ({ a: (k / 16) * 360 + (k %
       const inicio = enCamino[0];
       const fin = enCamino[n - 1];
       const fracciones = enCamino.map((l) => (l - inicio) / (fin - inicio));
-      avance.style.strokeDasharray = `${largo}`;
+      capas.forEach((c) => (c.style.strokeDasharray = `${largo}`));
+      // Huellas a lo largo del camino, alternando izquierda y derecha, orientadas hacia donde camina el jaguar
+      const huellas: { el: SVGUseElement; l: number }[] = [];
+      if (grupoHuellas && !grupoHuellas.childElementCount) {
+        let lado = 1;
+        for (let l = inicio + 26; l < fin - 20; l += 26) {
+          const p = avance.getPointAtLength(l);
+          const q = avance.getPointAtLength(l + 1);
+          const ang = Math.atan2(q.y - p.y, q.x - p.x);
+          const ox = -Math.sin(ang) * 9 * lado;
+          const oy = Math.cos(ang) * 9 * lado;
+          const u = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+          u.setAttribute('href', '#huella-jaguar');
+          u.setAttribute('transform', `translate(${p.x + ox} ${p.y + oy}) rotate(${(ang * 180) / Math.PI + 90}) scale(0.9)`);
+          grupoHuellas.appendChild(u);
+          huellas.push({ el: u, l });
+          lado = -lado;
+        }
+      }
 
       const estela = Array.from(seccion.querySelectorAll<SVGCircleElement>('[data-estela]'));
       const brotes = Array.from(seccion.querySelectorAll<HTMLElement>('[data-brotes]'));
@@ -300,7 +372,8 @@ const confeti = Array.from({ length: 16 }, (_, k) => ({ a: (k / 16) * 360 + (k %
       let activo = -1;
       const pintar = (p: number) => {
         const l = inicio + p * (fin - inicio);
-        avance.style.strokeDashoffset = `${largo - l}`;
+        capas.forEach((c) => (c.style.strokeDashoffset = `${largo - l}`));
+        huellas.forEach((h) => h.el.classList.toggle('pisada', h.l < l - 30));
         const punto = avance.getPointAtLength(l);
         viajero.setAttribute('transform', `translate(${punto.x} ${punto.y})`);
         // Estela tipo cometa detrás del jaguar

@@ -1,0 +1,30 @@
+---
+// Orillas bordadas a los lados de una sección, por fuera del contenido. Solo en pantallas anchas
+// (desde 1440 px), donde sobra espacio; en celular y laptops chicas no se muestran.
+// La sección que la usa debe ser "relative".
+interface Props {
+  class?: string;
+}
+const { class: clase = '' } = Astro.props;
+---
+<div class:list={['orillas-laterales pointer-events-none absolute inset-y-0 left-1/2 -z-10 w-screen -translate-x-1/2', clase]} aria-hidden="true">
+  <img src="/img/istmo/bordado-columna.webp" alt="" width="241" height="520" loading="lazy" decoding="async" class="orilla-lateral izq absolute left-0 top-1/2 h-[min(100%,34rem)] w-auto -translate-y-1/2" />
+  <img src="/img/istmo/bordado-columna-2.webp" alt="" width="250" height="520" loading="lazy" decoding="async" class="orilla-lateral der absolute right-0 top-1/2 h-[min(100%,34rem)] w-auto -translate-y-1/2" />
+</div>
+
+<style>
+  .orillas-laterales { display: none; overflow: hidden; }
+  @media (min-width: 1440px) { .orillas-laterales { display: block; } }
+  .orilla-lateral { opacity: 0.3; -webkit-mask-composite: source-in; mask-composite: intersect; animation: respira-orilla 8s ease-in-out infinite; }
+  .izq {
+    -webkit-mask-image: linear-gradient(to right, #000 30%, transparent), linear-gradient(transparent, #000 18%, #000 82%, transparent);
+    mask-image: linear-gradient(to right, #000 30%, transparent), linear-gradient(transparent, #000 18%, #000 82%, transparent);
+  }
+  .der {
+    -webkit-mask-image: linear-gradient(to left, #000 30%, transparent), linear-gradient(transparent, #000 18%, #000 82%, transparent);
+    mask-image: linear-gradient(to left, #000 30%, transparent), linear-gradient(transparent, #000 18%, #000 82%, transparent);
+    animation-delay: -4s;
+  }
+  @keyframes respira-orilla { 50% { opacity: 0.45; } }
+  @media (prefers-reduced-motion: reduce) { .orilla-lateral { animation: none; } }
+</style>

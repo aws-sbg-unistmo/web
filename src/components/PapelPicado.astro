@@ -1,6 +1,6 @@
 ---
 // Papel picado holográfico: banderitas de colores recortadas con flor, nube, código y grecas,
-// colgadas de un hilo de luz. Se mecen con el viento (del Istmo) y brillan. Decorativo.
+// colgadas de un hilo de luz que se vence en el centro, como en las fiestas. Se mecen con el viento (del Istmo) y brillan. Decorativo.
 interface Props {
   cantidad?: number;
   class?: string;
@@ -9,14 +9,30 @@ const { cantidad = 14, class: clase = '' } = Astro.props;
 const uid = Math.random().toString(36).slice(2, 8);
 const colores = ['var(--color-magenta)', 'var(--color-morado)', 'var(--color-azul)', 'var(--color-menta)', 'var(--color-naranja)'];
 const figuras = ['flor', 'nube', 'codigo', 'greca'] as const;
-const banderas = Array.from({ length: cantidad }, (_, i) => ({ c: colores[i % colores.length], f: figuras[i % figuras.length], i }));
+// Caída del hilo: las banderas del centro cuelgan más abajo (parábola de 0 a «caida» px)
+const caida = 18;
+const banderas = Array.from({ length: cantidad }, (_, i) => {
+  const t = cantidad > 1 ? i / (cantidad - 1) : 0.5;
+  return { c: colores[i % colores.length], f: figuras[i % figuras.length], i, y: Math.round(4 * caida * t * (1 - t) * 10) / 10 };
+});
 const borde = 'M0 0 H60 V64 L55 70 L50 64 L45 70 L40 64 L35 70 L30 64 L25 70 L20 64 L15 70 L10 64 L5 70 L0 64 Z';
 ---
 <div class:list={['papel-picado relative', clase]} aria-hidden="true">
-  <span class="hilo absolute inset-x-0 top-0 h-[2px]"></span>
+  <svg class="hilo absolute inset-x-0 top-0 h-6 w-full overflow-visible" viewBox="0 0 100 24" preserveAspectRatio="none">
+    <defs>
+      <linearGradient id={`hilo-${uid}`} x1="0" x2="1">
+        <stop offset="0" stop-color="var(--color-magenta)" stop-opacity="0" />
+        <stop offset="0.15" stop-color="var(--color-magenta)" />
+        <stop offset="0.5" stop-color="var(--color-azul)" />
+        <stop offset="0.85" stop-color="var(--color-magenta)" />
+        <stop offset="1" stop-color="var(--color-magenta)" stop-opacity="0" />
+      </linearGradient>
+    </defs>
+    <path d={`M0 1 Q50 ${1 + 2 * caida} 100 1`} fill="none" stroke={`url(#hilo-${uid})`} stroke-width="2" vector-effect="non-scaling-stroke" />
+  </svg>
   <ul class="flex justify-between gap-1 px-2">
     {banderas.map((b) => (
-      <li class:list={['bandera', `b-${b.i}`]} style={`--c:${b.c};--i:${b.i}`}>
+      <li class:list={['bandera', `b-${b.i}`]} style={`--c:${b.c};--i:${b.i};--y:${b.y}px`}>
         <svg viewBox="0 0 60 72" class="h-full w-full">
           <defs>
             <mask id={`pp-${uid}-${b.i}`}>
@@ -55,12 +71,13 @@ const borde = 'M0 0 H60 V64 L55 70 L50 64 L45 70 L40 64 L35 70 L30 64 L25 70 L20
 </div>
 
 <style>
-  .papel-picado { height: 4.5rem; }
-  .hilo { background: linear-gradient(90deg, transparent, var(--color-magenta), var(--color-azul), var(--color-magenta), transparent); box-shadow: 0 0 10px var(--color-magenta); }
-  .papel-picado ul { height: 100%; }
+  .papel-picado { height: 5.75rem; }
+  .hilo { filter: drop-shadow(0 0 5px var(--color-magenta)); }
+  .papel-picado ul { height: 4.5rem; }
   .bandera {
     width: clamp(2.2rem, 5vw, 3.6rem);
     height: 100%;
+    translate: 0 var(--y);
     transform-origin: 50% 0;
     animation: mecer 3.2s ease-in-out infinite alternate;
     animation-delay: calc(var(--i) * -0.41s);
@@ -71,7 +88,8 @@ const borde = 'M0 0 H60 V64 L55 70 L50 64 L45 70 L40 64 L35 70 L30 64 L25 70 L20
   @keyframes brillo-tela { 50% { opacity: 0.55; } }
   /* En celular caben menos banderas */
   @media (max-width: 639px) {
-    .papel-picado { height: 3.6rem; }
-    .bandera:nth-child(n + 8) { display: none; }
+    .papel-picado { height: 4.75rem; }
+    .papel-picado ul { height: 3.6rem; }
+    .bandera:nth-child(even) { display: none; }
   }
 </style>

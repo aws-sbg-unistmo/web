@@ -1,19 +1,37 @@
 ---
 // Voluntariado: personas que ayudan al grupo con su tiempo. Rol sin beneficios, se dice claro en la página.
+// Escenario con brillos y orillas bordadas; las tarjetas entran en orden, lo que «no reciben» se tacha solo
+// y el jaguar choca el puño junto a la invitación.
 import Icono from './Icono.astro';
 import LogoRed from './LogoRed.astro';
 import Palabras from './Palabras.astro';
+import OrillasLaterales from './OrillasLaterales.astro';
 import { voluntarios, site } from '../data/site';
 
 const nombreRed: Record<string, string> = { linkedin: 'LinkedIn', github: 'GitHub', instagram: 'Instagram', tiktok: 'TikTok', facebook: 'Facebook', youtube: 'YouTube', x: 'X', web: 'Sitio web' };
 const hacen = [
-  { icono: 'taller', t: 'Apoyan en talleres', d: 'Ayudan a resolver dudas mientras construimos.' },
-  { icono: 'usuarios', t: 'Acompañan a quien empieza', d: 'Comparten lo que saben con paciencia.' },
-  { icono: 'microfono', t: 'Difunden el grupo', d: 'Invitan y cuentan lo que hacemos.' },
+  { icono: 'taller', t: 'Apoyan en talleres', d: 'Ayudan a resolver dudas mientras construimos.', c: 'var(--color-magenta)' },
+  { icono: 'usuarios', t: 'Acompañan a quien empieza', d: 'Comparten lo que saben con paciencia.', c: 'var(--color-morado)' },
+  { icono: 'microfono', t: 'Difunden el grupo', d: 'Invitan y cuentan lo que hacemos.', c: 'var(--color-azul)' },
 ];
 const noReciben = ['Pago o sueldo', 'Créditos de AWS', 'Premios o regalos', 'Puntos o ventajas en el programa'];
+const corazones = [
+  { x: 12, d: 0, s: 1, c: 'var(--color-magenta)' },
+  { x: 30, d: 1.6, s: 0.7, c: 'var(--color-naranja)' },
+  { x: 55, d: 0.8, s: 0.85, c: 'var(--color-morado)' },
+  { x: 74, d: 2.4, s: 0.6, c: 'var(--color-menta)' },
+  { x: 88, d: 1.2, s: 0.75, c: 'var(--color-azul)' },
+];
 ---
-<section id="voluntariado" class="mx-auto mt-28 max-w-7xl px-5">
+<section id="voluntariado" class="voluntariado relative mx-auto mt-28 max-w-7xl px-5">
+  <!-- Escenario: brillos, rejilla y orillas bordadas a los lados -->
+  <div class="pointer-events-none absolute inset-x-0 -inset-y-10 -z-10" aria-hidden="true">
+    <span class="absolute -left-24 -top-24 size-96 rounded-full bg-magenta/15 blur-3xl"></span>
+    <span class="absolute -bottom-32 -right-20 size-[28rem] rounded-full bg-naranja/10 blur-3xl"></span>
+    <span class="rejilla absolute inset-0 opacity-20 [mask-image:radial-gradient(ellipse_at_center,#000,transparent_70%)]"></span>
+  </div>
+  <OrillasLaterales />
+
   <div class="grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:items-start">
     <div>
       <p class="chip" data-reveal>// Voluntariado</p>
@@ -23,20 +41,23 @@ const noReciben = ['Pago o sueldo', 'Créditos de AWS', 'Premios o regalos', 'Pu
         pueden y como pueden.
       </p>
 
-      <ul class="mt-8 grid gap-3 sm:grid-cols-3" data-stagger>
-        {hacen.map((h) => (
-          <li class="tarjeta p-5">
-            <span class="grid size-10 place-items-center rounded-xl bg-magenta/12 text-magenta"><Icono nombre={h.icono} class="size-5" /></span>
-            <h3 class="titulo mt-4 font-semibold">{h.t}</h3>
-            <p class="mt-1 text-sm leading-relaxed">{h.d}</p>
+      <ul class="hacen mt-8 grid gap-3 sm:grid-cols-3" data-en-vista>
+        {hacen.map((h, i) => (
+          <li class="hace tarjeta group relative overflow-hidden p-5" style={`--c:${h.c};--i:${i}`}>
+            <span class="hace-luz pointer-events-none absolute -right-10 -top-10 size-28 rounded-full blur-2xl" aria-hidden="true"></span>
+            <span class="hace-icono relative grid size-11 place-items-center rounded-xl"><Icono nombre={h.icono} class="size-5" /></span>
+            <h3 class="titulo relative mt-4 font-semibold">{h.t}</h3>
+            <p class="relative mt-1 text-sm leading-relaxed">{h.d}</p>
+            <span class="hace-linea absolute inset-x-0 bottom-0 h-[3px]" aria-hidden="true"></span>
           </li>
         ))}
       </ul>
 
       <!-- Aviso: rol sin beneficios -->
-      <div class="aviso-voluntario relative mt-8 overflow-hidden rounded-3xl p-6 md:p-7" data-reveal>
+      <div class="aviso-voluntario relative mt-8 overflow-hidden rounded-3xl p-6 pt-8 md:p-7 md:pt-9" data-en-vista>
+        <span class="cinta-aviso absolute inset-x-0 top-0 h-2" aria-hidden="true"></span>
         <div class="flex items-start gap-4">
-          <span class="grid size-11 shrink-0 place-items-center rounded-2xl bg-naranja/15 text-naranja"><Icono nombre="alerta" class="size-6" /></span>
+          <span class="icono-aviso grid size-11 shrink-0 place-items-center rounded-2xl bg-naranja/15 text-naranja"><Icono nombre="alerta" class="size-6" /></span>
           <div>
             <h3 class="titulo text-xl font-semibold">Es un rol sin beneficios</h3>
             <p class="mt-2 text-sm leading-relaxed">
@@ -44,13 +65,16 @@ const noReciben = ['Pago o sueldo', 'Créditos de AWS', 'Premios o regalos', 'Pu
               AWS Student Builder Group UNISTMO ni de Amazon Web Services:
             </p>
             <ul class="mt-4 flex flex-wrap gap-2">
-              {noReciben.map((n) => (
-                <li class="inline-flex items-center gap-1.5 rounded-full border border-linea bg-marino/60 px-3 py-1.5 text-xs text-white">
-                  <span class="text-naranja" aria-hidden="true">✕</span>{n}
+              {noReciben.map((n, i) => (
+                <li class="no-recibe inline-flex items-center gap-1.5 rounded-full border border-linea bg-marino/60 px-3 py-1.5 text-xs text-white" style={`--i:${i}`}>
+                  <span class="equis text-naranja" aria-hidden="true">✕</span><span class="tachado relative">{n}</span>
                 </li>
               ))}
             </ul>
-            <p class="mt-4 text-sm leading-relaxed">Lo que sí se llevan: aprender enseñando y una comunidad que lo agradece.</p>
+            <p class="mt-4 flex items-center gap-2 text-sm leading-relaxed">
+              <Icono nombre="corazon" class="latido size-4 shrink-0 text-magenta" />
+              Lo que sí se llevan: aprender enseñando y una comunidad que lo agradece.
+            </p>
           </div>
         </div>
       </div>
@@ -58,62 +82,142 @@ const noReciben = ['Pago o sueldo', 'Créditos de AWS', 'Premios o regalos', 'Pu
 
     <div class="space-y-6">
       {voluntarios.map((v) => (
-        <article class="voluntario tarjeta relative overflow-hidden p-6" data-reveal>
-          <div class="flex items-center gap-5">
-            {v.fotos?.[0] && (
-              <span class="relative shrink-0">
-                <span class="anillo-voluntario absolute -inset-1.5 rounded-full" aria-hidden="true"></span>
-                <img src={v.fotos[0]} alt={`Foto de ${v.nombre}`} width="400" height="500" loading="lazy" class="relative size-24 rounded-full object-cover ring-4 ring-marino" />
-              </span>
-            )}
-            <div>
-              <span class="insignia" style="--color-insignia:var(--color-naranja)">{v.rol}</span>
-              <h3 class="titulo mt-2 text-2xl font-bold">{v.nombre}</h3>
-              {v.carrera && <p class="mt-1 text-sm text-suave/80">{v.carrera}</p>}
+        <article class="voluntario relative rounded-3xl p-px" data-reveal>
+          <span class="borde-voluntario absolute inset-0 rounded-3xl" aria-hidden="true"></span>
+          <div class="relative overflow-hidden rounded-[calc(1.5rem-1px)] bg-marino-2 p-6 md:p-7">
+            <span class="pointer-events-none absolute -right-16 -top-16 size-48 rounded-full bg-naranja/10 blur-3xl" aria-hidden="true"></span>
+            <div class="relative flex items-center gap-5">
+              {v.fotos?.[0] && (
+                <span class="relative shrink-0">
+                  <span class="anillo-voluntario absolute -inset-1.5 rounded-full" aria-hidden="true"></span>
+                  <img src={v.fotos[0]} alt={`Foto de ${v.nombre}`} width="400" height="500" loading="lazy" class="relative size-24 rounded-full object-cover ring-4 ring-marino-2" />
+                  <span class="absolute -bottom-1 -right-1 grid size-8 place-items-center rounded-full bg-magenta text-marino ring-4 ring-marino-2" aria-hidden="true"><Icono nombre="corazon" class="latido size-4" /></span>
+                </span>
+              )}
+              <div>
+                <span class="insignia" style="--color-insignia:var(--color-naranja)">{v.rol}</span>
+                <h3 class="titulo mt-2 text-2xl font-bold">{v.nombre}</h3>
+                {v.carrera && <p class="mt-1 text-sm text-suave/80">{v.carrera}</p>}
+              </div>
             </div>
+            {v.descripcion && <p class="relative mt-5 leading-relaxed">{v.descripcion}</p>}
+            {v.redes && v.redes.length > 0 && (
+              <ul class="relative mt-5 flex flex-wrap gap-2" data-redes>
+                {v.redes.map((r) => (
+                  <li>
+                    <a href={r.url} target="_blank" rel="noopener" class="red-animada inline-flex items-center gap-2 rounded-full border border-linea bg-marino/60 py-1.5 pl-1.5 pr-3.5 text-sm text-suave hover:text-white" aria-label={`${nombreRed[r.tipo]} de ${v.nombre}`}>
+                      <LogoRed red={r.tipo} class="size-7" />
+                      {nombreRed[r.tipo]}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
-          {v.descripcion && <p class="mt-5 leading-relaxed">{v.descripcion}</p>}
-          {v.redes && v.redes.length > 0 && (
-            <ul class="mt-5 flex flex-wrap gap-2" data-redes>
-              {v.redes.map((r) => (
-                <li>
-                  <a href={r.url} target="_blank" rel="noopener" class="red-animada inline-flex items-center gap-2 rounded-full border border-linea bg-marino/60 py-1.5 pl-1.5 pr-3.5 text-sm text-suave hover:text-white" aria-label={`${nombreRed[r.tipo]} de ${v.nombre}`}>
-                    <LogoRed red={r.tipo} class="size-7" />
-                    {nombreRed[r.tipo]}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          )}
         </article>
       ))}
 
-      <a href="/contacto/?motivo=voluntariado" class="voluntario-cta tarjeta group flex items-center justify-between gap-4 p-6" data-reveal>
-        <span>
-          <span class="titulo block text-lg font-semibold text-white">¿Quieres ser voluntario?</span>
+      <!-- Invitación: el jaguar choca el puño y suben corazones -->
+      <a href="/contacto/?motivo=voluntariado" class="invitacion-vol tarjeta group relative block p-6 md:p-7" data-reveal>
+        <span class="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]" aria-hidden="true">
+          {corazones.map((c) => (
+            <span class="corazon-sube absolute bottom-0" style={`left:${c.x}%;--d:${c.d}s;--s:${c.s};color:${c.c}`}><Icono nombre="corazon" class="size-5" /></span>
+          ))}
+        </span>
+        <span class:list={['relative block', site.usarMascota && 'sm:pr-32']}>
+          <span class="titulo block text-xl font-semibold text-white">¿Quieres ser voluntario?</span>
           <span class="mt-1 block text-sm">Escríbenos y te contamos cómo ayudar.</span>
+          <span class="boton-vol mt-4 inline-flex items-center gap-2 rounded-full bg-magenta px-4 py-2 text-sm font-semibold text-marino">
+            Quiero ayudar <Icono nombre="flecha" class="size-4 transition-transform group-hover:translate-x-1" />
+          </span>
         </span>
-        <span class="grid size-11 shrink-0 place-items-center rounded-full bg-magenta text-marino transition-transform group-hover:translate-x-1">
-          <Icono nombre="flecha" class="size-5" />
-        </span>
+        {site.usarMascota && (
+          <img src="/img/mascota/sm/23-choca-puno.webp" alt="" width="148" height="300" loading="lazy" class="jaguar-puno absolute bottom-0 right-5 hidden h-48 w-auto sm:block" />
+        )}
       </a>
-      {site.usarMascota && (
-        <img src="/img/mascota/sm/23-choca-puno.webp" alt="" width="148" height="300" loading="lazy" class="mascota-voluntario mx-auto hidden h-40 w-auto lg:block" data-reveal />
-      )}
     </div>
   </div>
 </section>
 
 <style>
+  /* Qué hacen: cada tarjeta con su color, entran en cascada */
+  .hace { transition: border-color 0.4s ease, translate 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .hace:hover { border-color: color-mix(in srgb, var(--c) 55%, transparent); translate: 0 -5px; }
+  .hace-luz { background: var(--c); opacity: 0.12; transition: opacity 0.4s ease; }
+  .hace:hover .hace-luz { opacity: 0.3; }
+  .hace-icono { background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--c); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 35%, transparent); transition: rotate 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), scale 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .hace:hover .hace-icono { rotate: -10deg; scale: 1.12; }
+  .hace-linea { background: linear-gradient(90deg, transparent, var(--c), transparent); transform: scaleX(0.3); transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1); }
+  .hace:hover .hace-linea { transform: scaleX(1); }
+  .hacen.preparado:not(.en-vista) .hace { opacity: 0; }
+  .hacen.en-vista .hace { animation: entra-hace 0.75s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(var(--i) * 0.14s); }
+  @keyframes entra-hace { from { opacity: 0; transform: translateY(30px) rotate(-2deg); } }
+
+  /* Aviso: cinta de precaución que avanza y la lista de lo que no se recibe se tacha sola */
   .aviso-voluntario {
     background: linear-gradient(135deg, color-mix(in srgb, var(--color-naranja) 10%, var(--color-marino-2)), var(--color-marino-2) 60%);
     border: 1px solid color-mix(in srgb, var(--color-naranja) 35%, var(--color-linea));
   }
+  .cinta-aviso {
+    background: repeating-linear-gradient(-45deg, var(--color-naranja) 0 12px, var(--color-marino) 12px 24px);
+    background-size: 34px 100%;
+    opacity: 0.75;
+    animation: avanza-cinta 1.6s linear infinite;
+  }
+  @keyframes avanza-cinta { to { background-position: 34px 0; } }
+  .icono-aviso { animation: alerta 2.8s ease-in-out infinite; }
+  @keyframes alerta { 0%, 70%, 100% { rotate: 0deg; } 75% { rotate: -12deg; } 80% { rotate: 10deg; } 85% { rotate: -6deg; } 90% { rotate: 3deg; } }
+  .tachado::after {
+    content: '';
+    position: absolute;
+    left: -2px;
+    right: -2px;
+    top: 52%;
+    height: 1.5px;
+    background: var(--color-naranja);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  .aviso-voluntario.preparado:not(.en-vista) .no-recibe { opacity: 0; }
+  .aviso-voluntario.en-vista .no-recibe { animation: aparece-chip 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; animation-delay: calc(0.2s + var(--i) * 0.15s); }
+  .aviso-voluntario.en-vista .tachado::after { animation: tachar 0.45s ease-out both; animation-delay: calc(0.75s + var(--i) * 0.2s); }
+  .aviso-voluntario.en-vista .equis { display: inline-block; animation: gira-equis 0.5s ease both; animation-delay: calc(0.75s + var(--i) * 0.2s); }
+  @keyframes aparece-chip { from { opacity: 0; scale: 0.6; } }
+  @keyframes tachar { to { transform: scaleX(1); } }
+  @keyframes gira-equis { from { rotate: -180deg; scale: 0.3; } }
+  .latido { animation: latido 1.4s ease-in-out infinite; }
+  @keyframes latido { 0%, 100% { scale: 1; } 15% { scale: 1.25; } 30% { scale: 1; } 45% { scale: 1.15; } }
+
+  /* Tarjeta del voluntario: borde de colores que gira */
+  @property --giro { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+  .borde-voluntario { background: conic-gradient(from var(--giro), var(--color-naranja), var(--color-magenta), var(--color-morado), var(--color-linea) 55%, var(--color-linea) 80%, var(--color-naranja)); animation: borde-gira 6s linear infinite; }
+  @keyframes borde-gira { to { --giro: 360deg; } }
   .anillo-voluntario {
     background: conic-gradient(from 0deg, var(--color-magenta), var(--color-naranja), var(--color-morado), var(--color-magenta));
     animation: gira-anillo 6s linear infinite;
   }
   @keyframes gira-anillo { to { rotate: 360deg; } }
-  .voluntario { transition: border-color 0.4s ease; }
-  .voluntario:hover { border-color: color-mix(in srgb, var(--color-naranja) 45%, transparent); }
+  .voluntario { transition: translate 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.45s ease; }
+  .voluntario:hover { translate: 0 -4px; filter: drop-shadow(0 24px 40px rgb(255 153 0 / 0.18)); }
+
+  /* Invitación: corazones que suben y el jaguar que choca el puño */
+  .invitacion-vol { background: linear-gradient(120deg, color-mix(in srgb, var(--color-magenta) 14%, var(--color-marino-2)), var(--color-marino-2) 55%); transition: border-color 0.4s ease; }
+  .invitacion-vol:hover { border-color: color-mix(in srgb, var(--color-magenta) 55%, transparent); }
+  .corazon-sube { opacity: 0; scale: var(--s); animation: sube-corazon 5s ease-in infinite; animation-delay: var(--d); }
+  @keyframes sube-corazon {
+    0% { opacity: 0; translate: 0 10px; }
+    15% { opacity: 0.55; }
+    100% { opacity: 0; translate: 12px -150px; rotate: 20deg; }
+  }
+  .boton-vol { box-shadow: 0 10px 30px -10px var(--color-magenta); transition: box-shadow 0.3s ease; }
+  .invitacion-vol:hover .boton-vol { box-shadow: 0 12px 36px -6px var(--color-magenta); }
+  .jaguar-puno { transform-origin: 50% 90%; filter: drop-shadow(0 16px 24px rgb(0 0 0 / 0.5)); animation: respira-jaguar 3s ease-in-out infinite; }
+  .invitacion-vol:hover .jaguar-puno { animation: puno 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  @keyframes respira-jaguar { 50% { translate: 0 -4px; } }
+  @keyframes puno { 40% { scale: 1.12; rotate: -6deg; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cinta-aviso, .icono-aviso, .latido, .borde-voluntario, .anillo-voluntario, .corazon-sube, .jaguar-puno { animation: none; }
+    .tachado::after { transform: scaleX(1); }
+  }
 </style>
