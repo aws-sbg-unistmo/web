@@ -12,6 +12,9 @@ export const site = {
   meetup: 'https://www.meetup.com/aws-sbg-at-university-of-the-isthmus-tehuantepec-campus/',
   correo: 'aws.unistmo@gmail.com',
   github: 'https://github.com/aws-sbg-unistmo',
+  // Invitación a la comunidad de WhatsApp. No caduca mientras nadie la restablezca en WhatsApp; si se restablece,
+  // se cambia aquí y se actualizan el botón, el QR y el enlace corto /whatsapp.
+  whatsapp: 'https://chat.whatsapp.com/HV8T0piGjky8Iq7ttQ7R36',
   // La mascota lleva el logo de AWS en la playera: se usa mientras el Account Manager la apruebe.
   // Para quitarla de toda la página basta con poner false.
   usarMascota: true,

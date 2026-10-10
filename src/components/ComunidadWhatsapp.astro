@@ -1,0 +1,94 @@
+---
+// Comunidad de WhatsApp: botón para unirse y código QR con el logo del grupo al centro.
+// El QR lleva directo el enlace de invitación de la comunidad (site.whatsapp): no caduca mientras ningún admin lo
+// restablezca, y funciona igual con la vista previa de GitHub Pages o con un dominio propio.
+// Si algún día se restablece el enlace en WhatsApp, basta con cambiar site.whatsapp y el QR se regenera al compilar.
+import QRCode from 'qrcode';
+import Icono from './Icono.astro';
+import Palabras from './Palabras.astro';
+import { site } from '../data/site';
+
+interface Props {
+  class?: string;
+}
+const { class: clase = '' } = Astro.props;
+const qr = await QRCode.toString(site.whatsapp, {
+  type: 'svg',
+  errorCorrectionLevel: 'H',
+  margin: 0,
+  color: { dark: '#161d26', light: '#ffffff' },
+});
+const canales = [
+  { emoji: '📢', t: 'Avisos', d: 'Eventos, talleres y convocatorias' },
+  { emoji: '💬', t: 'General', d: 'Dudas, plática y presentaciones' },
+  { emoji: '🚀', t: 'Oportunidades', d: 'Becas, cursos, hackathons y empleos' },
+];
+---
+<section id="comunidad" class:list={['mx-auto max-w-7xl px-5', clase]}>
+  <div class="comunidad-wa relative grid items-center gap-10 overflow-hidden rounded-[2rem] p-7 md:p-12 lg:grid-cols-[1.2fr_auto] lg:gap-16">
+    <span class="pointer-events-none absolute -left-24 -top-24 size-80 rounded-full bg-[#25d366]/15 blur-3xl" aria-hidden="true"></span>
+    <span class="pointer-events-none absolute -bottom-28 right-1/3 size-80 rounded-full bg-magenta/12 blur-3xl" aria-hidden="true"></span>
+    <span class="rejilla pointer-events-none absolute inset-0 opacity-20 [mask-image:radial-gradient(ellipse_at_30%_40%,#000,transparent_70%)]" aria-hidden="true"></span>
+
+    <div class="relative">
+      <p class="chip" data-reveal>// Comunidad</p>
+      <Palabras texto="Únete a la comunidad en WhatsApp" resaltar={['WhatsApp']} class="mt-5 text-4xl font-bold leading-tight md:text-5xl" />
+      <p class="mt-5 max-w-xl text-lg leading-relaxed" data-reveal>
+        Entérate primero de los eventos, pregunta lo que quieras y comparte oportunidades con estudiantes del Istmo.
+        Es gratis y abierta para cualquier carrera.
+      </p>
+      <ul class="mt-7 grid gap-3 sm:grid-cols-3" data-stagger>
+        {canales.map((c) => (
+          <li class="canal-wa rounded-2xl border border-linea bg-marino/60 p-4">
+            <span class="text-2xl" aria-hidden="true">{c.emoji}</span>
+            <p class="titulo mt-2 font-semibold text-white">{c.t}</p>
+            <p class="mt-0.5 text-xs leading-relaxed">{c.d}</p>
+          </li>
+        ))}
+      </ul>
+      <div class="mt-8 flex flex-wrap items-center gap-4" data-reveal>
+        <a href={site.whatsapp} target="_blank" rel="noopener" class="boton-wa inline-flex items-center gap-2.5 rounded-full px-6 py-3.5 font-semibold" data-magnetico>
+          <svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" /></svg>
+          Unirme a la comunidad
+        </a>
+        <p class="text-sm text-suave/80">Al entrar aceptas nuestro <a href="/nosotros/#codigo" class="font-semibold text-white underline underline-offset-4 hover:text-magenta">código de conducta</a>.</p>
+      </div>
+    </div>
+
+    <!-- Código QR -->
+    <div class="relative mx-auto" data-reveal>
+      {site.usarMascota && (
+        <img src="/img/mascota/sm/17-selfie.webp" alt="" width="201" height="300" loading="lazy" class="jaguar-qr pointer-events-none absolute -right-8 -top-24 z-10 hidden h-32 w-auto md:block" />
+      )}
+      <div class="marco-qr relative rounded-[1.75rem] p-[3px]">
+        <div class="relative rounded-[calc(1.75rem-3px)] bg-white p-4 md:p-5">
+          <div class="qr relative size-52 md:size-60" role="img" aria-label="Código QR para unirse a la comunidad de WhatsApp del AWS Student Builder Group UNISTMO">
+            <Fragment set:html={qr} />
+            <img src="/img/logo-192.png" alt="" width="48" height="48" class="absolute left-1/2 top-1/2 size-12 -translate-x-1/2 -translate-y-1/2 rounded-xl ring-4 ring-white md:size-14" />
+          </div>
+        </div>
+      </div>
+      <p class="mt-4 flex items-center justify-center gap-2 text-center font-mono text-xs uppercase tracking-[0.18em] text-suave/80">
+        <Icono nombre="chispa" class="size-3.5 text-[#25d366]" /> Escanéalo con tu celular
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .comunidad-wa {
+    background: linear-gradient(135deg, color-mix(in srgb, #25d366 9%, var(--color-marino-2)), var(--color-marino-2) 55%);
+    border: 1px solid color-mix(in srgb, #25d366 30%, var(--color-linea));
+  }
+  .qr :global(svg) { width: 100%; height: 100%; display: block; }
+  .marco-qr { background: conic-gradient(from var(--giro-qr), #25d366, var(--color-magenta), var(--color-morado), var(--color-azul), #25d366); animation: gira-qr 6s linear infinite; box-shadow: 0 30px 70px -30px #25d366; }
+  @property --giro-qr { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+  @keyframes gira-qr { to { --giro-qr: 360deg; } }
+  .boton-wa { background: #25d366; color: #0b1a10; box-shadow: 0 12px 34px -12px #25d366; transition: box-shadow 0.3s ease, translate 0.3s ease; }
+  .boton-wa:hover { box-shadow: 0 16px 40px -8px #25d366; translate: 0 -2px; }
+  .canal-wa { transition: border-color 0.3s ease, translate 0.3s ease; }
+  .canal-wa:hover { border-color: color-mix(in srgb, #25d366 50%, transparent); translate: 0 -3px; }
+  .jaguar-qr { filter: drop-shadow(0 16px 24px rgb(0 0 0 / 0.5)); animation: selfie 3.4s ease-in-out infinite; transform-origin: 50% 100%; }
+  @keyframes selfie { 50% { rotate: -4deg; translate: 0 -4px; } }
+  @media (prefers-reduced-motion: reduce) { .marco-qr, .jaguar-qr { animation: none; } }
+</style>

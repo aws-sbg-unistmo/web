@@ -10,7 +10,7 @@ export default defineConfig({
   trailingSlash: 'ignore',
   build: { format: 'directory' },
   // El sitemap solo se genera cuando se conoce la URL pública (SITE_URL)
-  integrations: process.env.SITE_URL ? [sitemap({ filter: (pagina) => !pagina.includes('/404') })] : [],
+  integrations: process.env.SITE_URL ? [sitemap({ filter: (pagina) => !pagina.includes('/404') && !pagina.includes('/whatsapp') })] : [],
   vite: {
     plugins: [tailwindcss()],
   },

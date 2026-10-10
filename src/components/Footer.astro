@@ -55,9 +55,14 @@ const columnas = [
       <a href={`mailto:${site.correo}`} class="mt-2 inline-flex items-center gap-2 text-sm text-white hover:text-magenta">
         <Icono nombre="correo" class="size-4 text-magenta" /> {site.correo}
       </a>
-      <a href={site.meetup} target="_blank" rel="noopener" class="boton boton-primario mt-6 px-5! py-3! text-sm">
-        Únete en Meetup <Icono nombre="externo" class="size-4" />
-      </a>
+      <div class="mt-6 flex flex-wrap gap-3">
+        <a href={site.meetup} target="_blank" rel="noopener" class="boton boton-primario px-5! py-3! text-sm">
+          Únete en Meetup <Icono nombre="externo" class="size-4" />
+        </a>
+        <a href={site.whatsapp} target="_blank" rel="noopener" class="boton boton-secundario px-5! py-3! text-sm">
+          Comunidad de WhatsApp <Icono nombre="externo" class="size-4" />
+        </a>
+      </div>
     </div>
 
     {columnas.map((c) => {

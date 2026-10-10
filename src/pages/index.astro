@@ -10,6 +10,7 @@ import EventoTarjeta from '../components/EventoTarjeta.astro';
 import Arquitectura from '../components/Arquitectura.astro';
 import Preguntas from '../components/Preguntas.astro';
 import LlamadoFinal from '../components/LlamadoFinal.astro';
+import ComunidadWhatsapp from '../components/ComunidadWhatsapp.astro';
 import Ruta from '../components/Ruta.astro';
 import Temas from '../components/Temas.astro';
 import RegionMexico from '../components/RegionMexico.astro';
@@ -267,6 +268,8 @@ const preguntas = [
       <Preguntas preguntas={preguntas} />
     </div>
   </section>
+
+  <ComunidadWhatsapp class="mt-28 md:mt-32" />
 
   <LlamadoFinal />
 </Layout>

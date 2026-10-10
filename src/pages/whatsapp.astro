@@ -1,0 +1,23 @@
+---
+// Enlace corto para compartir: /whatsapp lleva a la comunidad de WhatsApp (site.whatsapp).
+// Si se restablece la invitación en WhatsApp, solo se cambia site.whatsapp y este enlace sigue sirviendo.
+import { site } from '../data/site';
+---
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <meta http-equiv="refresh" content={`0; url=${site.whatsapp}`} />
+    <title>Comunidad de WhatsApp · {site.corto}</title>
+    <style>
+      body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #161d26; color: #c9ccd1; font: 16px system-ui, sans-serif; text-align: center; }
+      a { color: #25d366; font-weight: 600; }
+    </style>
+  </head>
+  <body>
+    <p>Te estamos llevando a la comunidad de WhatsApp del {site.nombre}.<br /><a href={site.whatsapp}>Toca aquí si no se abre</a>.</p>
+    <script is:inline define:vars={{ destino: site.whatsapp }}>location.replace(destino);</script>
+  </body>
+</html>
