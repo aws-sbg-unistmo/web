@@ -43,11 +43,14 @@ const cloudinary = (url?: string, carpeta = 'aws-sbg-unistmo', cloud = cuentaDel
       datos = { cloud_name: hostname, api_key: decodeURIComponent(username), api_secret: decodeURIComponent(password) };
     } else if (/^[A-Za-z0-9_-]{20,}$/.test(valor)) {
       datos = { cloud_name: cloud, api_key: key, api_secret: valor };
+      // La librería de Cloudinary lee CLOUDINARY_URL al cargarse y exige el formato completo: se lo armamos
+      process.env.CLOUDINARY_URL = `cloudinary://${key}:${valor}@${cloud}`;
     } else {
       throw new Error('formato');
     }
   } catch {
     console.warn('CLOUDINARY_URL no es ni cloudinary://<key>:<secret>@<cloud> ni un API Secret; las imágenes se guardan en el disco.');
+    delete process.env.CLOUDINARY_URL;
     return {};
   }
   const opciones = { folder: carpeta };
