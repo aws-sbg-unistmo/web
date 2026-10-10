@@ -1,0 +1,109 @@
+---
+// La lotería del jaguar: las poses de la mascota como cartas de lotería, en una cinta que avanza sola.
+// Se detiene al pasar el cursor; con movimiento reducido queda como carrusel que se desliza a mano.
+import Palabras from './Palabras.astro';
+import { site } from '../data/site';
+
+const cartas = [
+  { pose: '13-programando', nombre: 'El Programador', w: 246 },
+  { pose: '22-totopo', nombre: 'El Totopo', w: 188 },
+  { pose: '14-pizarra', nombre: 'El Maestro', w: 256 },
+  { pose: '20-seguridad', nombre: 'El Guardián', w: 207 },
+  { pose: '17-selfie', nombre: 'La Selfie', w: 201 },
+  { pose: '06-nube-brillante', nombre: 'La Nube', w: 171 },
+  { pose: '16-megafono', nombre: 'El Pregonero', w: 209 },
+  { pose: '19-dormido', nombre: 'El Desvelado', w: 304 },
+  { pose: '21-realidad-virtual', nombre: 'El Visionario', w: 197 },
+  { pose: '07-sentado-en-servidor', nombre: 'El Servidor', w: 188 },
+  { pose: '15-trofeo', nombre: 'El Campeón', w: 210 },
+  { pose: '18-mochila', nombre: 'El Estudiante', w: 190 },
+  { pose: '23-choca-puno', nombre: 'El Compa', w: 148 },
+  { pose: '12-audifonos', nombre: 'El Sonidero', w: 194 },
+  { pose: '24-senalando', nombre: 'El Guía', w: 182 },
+  { pose: '08-leyendo', nombre: 'El Lector', w: 248 },
+];
+const colores = ['var(--color-magenta)', 'var(--color-naranja)', 'var(--color-morado)', 'var(--color-menta)', 'var(--color-azul)'];
+const fila = [...cartas, ...cartas];
+---
+{site.usarMascota && (
+  <section id="mascota" class="mt-28">
+    <div class="mx-auto max-w-7xl px-5">
+      <div class="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
+        <div class="max-w-3xl">
+          <p class="chip" data-reveal>// Nuestra mascota</p>
+          <Palabras texto="La lotería del jaguar" resaltar={['jaguar']} class="mt-5 text-4xl font-bold leading-tight md:text-5xl" />
+          <p class="mt-5 text-lg leading-relaxed" data-reveal>
+            Nuestro jaguar viste guayabera con flores bordadas, como los trajes del Istmo, y vive entre servidores.
+            Lo vas a ver en talleres, eventos y redes. ¿Cuál carta eres tú?
+          </p>
+        </div>
+        <p class="font-mono text-sm text-suave/70" data-reveal>{cartas.length} cartas · y contando</p>
+      </div>
+    </div>
+
+    <div class="loteria relative mt-12 overflow-hidden py-6">
+      <div class="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-marino to-transparent md:w-32"></div>
+      <div class="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-marino to-transparent md:w-32"></div>
+      <ul class="pista-loteria flex w-max" role="list">
+        {fila.map((c, i) => {
+          const n = i % cartas.length;
+          return (
+            <li class="mr-5 shrink-0" aria-hidden={i >= cartas.length ? 'true' : undefined} style={`--c:${colores[n % colores.length]};--giro:${n % 2 ? 2 : -2}deg`}>
+              <figure class="carta relative flex h-72 w-48 flex-col rounded-2xl p-2.5">
+                <div class="carta-marco relative flex flex-1 flex-col overflow-hidden rounded-xl">
+                  <span class="carta-num titulo absolute left-2.5 top-2 text-xl font-bold">{String(n + 1).padStart(2, '0')}</span>
+                  <span class="carta-flor absolute right-2.5 top-2.5" aria-hidden="true">
+                    <svg viewBox="-12 -12 24 24" class="size-5"><g fill="var(--c)">{[0, 60, 120, 180, 240, 300].map((r) => <ellipse cx="0" cy="-6" rx="2.6" ry="5" transform={`rotate(${r})`} />)}</g><circle r="2.6" fill="var(--color-marino)" /></svg>
+                  </span>
+                  <img src={`/img/mascota/sm/${c.pose}.webp`} alt={i < cartas.length ? `El jaguar del grupo: ${c.nombre}` : ''} width={c.w} height="300" loading="lazy" class="carta-img mx-auto mt-8 h-44 w-auto max-w-[92%] object-contain" />
+                  <figcaption class="carta-nombre titulo mt-auto py-2.5 text-center text-sm font-bold uppercase tracking-[0.14em]">{c.nombre}</figcaption>
+                </div>
+              </figure>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  </section>
+)}
+
+<style>
+  .pista-loteria { animation: avanza-loteria 70s linear infinite; }
+  .loteria:hover .pista-loteria { animation-play-state: paused; }
+  @keyframes avanza-loteria { to { transform: translateX(-50%); } }
+
+  /* La carta: borde de color como las de lotería, papel oscuro con rejilla y el jaguar al centro */
+  .carta {
+    background: var(--c);
+    rotate: var(--giro);
+    box-shadow: 0 18px 40px -22px var(--c);
+    transition: rotate 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), translate 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.5s ease;
+  }
+  .carta:hover { rotate: 0deg; translate: 0 -10px; box-shadow: 0 28px 60px -20px var(--c); }
+  .carta-marco {
+    background:
+      radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--c) 28%, transparent), transparent 65%),
+      linear-gradient(var(--color-marino-2), var(--color-marino));
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, #fff 10%, transparent);
+  }
+  .carta-marco::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(color-mix(in srgb, var(--c) 12%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--c) 12%, transparent) 1px, transparent 1px);
+    background-size: 16px 16px;
+    mask-image: radial-gradient(circle at 50% 40%, #000, transparent 70%);
+  }
+  .carta-num { color: var(--c); }
+  .carta-flor { animation: gira-carta 9s linear infinite; }
+  @keyframes gira-carta { to { rotate: 360deg; } }
+  .carta-img { position: relative; filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.45)); transition: scale 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .carta:hover .carta-img { scale: 1.08; }
+  .carta-nombre { position: relative; color: #fff; background: color-mix(in srgb, var(--c) 22%, var(--color-marino)); border-top: 1px solid color-mix(in srgb, var(--c) 45%, transparent); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .loteria { overflow-x: auto; }
+    .pista-loteria { animation: none; padding-inline: 1.25rem; }
+    .carta-flor { animation: none; }
+  }
+</style>

@@ -119,11 +119,16 @@ const equipoLocal: Integrante[] = [
       { tipo: 'instagram', url: 'https://www.instagram.com/joangarfias_/' },
     ],
   },
+  { nombre: 'Gerónimo', rol: 'Core Team' },
+];
+
+// Voluntarios: ayudan con su tiempo y conocimiento. Es un rol sin beneficios (ver Nosotros → Voluntariado).
+export const voluntarios: Integrante[] = [
   {
     nombre: 'Jeovani Pacheco Rueda',
-    rol: 'Core Team',
-    descripcion: 'Programador full stack en Onexo y estudiante de la UNISTMO en Tehuantepec.',
-    ficha: [{ titulo: 'Especialidad', items: ['Full stack'] }],
+    rol: 'Voluntario',
+    carrera: 'Programador full stack',
+    descripcion: 'Programador full stack en Onexo y estudiante de la UNISTMO en Tehuantepec. Apoya en los talleres y en los proyectos del grupo.',
     fotos: ['/img/equipo/jeovani.webp'],
     redes: [
       { tipo: 'linkedin', url: 'https://www.linkedin.com/in/jeovanipacheco/' },
@@ -131,7 +136,6 @@ const equipoLocal: Integrante[] = [
       { tipo: 'instagram', url: 'https://www.instagram.com/jeovanipachecobautista/' },
     ],
   },
-  { nombre: 'Gerónimo', rol: 'Core Team' },
 ];
 
 // Comunidades, empresas e instituciones aliadas. Con la lista vacía la página muestra cómo ser aliado.

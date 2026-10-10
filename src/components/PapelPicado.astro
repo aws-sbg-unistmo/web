@@ -1,0 +1,77 @@
+---
+// Papel picado holográfico: banderitas de colores recortadas con flor, nube, código y grecas,
+// colgadas de un hilo de luz. Se mecen con el viento (del Istmo) y brillan. Decorativo.
+interface Props {
+  cantidad?: number;
+  class?: string;
+}
+const { cantidad = 14, class: clase = '' } = Astro.props;
+const uid = Math.random().toString(36).slice(2, 8);
+const colores = ['var(--color-magenta)', 'var(--color-morado)', 'var(--color-azul)', 'var(--color-menta)', 'var(--color-naranja)'];
+const figuras = ['flor', 'nube', 'codigo', 'greca'] as const;
+const banderas = Array.from({ length: cantidad }, (_, i) => ({ c: colores[i % colores.length], f: figuras[i % figuras.length], i }));
+const borde = 'M0 0 H60 V64 L55 70 L50 64 L45 70 L40 64 L35 70 L30 64 L25 70 L20 64 L15 70 L10 64 L5 70 L0 64 Z';
+---
+<div class:list={['papel-picado relative', clase]} aria-hidden="true">
+  <span class="hilo absolute inset-x-0 top-0 h-[2px]"></span>
+  <ul class="flex justify-between gap-1 px-2">
+    {banderas.map((b) => (
+      <li class:list={['bandera', `b-${b.i}`]} style={`--c:${b.c};--i:${b.i}`}>
+        <svg viewBox="0 0 60 72" class="h-full w-full">
+          <defs>
+            <mask id={`pp-${uid}-${b.i}`}>
+              <path d={borde} fill="#fff" />
+              <g fill="#000">
+                {[8, 16, 24, 32, 40, 48].map((x) => <circle cx={x + 2} cy="8" r="1.6" />)}
+              </g>
+              {b.f === 'flor' && (
+                <g fill="#000" transform="translate(30 36)">
+                  {[0, 60, 120, 180, 240, 300].map((r) => <ellipse cx="0" cy="-10" rx="4.5" ry="8" transform={`rotate(${r})`} />)}
+                  <circle r="4" fill="#fff" />
+                  <circle r="2" />
+                </g>
+              )}
+              {b.f === 'nube' && (
+                <path fill="#000" d="M19 44 H41 A7 7 0 0 0 41 30 A9.5 9.5 0 0 0 23 31 A6.5 6.5 0 0 0 19 44 Z" />
+              )}
+              {b.f === 'codigo' && (
+                <g fill="none" stroke="#000" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 27 L14 36 L22 45" /><path d="M38 27 L46 36 L38 45" /><path d="M33 24 L27 48" />
+                </g>
+              )}
+              {b.f === 'greca' && (
+                <g fill="#000">
+                  <path d="M12 26 h8 v8 h8 v-8 h8 v8 h8 v-8 h4 v4 h-2 v8 h-8 v-8 h-8 v8 h-8 v-8 h-8 v8 h-2 Z" />
+                  <path d="M30 44 l6 6 l-6 6 l-6 -6 Z" />
+                </g>
+              )}
+            </mask>
+          </defs>
+          <rect width="60" height="72" fill="var(--c)" mask={`url(#pp-${uid}-${b.i})`} class="tela" />
+        </svg>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style>
+  .papel-picado { height: 4.5rem; }
+  .hilo { background: linear-gradient(90deg, transparent, var(--color-magenta), var(--color-azul), var(--color-magenta), transparent); box-shadow: 0 0 10px var(--color-magenta); }
+  .papel-picado ul { height: 100%; }
+  .bandera {
+    width: clamp(2.2rem, 5vw, 3.6rem);
+    height: 100%;
+    transform-origin: 50% 0;
+    animation: mecer 3.2s ease-in-out infinite alternate;
+    animation-delay: calc(var(--i) * -0.41s);
+    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--c) 70%, transparent));
+  }
+  .tela { opacity: 0.82; animation: brillo-tela 4s ease-in-out infinite; animation-delay: calc(var(--i) * -0.6s); }
+  @keyframes mecer { from { rotate: -6deg; } to { rotate: 6deg; } }
+  @keyframes brillo-tela { 50% { opacity: 0.55; } }
+  /* En celular caben menos banderas */
+  @media (max-width: 639px) {
+    .papel-picado { height: 3.6rem; }
+    .bandera:nth-child(n + 8) { display: none; }
+  }
+</style>

@@ -107,36 +107,6 @@
       ]
     },
     {
-      "nombre": "Jeovani Pacheco Rueda",
-      "rol": "Core Team",
-      "descripcion": "Programador full stack en Onexo y estudiante de la UNISTMO en Tehuantepec.",
-      "ficha": [
-        {
-          "titulo": "Especialidad",
-          "items": [
-            "Full stack"
-          ]
-        }
-      ],
-      "fotos": [
-        "datos-iniciales/jeovani.webp"
-      ],
-      "redes": [
-        {
-          "tipo": "linkedin",
-          "url": "https://www.linkedin.com/in/jeovanipacheco/"
-        },
-        {
-          "tipo": "github",
-          "url": "https://github.com/JeovaniPacheco"
-        },
-        {
-          "tipo": "instagram",
-          "url": "https://www.instagram.com/jeovanipachecobautista/"
-        }
-      ]
-    },
-    {
       "nombre": "Gerónimo",
       "rol": "Core Team"
     }

@@ -1,0 +1,119 @@
+---
+// Voluntariado: personas que ayudan al grupo con su tiempo. Rol sin beneficios, se dice claro en la página.
+import Icono from './Icono.astro';
+import LogoRed from './LogoRed.astro';
+import Palabras from './Palabras.astro';
+import { voluntarios, site } from '../data/site';
+
+const nombreRed: Record<string, string> = { linkedin: 'LinkedIn', github: 'GitHub', instagram: 'Instagram', tiktok: 'TikTok', facebook: 'Facebook', youtube: 'YouTube', x: 'X', web: 'Sitio web' };
+const hacen = [
+  { icono: 'taller', t: 'Apoyan en talleres', d: 'Ayudan a resolver dudas mientras construimos.' },
+  { icono: 'usuarios', t: 'Acompañan a quien empieza', d: 'Comparten lo que saben con paciencia.' },
+  { icono: 'microfono', t: 'Difunden el grupo', d: 'Invitan y cuentan lo que hacemos.' },
+];
+const noReciben = ['Pago o sueldo', 'Créditos de AWS', 'Premios o regalos', 'Puntos o ventajas en el programa'];
+---
+<section id="voluntariado" class="mx-auto mt-28 max-w-7xl px-5">
+  <div class="grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:items-start">
+    <div>
+      <p class="chip" data-reveal>// Voluntariado</p>
+      <Palabras texto="Manos que suman por gusto" resaltar={['suman']} class="mt-5 text-4xl font-bold leading-tight md:text-5xl" />
+      <p class="mt-5 max-w-xl text-lg leading-relaxed" data-reveal>
+        Los voluntarios ayudan al grupo con su tiempo y lo que saben. No son parte del Core Team: participan cuando
+        pueden y como pueden.
+      </p>
+
+      <ul class="mt-8 grid gap-3 sm:grid-cols-3" data-stagger>
+        {hacen.map((h) => (
+          <li class="tarjeta p-5">
+            <span class="grid size-10 place-items-center rounded-xl bg-magenta/12 text-magenta"><Icono nombre={h.icono} class="size-5" /></span>
+            <h3 class="titulo mt-4 font-semibold">{h.t}</h3>
+            <p class="mt-1 text-sm leading-relaxed">{h.d}</p>
+          </li>
+        ))}
+      </ul>
+
+      <!-- Aviso: rol sin beneficios -->
+      <div class="aviso-voluntario relative mt-8 overflow-hidden rounded-3xl p-6 md:p-7" data-reveal>
+        <div class="flex items-start gap-4">
+          <span class="grid size-11 shrink-0 place-items-center rounded-2xl bg-naranja/15 text-naranja"><Icono nombre="alerta" class="size-6" /></span>
+          <div>
+            <h3 class="titulo text-xl font-semibold">Es un rol sin beneficios</h3>
+            <p class="mt-2 text-sm leading-relaxed">
+              Ser voluntario es una ayuda desinteresada. Los voluntarios <strong class="text-white">no reciben nada</strong> del
+              AWS Student Builder Group UNISTMO ni de Amazon Web Services:
+            </p>
+            <ul class="mt-4 flex flex-wrap gap-2">
+              {noReciben.map((n) => (
+                <li class="inline-flex items-center gap-1.5 rounded-full border border-linea bg-marino/60 px-3 py-1.5 text-xs text-white">
+                  <span class="text-naranja" aria-hidden="true">✕</span>{n}
+                </li>
+              ))}
+            </ul>
+            <p class="mt-4 text-sm leading-relaxed">Lo que sí se llevan: aprender enseñando y una comunidad que lo agradece.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-6">
+      {voluntarios.map((v) => (
+        <article class="voluntario tarjeta relative overflow-hidden p-6" data-reveal>
+          <div class="flex items-center gap-5">
+            {v.fotos?.[0] && (
+              <span class="relative shrink-0">
+                <span class="anillo-voluntario absolute -inset-1.5 rounded-full" aria-hidden="true"></span>
+                <img src={v.fotos[0]} alt={`Foto de ${v.nombre}`} width="400" height="500" loading="lazy" class="relative size-24 rounded-full object-cover ring-4 ring-marino" />
+              </span>
+            )}
+            <div>
+              <span class="insignia" style="--color-insignia:var(--color-naranja)">{v.rol}</span>
+              <h3 class="titulo mt-2 text-2xl font-bold">{v.nombre}</h3>
+              {v.carrera && <p class="mt-1 text-sm text-suave/80">{v.carrera}</p>}
+            </div>
+          </div>
+          {v.descripcion && <p class="mt-5 leading-relaxed">{v.descripcion}</p>}
+          {v.redes && v.redes.length > 0 && (
+            <ul class="mt-5 flex flex-wrap gap-2" data-redes>
+              {v.redes.map((r) => (
+                <li>
+                  <a href={r.url} target="_blank" rel="noopener" class="red-animada inline-flex items-center gap-2 rounded-full border border-linea bg-marino/60 py-1.5 pl-1.5 pr-3.5 text-sm text-suave hover:text-white" aria-label={`${nombreRed[r.tipo]} de ${v.nombre}`}>
+                    <LogoRed red={r.tipo} class="size-7" />
+                    {nombreRed[r.tipo]}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </article>
+      ))}
+
+      <a href="/contacto/?motivo=voluntariado" class="voluntario-cta tarjeta group flex items-center justify-between gap-4 p-6" data-reveal>
+        <span>
+          <span class="titulo block text-lg font-semibold text-white">¿Quieres ser voluntario?</span>
+          <span class="mt-1 block text-sm">Escríbenos y te contamos cómo ayudar.</span>
+        </span>
+        <span class="grid size-11 shrink-0 place-items-center rounded-full bg-magenta text-marino transition-transform group-hover:translate-x-1">
+          <Icono nombre="flecha" class="size-5" />
+        </span>
+      </a>
+      {site.usarMascota && (
+        <img src="/img/mascota/sm/23-choca-puno.webp" alt="" width="148" height="300" loading="lazy" class="mascota-voluntario mx-auto hidden h-40 w-auto lg:block" data-reveal />
+      )}
+    </div>
+  </div>
+</section>
+
+<style>
+  .aviso-voluntario {
+    background: linear-gradient(135deg, color-mix(in srgb, var(--color-naranja) 10%, var(--color-marino-2)), var(--color-marino-2) 60%);
+    border: 1px solid color-mix(in srgb, var(--color-naranja) 35%, var(--color-linea));
+  }
+  .anillo-voluntario {
+    background: conic-gradient(from 0deg, var(--color-magenta), var(--color-naranja), var(--color-morado), var(--color-magenta));
+    animation: gira-anillo 6s linear infinite;
+  }
+  @keyframes gira-anillo { to { rotate: 360deg; } }
+  .voluntario { transition: border-color 0.4s ease; }
+  .voluntario:hover { border-color: color-mix(in srgb, var(--color-naranja) 45%, transparent); }
+</style>

@@ -7,6 +7,7 @@
 //   data-magnetico         botón que se acerca al cursor
 //   data-palabras          título que entra palabra por palabra
 //   data-redes             botones de redes que entran en ola (estilos .red-animada en global.css)
+//   data-en-vista          agrega .en-vista al aparecer (la animación la define el CSS de cada sección)
 // Con "reducir movimiento" activado en el sistema, todo se muestra sin animar.
 import Lenis from 'lenis';
 import { gsap } from 'gsap';
@@ -60,6 +61,8 @@ if (reducir) {
       ease: 'expo.out',
       stagger: 0.07,
       delay: Number(el.dataset.delay ?? 0.15),
+      // Sin transformación residual: el degradado del texto se ve nítido al terminar
+      clearProps: 'transform',
       scrollTrigger: el.hasAttribute('data-inmediato') ? undefined : { trigger: el, start: 'top 88%' },
     });
   });
@@ -202,4 +205,16 @@ todos('[data-redes]').forEach((lista) => {
     observador.disconnect();
   }, { threshold: 0.4 });
   observador.observe(lista);
+});
+
+// Secciones animadas con CSS: se preparan (ocultas) y se encienden al entrar en pantalla
+todos('[data-en-vista]').forEach((el) => {
+  if (reducir) { el.classList.add('en-vista'); return; }
+  el.classList.add('preparado');
+  const obs = new IntersectionObserver(([e]) => {
+    if (!e.isIntersecting) return;
+    el.classList.add('en-vista');
+    obs.disconnect();
+  }, { threshold: 0.25 });
+  obs.observe(el);
 });

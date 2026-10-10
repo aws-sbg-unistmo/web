@@ -22,6 +22,9 @@ const { etiqueta, titulo, resaltar = [], descripcion, pose, video, migas } = Ast
 const medidas: Record<string, [number, number]> = {
   '01-saludando': [520, 900], '03-celebrando': [620, 900], '06-nube-brillante': [513, 900], '07-sentado-en-servidor': [565, 900],
   '08-leyendo': [744, 900], '09-lupa': [589, 900], '10-pensando': [384, 900], '12-audifonos': [582, 900],
+  '13-programando': [738, 900], '14-pizarra': [768, 900], '15-trofeo': [629, 900], '16-megafono': [628, 900],
+  '17-selfie': [602, 900], '18-mochila': [569, 900], '19-dormido': [911, 900], '20-seguridad': [622, 900],
+  '21-realidad-virtual': [590, 900], '22-totopo': [564, 900], '23-choca-puno': [443, 900], '24-senalando': [545, 900],
 };
 const [anchoPose, altoPose] = (pose && medidas[pose]) || [600, 900];
 const conVideo = Boolean(video && site.usarMascota);

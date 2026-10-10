@@ -1,4 +1,5 @@
 ---
+import PapelPicado from '../../components/PapelPicado.astro';
 import Layout from '../../layouts/Layout.astro';
 import CabeceraPagina from '../../components/CabeceraPagina.astro';
 import EventoTarjeta from '../../components/EventoTarjeta.astro';
@@ -16,10 +17,10 @@ const tipos = [
 ] as const;
 
 const pasos = [
-  { t: 'Lo publicamos', d: 'Cada evento sale primero en Meetup y en nuestras redes, con fecha, lugar y temario.' },
-  { t: 'Te registras', d: 'Marca que asistes (RSVP) en Meetup para apartar tu lugar. Te llegan recordatorios.' },
-  { t: 'Llegas y construyes', d: 'Presentamos el tema y luego manos a la obra, con ayuda del equipo en todo momento.' },
-  { t: 'Te llevas el material', d: 'Compartimos las guías para que repitas el ejercicio en casa y sigas avanzando.' },
+  { icono: 'microfono', t: 'Lo publicamos', d: 'Cada evento sale primero en Meetup y en nuestras redes, con fecha, lugar y temario.' },
+  { icono: 'check', t: 'Te registras', d: 'Marca que asistes (RSVP) en Meetup para apartar tu lugar. Te llegan recordatorios.' },
+  { icono: 'laptop', t: 'Llegas y construyes', d: 'Presentamos el tema y luego manos a la obra, con ayuda del equipo en todo momento.' },
+  { icono: 'libro', t: 'Te llevas el material', d: 'Compartimos las guías para que repitas el ejercicio en casa y sigas avanzando.' },
 ];
 const llevar = [
   { icono: 'laptop', t: 'Tu laptop y su cargador', d: 'Para los talleres. Cualquier sistema operativo funciona.' },
@@ -46,6 +47,7 @@ const preguntas = [
     pose="12-audifonos"
     video="eventos"
   />
+  <PapelPicado class="mx-auto -mt-2 max-w-7xl" />
 
   <section class="mx-auto max-w-7xl px-5">
     <h2 class="titulo text-2xl font-semibold" data-reveal>Próximos</h2>
@@ -78,12 +80,18 @@ const preguntas = [
     </div>
 
     <h2 class="titulo mt-20 text-2xl font-semibold" data-reveal>Cómo funcionan</h2>
-    <ol class="mt-8 grid gap-px overflow-hidden rounded-3xl border border-linea bg-linea sm:grid-cols-2 lg:grid-cols-4" data-stagger>
+    <ol class="pasos relative mt-10 grid gap-8 lg:grid-cols-4 lg:gap-6" data-en-vista>
+      <span class="pasos-riel" aria-hidden="true"><span class="pasos-avance"></span></span>
       {pasos.map((p, i) => (
-        <li class="relative bg-marino-2 p-7">
-          <span class="titulo grid size-10 place-items-center rounded-full border border-magenta/50 font-bold text-magenta">{i + 1}</span>
-          <h3 class="titulo mt-5 text-lg font-semibold">{p.t}</h3>
-          <p class="mt-2 text-sm leading-relaxed">{p.d}</p>
+        <li class="paso relative pl-16 lg:pl-0" style={`--i:${i}`}>
+          <span class="paso-nodo titulo absolute left-0 top-0 grid size-12 place-items-center rounded-full font-bold lg:relative">
+            <Icono nombre={p.icono} class="size-5" />
+            <span class="paso-num absolute -right-1 -top-1 grid size-5 place-items-center rounded-full text-[0.65rem]">{i + 1}</span>
+          </span>
+          <div class="paso-tarjeta tarjeta p-6 lg:mt-6">
+            <h3 class="titulo text-lg font-semibold">{p.t}</h3>
+            <p class="mt-2 text-sm leading-relaxed">{p.d}</p>
+          </div>
         </li>
       ))}
     </ol>
@@ -104,7 +112,7 @@ const preguntas = [
         </ul>
       </div>
       {site.usarMascota && (
-        <img src="/img/mascota/08-leyendo.webp" alt="" width="744" height="900" loading="lazy" class="mx-auto hidden h-72 w-auto lg:block" data-reveal />
+        <img src="/img/mascota/18-mochila.webp" alt="" width="569" height="900" loading="lazy" class="mx-auto hidden h-72 w-auto lg:block" data-reveal />
       )}
     </div>
 
@@ -128,3 +136,32 @@ const preguntas = [
     </div>
   </section>
 </Layout>
+
+<style>
+  /* Cómo funcionan: línea de tiempo que se dibuja y enciende cada paso en orden */
+  .pasos-riel { position: absolute; left: 23px; top: 24px; bottom: 24px; width: 2px; background: var(--color-linea); }
+  .pasos-avance { position: absolute; inset: 0; background: linear-gradient(180deg, var(--color-magenta), var(--color-morado), var(--color-azul)); transform-origin: top; transform: scaleY(0); }
+  @media (min-width: 1024px) {
+    .pasos-riel { left: 24px; right: 24px; top: 23px; bottom: auto; width: auto; height: 2px; }
+    .pasos-avance { background: linear-gradient(90deg, var(--color-magenta), var(--color-morado), var(--color-azul)); transform-origin: left; transform: scaleX(0); }
+  }
+  .pasos:not(.preparado) .pasos-avance { transform: none; }
+  .paso-nodo { background: var(--color-marino); color: var(--color-suave); box-shadow: inset 0 0 0 2px var(--color-linea); z-index: 1; }
+  .paso-num { background: var(--color-linea); color: #fff; }
+  .paso-tarjeta { transition: border-color 0.4s ease, translate 0.4s ease; }
+  .paso:hover .paso-tarjeta { border-color: color-mix(in srgb, var(--color-magenta) 50%, transparent); translate: 0 -3px; }
+  .pasos.en-vista .pasos-avance { animation: dibuja-y 1.6s cubic-bezier(0.6, 0, 0.2, 1) 0.2s both; }
+  @media (min-width: 1024px) { .pasos.en-vista .pasos-avance { animation-name: dibuja-x; } }
+  .pasos.en-vista .paso-nodo { animation: enciende 0.6s ease both; animation-delay: calc(0.3s + var(--i) * 0.38s); }
+  .pasos.en-vista .paso-num { animation: enciende-num 0.6s ease both; animation-delay: calc(0.3s + var(--i) * 0.38s); }
+  .pasos.preparado:not(.en-vista) .paso-tarjeta { opacity: 0; }
+  .pasos.en-vista .paso-tarjeta { animation: sube-paso 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(0.4s + var(--i) * 0.38s); }
+  @keyframes dibuja-y { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+  @keyframes dibuja-x { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  @keyframes enciende {
+    50% { box-shadow: inset 0 0 0 2px var(--color-magenta), 0 0 0 10px color-mix(in srgb, var(--color-magenta) 25%, transparent); }
+    100% { color: #fff; background: color-mix(in srgb, var(--color-magenta) 22%, var(--color-marino)); box-shadow: inset 0 0 0 2px var(--color-magenta), 0 0 24px -4px var(--color-magenta); }
+  }
+  @keyframes enciende-num { to { background: var(--color-magenta); color: var(--color-marino); } }
+  @keyframes sube-paso { from { opacity: 0; transform: translateY(24px); } }
+</style>

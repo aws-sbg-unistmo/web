@@ -7,15 +7,16 @@ import Icono from '../components/Icono.astro';
 import Mosaico from '../components/Mosaico.astro';
 import LlamadoFinal from '../components/LlamadoFinal.astro';
 import { categorias, certificaciones, glosario, niveles, recursos, regionMexico, temas } from '../data/contenido';
+import { site } from '../data/site';
 
 // Las seis ventajas de la nube que AWS explica en su introducción "Overview of Amazon Web Services"
 const ventajas = [
-  { t: 'Paga solo lo que usas', d: 'En lugar de comprar servidores por adelantado, pagas por los recursos que consumes y cuando los consumes.' },
-  { t: 'Precios a gran escala', d: 'Millones de clientes comparten la infraestructura, así que el costo por recurso es más bajo.' },
-  { t: 'Deja de adivinar capacidad', d: 'Aumenta o reduce tus recursos según la demanda real, en minutos y sin comprar equipo.' },
-  { t: 'Más velocidad para crear', d: 'Un servidor nuevo está a unos clics: puedes experimentar, probar y equivocarte barato.' },
-  { t: 'Enfócate en tu proyecto', d: 'No gastas tiempo ni dinero en mantener centros de datos: te concentras en tu aplicación.' },
-  { t: 'Global en minutos', d: 'Publica tu aplicación en distintas regiones del mundo para estar cerca de tus usuarios.' },
+  { icono: 'reloj', c: 'var(--color-magenta)', t: 'Paga solo lo que usas', d: 'En lugar de comprar servidores por adelantado, pagas por los recursos que consumes y cuando los consumes.' },
+  { icono: 'usuarios', c: 'var(--color-morado)', t: 'Precios a gran escala', d: 'Millones de clientes comparten la infraestructura, así que el costo por recurso es más bajo.' },
+  { icono: 'rayo', c: 'var(--color-azul)', t: 'Deja de adivinar capacidad', d: 'Aumenta o reduce tus recursos según la demanda real, en minutos y sin comprar equipo.' },
+  { icono: 'terminal', c: 'var(--color-menta)', t: 'Más velocidad para crear', d: 'Un servidor nuevo está a unos clics: puedes experimentar, probar y equivocarte barato.' },
+  { icono: 'proyecto', c: 'var(--color-naranja)', t: 'Enfócate en tu proyecto', d: 'No gastas tiempo ni dinero en mantener centros de datos: te concentras en tu aplicación.' },
+  { icono: 'globo', c: 'var(--color-magenta)', t: 'Global en minutos', d: 'Publica tu aplicación en distintas regiones del mundo para estar cerca de tus usuarios.' },
 ];
 
 const quitarAcentos = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -80,12 +81,14 @@ const quitarAcentos = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').
     </div>
 
     <h3 class="titulo mt-20 text-2xl font-semibold md:text-3xl" data-reveal>Seis ventajas de la nube</h3>
-    <div class="mt-8 grid gap-px overflow-hidden rounded-3xl border border-linea bg-linea max-md:rounded-none max-md:border-0 max-md:bg-transparent sm:grid-cols-2 lg:grid-cols-3" data-stagger data-carrusel>
+    <div class="ventajas mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" data-en-vista data-carrusel>
       {ventajas.map((v, i) => (
-        <article class="bg-marino-2 p-7 transition-colors hover:bg-[#222c38] max-md:rounded-2xl max-md:border max-md:border-linea">
-          <span class="font-mono text-sm text-magenta">0{i + 1}</span>
-          <h4 class="titulo mt-3 text-lg font-semibold">{v.t}</h4>
-          <p class="mt-2 text-sm leading-relaxed">{v.d}</p>
+        <article class="ventaja tarjeta group relative overflow-hidden p-7" style={`--acento:${v.c};--i:${i}`} data-tilt>
+          <span class="ventaja-numero titulo pointer-events-none absolute -right-2 -top-4 select-none text-[6.5rem] font-bold leading-none" aria-hidden="true">0{i + 1}</span>
+          <span class="ventaja-icono relative grid size-12 place-items-center rounded-2xl"><Icono nombre={v.icono} class="size-6" /></span>
+          <h4 class="titulo relative mt-6 text-xl font-semibold">{v.t}</h4>
+          <p class="relative mt-2 text-sm leading-relaxed">{v.d}</p>
+          <span class="ventaja-linea absolute inset-x-0 bottom-0 h-[3px]" aria-hidden="true"></span>
         </article>
       ))}
     </div>
@@ -182,6 +185,7 @@ const quitarAcentos = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').
 
   <!-- Certificaciones -->
   <section id="certificaciones" class="mx-auto mt-32 max-w-7xl px-5">
+    <div class="flex items-end justify-between gap-8">
     <div class="max-w-3xl">
       <p class="chip" data-reveal>// Certificaciones</p>
       <Palabras texto="Tu primera certificación de AWS" resaltar={['certificación']} class="mt-5 text-4xl font-bold leading-tight md:text-5xl" />
@@ -189,6 +193,10 @@ const quitarAcentos = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').
         Las certificaciones de nivel fundamental no piden experiencia técnica y son el mejor punto de partida.
         En el grupo armamos sesiones de estudio para prepararlas juntos.
       </p>
+    </div>
+    {site.usarMascota && (
+      <img src="/img/mascota/15-trofeo.webp" alt="" width="629" height="900" loading="lazy" class="flotar hidden h-60 w-auto shrink-0 drop-shadow-[0_20px_50px_rgba(255,153,0,0.25)] lg:block" data-reveal />
+    )}
     </div>
     <div class="mt-12 grid gap-6 lg:grid-cols-2" data-stagger data-carrusel>
       {certificaciones.map((c, i) => (
@@ -323,4 +331,31 @@ const quitarAcentos = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').
     #glosario.con-js #lista-glosario.recortado .termino:nth-child(n + 7) { display: none; }
   }
   @keyframes desplegar { from { opacity: 0; translate: 0 -8px; } }
+</style>
+
+<style>
+  /* Seis ventajas: cada tarjeta con su color; entran en cascada y las cruza una línea de luz */
+  .ventaja { transition: border-color 0.4s ease, box-shadow 0.4s ease, translate 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .ventaja:hover { border-color: color-mix(in srgb, var(--acento) 55%, transparent); box-shadow: 0 24px 60px -30px var(--acento); translate: 0 -4px; }
+  .ventaja-numero { color: transparent; -webkit-text-stroke: 1px color-mix(in srgb, var(--acento) 35%, transparent); transition: -webkit-text-stroke-color 0.4s ease, translate 0.6s ease; }
+  .ventaja:hover .ventaja-numero { -webkit-text-stroke-color: var(--acento); translate: -6px 4px; }
+  .ventaja-icono { background: color-mix(in srgb, var(--acento) 16%, transparent); color: var(--acento); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--acento) 35%, transparent); transition: scale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), rotate 0.4s ease; }
+  .ventaja:hover .ventaja-icono { scale: 1.12; rotate: -8deg; }
+  .ventaja-linea { background: linear-gradient(90deg, transparent, var(--acento), transparent); transform: scaleX(0.35); transition: transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1); }
+  .ventaja:hover .ventaja-linea { transform: scaleX(1); }
+  .ventaja::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(115deg, transparent 35%, color-mix(in srgb, var(--acento) 22%, transparent) 50%, transparent 65%);
+    translate: -120% 0;
+    pointer-events: none;
+  }
+  .ventajas.preparado:not(.en-vista) .ventaja { opacity: 0; }
+  .ventajas.en-vista .ventaja { animation: entra-ventaja 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(var(--i) * 0.09s); }
+  .ventajas.en-vista .ventaja::before { animation: barrido-ventaja 1.4s ease both; animation-delay: calc(0.4s + var(--i) * 0.09s); }
+  .ventajas.en-vista .ventaja-linea { animation: crece-linea 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(0.3s + var(--i) * 0.09s); }
+  @keyframes entra-ventaja { from { opacity: 0; transform: translateY(40px) scale(0.96); } }
+  @keyframes barrido-ventaja { to { translate: 120% 0; } }
+  @keyframes crece-linea { 0% { transform: scaleX(0); } 60% { transform: scaleX(1); } 100% { transform: scaleX(0.35); } }
 </style>

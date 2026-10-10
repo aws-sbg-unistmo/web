@@ -14,7 +14,7 @@ const palabras = texto.split(' ');
 ---
 <Etiqueta class:list={['titulo', clase]} data-palabras={inmediato ? undefined : ''} aria-label={texto}>
   {palabras.map((p, i) => (
-    <span class="palabra inline-block overflow-hidden pb-[0.08em] align-bottom" aria-hidden="true">
+    <span class="palabra -mx-[0.08em] inline-block overflow-hidden px-[0.08em] pb-[0.08em] align-bottom" aria-hidden="true">
       <span class:list={['inline-block', inmediato && 'palabra-css']} style={inmediato ? `--i:${i}` : undefined}>
         {resaltar.includes(p) ? <span class="degradado">{p}</span> : p}
       </span>

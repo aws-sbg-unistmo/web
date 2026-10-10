@@ -6,6 +6,8 @@ import Icono from '../components/Icono.astro';
 import Palabras from '../components/Palabras.astro';
 import Universidad from '../components/Universidad.astro';
 import Alianzas from '../components/Alianzas.astro';
+import Voluntariado from '../components/Voluntariado.astro';
+import LoteriaJaguar from '../components/LoteriaJaguar.astro';
 import Equipo from '../components/Equipo.astro';
 import { site } from '../data/site';
 
@@ -65,6 +67,8 @@ const codigo = [
       { id: 'universidad', texto: 'Universidad' },
       { id: 'historia', texto: 'Historia' },
       { id: 'equipo', texto: 'Equipo' },
+      { id: 'voluntariado', texto: 'Voluntariado' },
+      { id: 'mascota', texto: 'Mascota' },
       { id: 'alianzas', texto: 'Alianzas' },
       { id: 'codigo', texto: 'Código de conducta' },
     ]}
@@ -169,6 +173,10 @@ const codigo = [
 
   <Equipo />
 
+  <Voluntariado />
+
+  <LoteriaJaguar />
+
   <Alianzas />
 
   <!-- Código de conducta -->
@@ -188,6 +196,9 @@ const codigo = [
             Lo atendemos con discreción.
           </p>
         </div>
+        {site.usarMascota && (
+          <img src="/img/mascota/20-seguridad.webp" alt="" width="622" height="900" loading="lazy" class="mx-auto mt-10 hidden h-64 w-auto drop-shadow-[0_20px_50px_rgba(0,200,180,0.2)] lg:block" data-reveal />
+        )}
       </div>
       <ol class="space-y-4" data-stagger>
         {codigo.map((c, i) => (

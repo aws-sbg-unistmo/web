@@ -195,7 +195,7 @@ export const niveles: {
   },
   {
     n: '02', t: 'Tu primer sitio en la nube', nivel: 'Principiante', c: 'var(--color-magenta)',
-    pose: '07-sentado-en-servidor',
+    pose: '13-programando',
     mosaicos: [{ categoria: 'almacenamiento', icono: 'nube' }, { categoria: 'redes', icono: 'globo' }],
     referencias: [
       { texto: 'Sitio estático en S3', url: 'https://docs.aws.amazon.com/es_es/AmazonS3/latest/userguide/WebsiteHosting.html' },

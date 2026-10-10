@@ -1,4 +1,5 @@
 ---
+import PapelPicado from '../components/PapelPicado.astro';
 import Bordado from '../components/Bordado.astro';
 import Layout from '../layouts/Layout.astro';
 import Hero from '../components/Hero.astro';
@@ -183,7 +184,8 @@ const preguntas = [
   <RegionMexico />
 
   <!-- Eventos -->
-  <section class="mx-auto mt-20 max-w-7xl px-5 md:mt-32">
+  <PapelPicado class="mx-auto mt-20 max-w-7xl md:mt-28" />
+  <section class="mx-auto mt-10 max-w-7xl px-5 md:mt-14">
     <div class="flex flex-wrap items-end justify-between gap-6">
       <div>
         <p class="chip" data-reveal>// Próximos eventos</p>
@@ -210,7 +212,7 @@ const preguntas = [
           </a>
         </div>
         {site.usarMascota && (
-          <img src="/img/mascota/08-leyendo.webp" alt="" width="744" height="900" loading="lazy" class="mx-auto h-40 w-auto md:h-64" />
+          <img src="/img/mascota/16-megafono.webp" alt="" width="628" height="900" loading="lazy" class="mx-auto h-40 w-auto md:h-64" />
         )}
       </div>
     )}
