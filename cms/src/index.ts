@@ -2,7 +2,7 @@
 // 1. Condición "Es su tarjeta": cada integrante (rol Author) edita y publica solo la tarjeta con su correo.
 // 2. Permisos del rol Author: su tarjeta, sus eventos y sus alianzas, incluido publicar.
 // 3. Datos iniciales (equipo, voluntarios y alianzas de la página) la primera vez, con sus fotos.
-// 4. Token de solo lectura "web" para que GitHub Actions lea el contenido al compilar.
+// 4. Lectura pública de lo publicado (GitHub Actions compila sin token) y un token de solo lectura "web" opcional.
 // 5. Al publicar o borrar algo, pide a GitHub que recompile la página (si hay GITHUB_TOKEN_DESPLIEGUE, un token
 //    fine-grained con permiso "Actions: Read and write": solo puede lanzar el flujo, no cambiar el código).
 import type { Core } from '@strapi/strapi';
@@ -49,6 +49,22 @@ async function permisosAutor(strapi: Core.Strapi) {
   ]);
   await almacen.set({ key: 'permisos-autor-v2', value: true });
   strapi.log.info('Rol Author: puede editar y publicar su tarjeta (de integrante o voluntario), sus eventos y sus alianzas.');
+}
+
+// Lectura pública (solo find y findOne) de lo que ya sale en la página, para que GitHub Actions compile sin token.
+// Strapi nunca entrega los campos privados (correoEditor) ni los borradores por la API pública.
+async function lecturaPublica(strapi: Core.Strapi) {
+  const rol = await strapi.db.query('plugin::users-permissions.role').findOne({ where: { type: 'public' } });
+  if (!rol) return;
+  const permisos = strapi.db.query('plugin::users-permissions.permission');
+  for (const tipo of TIPOS) {
+    for (const accion of ['find', 'findOne']) {
+      const action = `${tipo}.${accion}`;
+      if (!(await permisos.findOne({ where: { action, role: rol.id } }))) {
+        await permisos.create({ data: { action, role: rol.id } });
+      }
+    }
+  }
 }
 
 // Se carga una sola vez (queda marcado en la base). Si el servidor se reinicia a la mitad, al volver
@@ -185,6 +201,7 @@ export default {
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
     await registrarCondicion(strapi);
     await permisosAutor(strapi);
+    await lecturaPublica(strapi);
     await tokenWeb(strapi);
     avisarAGitHub(strapi);
     // Sin await: subir las fotos iniciales tarda, y Heroku exige que el servidor responda en menos de 60 s

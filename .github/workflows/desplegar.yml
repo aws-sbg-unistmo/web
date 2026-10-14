@@ -2,7 +2,7 @@ name: Desplegar página
 
 # Cuándo corre:
 #  - push a main: compila, actualiza la infraestructura (si cambió) y publica.
-#  - cada 6 horas: vuelve a leer los eventos de Meetup y publica la versión nueva.
+#  - cada hora: vuelve a leer los eventos de Meetup y el contenido de Strapi, y publica la versión nueva.
 #  - cuando alguien publica o cambia algo en Strapi (Strapi lanza este flujo con workflow_dispatch).
 #    Strapi puede vivir en Heroku (variable HEROKU_APP, gratis con el Student Pack) o en AWS (CMS_ACTIVO=true).
 #  - a mano desde la pestaña Actions.
@@ -10,7 +10,7 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: '17 */6 * * *'
+    - cron: '17 * * * *'
   workflow_dispatch:
     inputs:
       origen:
@@ -128,8 +128,9 @@ jobs:
       - name: Subir a S3
         run: |
           BUCKET="${{ steps.salidas.outputs.SiteBucketName }}"
-          # Archivos con huella en el nombre (_astro, video, img): caché de un año
-          aws s3 sync dist "s3://$BUCKET" --delete --exclude "*.html" --cache-control "public,max-age=31536000,immutable"
+          # Archivos con huella en el nombre (_astro, video, img): caché de un año. --size-only evita volver a subir
+          # todo cada hora (en el runner todos los archivos tienen fecha nueva) y mantiene las escrituras en S3 casi en cero
+          aws s3 sync dist "s3://$BUCKET" --delete --size-only --exclude "*.html" --cache-control "public,max-age=31536000,immutable"
           # HTML: siempre se revalida para que los cambios se vean al instante
           aws s3 sync dist "s3://$BUCKET" --exclude "*" --include "*.html" --cache-control "public,max-age=0,must-revalidate"
       - name: Limpiar la caché de CloudFront
