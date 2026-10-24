@@ -76,6 +76,23 @@
       ]
     },
     {
+      "nombre": "Emiliano Hernández Ricardez",
+      "rol": "Core Team",
+      "fotos": [
+        "datos-iniciales/emiliano.webp"
+      ],
+      "redes": [
+        {
+          "tipo": "linkedin",
+          "url": "https://www.linkedin.com/in/hern%C3%A1ndez-ricardez-emiliano-900564446/"
+        },
+        {
+          "tipo": "instagram",
+          "url": "https://www.instagram.com/emiii_hedz/"
+        }
+      ]
+    },
+    {
       "nombre": "Abril Estefanía Pérez Hernández",
       "rol": "Core Team",
       "redes": [

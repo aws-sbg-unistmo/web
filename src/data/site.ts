@@ -111,6 +111,15 @@ const equipoLocal: Integrante[] = [
     ],
   },
   {
+    nombre: 'Emiliano Hernández Ricardez',
+    rol: 'Core Team',
+    fotos: ['/img/equipo/emiliano.webp'],
+    redes: [
+      { tipo: 'linkedin', url: 'https://www.linkedin.com/in/hern%C3%A1ndez-ricardez-emiliano-900564446/' },
+      { tipo: 'instagram', url: 'https://www.instagram.com/emiii_hedz/' },
+    ],
+  },
+  {
     nombre: 'Abril Estefanía Pérez Hernández',
     rol: 'Core Team',
     redes: [{ tipo: 'linkedin', url: 'https://www.linkedin.com/in/abril-estefan%C3%ADa-p%C3%A9rez-hern%C3%A1ndez-78a15a446/' }],
