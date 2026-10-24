@@ -13,6 +13,10 @@ Parameters:
   RepoName:
     Type: String
     Default: web
+  SubjectPrefix:
+    Type: String
+    Default: repo:aws-sbg-unistmo@337260302/web@1402904022
+    Description: Prefijo del «sub» que manda GitHub (gh api repos/ORG/REPO/actions/oidc/customization/sub → sub_claim_prefix).
   StackPrefix:
     Type: String
     Default: aws-sbg-web
@@ -53,7 +57,13 @@ Resources:
             Condition:
               StringEquals:
                 token.actions.githubusercontent.com:aud: sts.amazonaws.com
-                token.actions.githubusercontent.com:sub: !Sub 'repo:${GitHubOrg}/${RepoName}:ref:refs/heads/main'
+                # Rama main y el ambiente «produccion», en el formato nuevo de GitHub (con IDs fijos de la
+                # organización y del repo, que no se pueden suplantar renombrando) y en el formato clásico
+                token.actions.githubusercontent.com:sub:
+                  - !Sub '${SubjectPrefix}:ref:refs/heads/main'
+                  - !Sub '${SubjectPrefix}:environment:produccion'
+                  - !Sub 'repo:${GitHubOrg}/${RepoName}:ref:refs/heads/main'
+                  - !Sub 'repo:${GitHubOrg}/${RepoName}:environment:produccion'
       Policies:
         - PolicyName: desplegar-pagina
           PolicyDocument:
