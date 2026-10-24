@@ -4,46 +4,13 @@
       "nombre": "Jean Paul Gallegos Cruz",
       "rol": "Student Builder Group Leader",
       "carrera": "Ingeniería en Computación",
-      "descripcion": "Fundé el AWS Student Builder Group de la UNISTMO. Me enfoco en la seguridad en la nube —AWS, Google Cloud y Azure— y en backend con Python y Laravel, con la IA como hilo que lo une todo. Soy Google Student Ambassador ’26, de la primera generación en México, y organizo eventos con Nexis Oaxaca Tech.",
+      "descripcion": "Hola, soy Jean Paul. Estoy en tercer semestre en la UNISTMO y me gusta aprender cosas nuevas y enfocarme en nuevos retos.",
       "ficha": [
-        {
-          "titulo": "Especialidad",
-          "items": [
-            "Cloud Security",
-            "Ciberseguridad multinube",
-            "Backend"
-          ]
-        },
         {
           "titulo": "Me apasiona",
           "items": [
             "IA",
-            "Cloud",
-            "Ciberseguridad",
-            "Automatización",
-            "Robótica"
-          ]
-        },
-        {
-          "titulo": "Credenciales",
-          "items": [
-            "Google Student Ambassador ’26",
-            "Google Cloud Cybersecurity",
-            "Google Cloud Computing Foundations",
-            "Cédula técnica en programación"
-          ]
-        },
-        {
-          "titulo": "Stack",
-          "items": [
-            "Python",
-            "PHP · Laravel",
-            "C",
-            "Dart",
-            "Docker",
-            "Bash",
-            "AWS",
-            "Google Cloud"
+            "Cloud"
           ]
         }
       ],
