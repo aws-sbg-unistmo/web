@@ -7,12 +7,20 @@ import { SESv2Client, SendEmailCommand } from '@aws-sdk/client-sesv2';
 
 const dynamo = new DynamoDBClient({});
 const ses = new SESv2Client({});
-const { TABLE_NAME, NOTIFY_EMAIL, FROM_EMAIL, TURNSTILE_SECRET } = process.env;
+const { TABLE_NAME, NOTIFY_EMAIL, FROM_EMAIL, TURNSTILE_SECRET, ORIGENES = '' } = process.env;
+const PERMITIDOS = ORIGENES.split(',').map((o) => o.trim()).filter(Boolean);
 const DIECIOCHO_MESES = 60 * 60 * 24 * 548; // los registros se borran solos (TTL de DynamoDB)
+
+// CORS: solo la página (dominio propio, www y CloudFront) puede mandar formularios desde el navegador
+let cors = {};
+const corsPara = (origen) =>
+  PERMITIDOS.includes(origen)
+    ? { 'Access-Control-Allow-Origin': origen, 'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Access-Control-Allow-Headers': 'content-type', 'Access-Control-Max-Age': '3600', Vary: 'Origin' }
+    : { Vary: 'Origin' };
 
 const responder = (estado, cuerpo) => ({
   statusCode: estado,
-  headers: { 'Content-Type': 'application/json' },
+  headers: { 'Content-Type': 'application/json', ...cors },
   body: JSON.stringify(cuerpo),
 });
 
@@ -73,6 +81,8 @@ const aDynamo = (obj) =>
   );
 
 export async function handler(event) {
+  cors = corsPara(event.headers?.origin ?? event.headers?.Origin);
+  if (event.requestContext?.http?.method === 'OPTIONS') return { statusCode: 204, headers: cors };
   const tipo = (event.rawPath ?? '').split('/').filter(Boolean).pop();
   const formulario = FORMULARIOS[tipo];
   if (!formulario) return responder(404, { ok: false, error: 'Formulario no encontrado' });

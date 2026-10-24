@@ -168,14 +168,8 @@ Resources:
   FormsApi:
     Type: AWS::Serverless::HttpApi
     Properties:
-      CorsConfiguration:
-        AllowOrigins: !If
-          - HasDomain
-          - [!Sub 'https://${SiteDistribution.DomainName}', !Sub 'https://${DomainName}', 'http://localhost:4321']
-          - [!Sub 'https://${SiteDistribution.DomainName}', 'http://localhost:4321']
-        AllowMethods: [POST, OPTIONS]
-        AllowHeaders: [content-type]
-        MaxAge: 3600
+      # CORS lo contesta la Lambda (variable ORIGENES): el CorsConfiguration de SAM va dentro del OpenAPI
+      # y ahí CloudFormation no resuelve !If ni referencias, así que quedaba vacío.
       DefaultRouteSettings:
         ThrottlingBurstLimit: 10
         ThrottlingRateLimit: 2
@@ -192,6 +186,10 @@ Resources:
           NOTIFY_EMAIL: !Ref NotifyEmail
           FROM_EMAIL: !Ref NotifyEmail
           TURNSTILE_SECRET: !Ref TurnstileSecret
+          ORIGENES: !If
+            - HasDomain
+            - !Sub 'https://${DomainName},https://www.${DomainName},https://${SiteDistribution.DomainName},http://localhost:4321'
+            - !Sub 'https://${SiteDistribution.DomainName},http://localhost:4321'
       Policies:
         - DynamoDBWritePolicy:
             TableName: !Ref FormsTable
@@ -206,6 +204,12 @@ Resources:
         Contacto:
           Type: HttpApi
           Properties: { ApiId: !Ref FormsApi, Path: /contacto, Method: POST }
+        UnetePrevio:
+          Type: HttpApi
+          Properties: { ApiId: !Ref FormsApi, Path: /unete, Method: OPTIONS }
+        ContactoPrevio:
+          Type: HttpApi
+          Properties: { ApiId: !Ref FormsApi, Path: /contacto, Method: OPTIONS }
 
   FormsFunctionLogs:
     Type: AWS::Logs::LogGroup
