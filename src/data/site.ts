@@ -110,6 +110,16 @@ const equipoLocal: Integrante[] = [
       { tipo: 'facebook', url: 'https://www.facebook.com/profile.php?id=61593415306721' },
     ],
   },
+  {
+    nombre: 'Abril Estefanía Pérez Hernández',
+    rol: 'Core Team',
+    redes: [{ tipo: 'linkedin', url: 'https://www.linkedin.com/in/abril-estefan%C3%ADa-p%C3%A9rez-hern%C3%A1ndez-78a15a446/' }],
+  },
+  {
+    nombre: 'Braulio Felipe Díaz',
+    rol: 'Core Team',
+    redes: [{ tipo: 'linkedin', url: 'https://www.linkedin.com/in/braulio-felipe-diaz-82b987440/' }],
+  },
   { nombre: 'Gerónimo', rol: 'Core Team' },
 ];
 
