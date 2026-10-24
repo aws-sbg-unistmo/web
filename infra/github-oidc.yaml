@@ -2,6 +2,8 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: >
   Permite que GitHub Actions (solo el repositorio de la página, rama main) despliegue en esta cuenta de AWS
   sin guardar llaves de acceso: usa un rol temporal mediante OpenID Connect (OIDC).
+  Solo puede tocar lo que lleva el prefijo de la página (no puede tocar instancias EC2 ni otros recursos de la cuenta).
+  Strapi vive en Heroku; si algún día se mueve a AWS (infra/cms.yaml) hay que volver a dar permisos de EC2, ECR y SSM.
   Se crea UNA sola vez desde la consola de CloudFormation.
 
 Parameters:
@@ -103,54 +105,6 @@ Resources:
                   - iam:GetRolePolicy
                   - iam:DeleteRolePolicy
                 Resource: !Sub 'arn:aws:iam::${AWS::AccountId}:role/${StackPrefix}*'
-              - Sid: PerfilDeInstanciaDelCms
-                Effect: Allow
-                Action:
-                  - iam:CreateInstanceProfile
-                  - iam:DeleteInstanceProfile
-                  - iam:GetInstanceProfile
-                  - iam:AddRoleToInstanceProfile
-                  - iam:RemoveRoleFromInstanceProfile
-                  - iam:TagInstanceProfile
-                Resource: !Sub 'arn:aws:iam::${AWS::AccountId}:instance-profile/${StackPrefix}*'
-              - Sid: ImagenDelCms
-                Effect: Allow
-                Action: ecr:*
-                Resource: !Sub 'arn:aws:ecr:*:${AWS::AccountId}:repository/${StackPrefix}*'
-              - Sid: AccesoAEcr
-                Effect: Allow
-                Action: ecr:GetAuthorizationToken
-                Resource: '*'
-              - Sid: InstanciaDelCms
-                Effect: Allow
-                Action:
-                  - ec2:RunInstances
-                  - ec2:TerminateInstances
-                  - ec2:StopInstances
-                  - ec2:StartInstances
-                  - ec2:ModifyInstanceAttribute
-                  - ec2:Describe*
-                  - ec2:CreateTags
-                  - ec2:DeleteTags
-                  - ec2:CreateSecurityGroup
-                  - ec2:DeleteSecurityGroup
-                  - ec2:AuthorizeSecurityGroupIngress
-                  - ec2:RevokeSecurityGroupIngress
-                  - ec2:AuthorizeSecurityGroupEgress
-                  - ec2:RevokeSecurityGroupEgress
-                  - ec2:AllocateAddress
-                  - ec2:ReleaseAddress
-                  - ec2:AssociateAddress
-                  - ec2:DisassociateAddress
-                  - ec2:GetManagedPrefixListEntries
-                Resource: '*'
-              - Sid: ReiniciarElCms
-                Effect: Allow
-                Action:
-                  - ssm:SendCommand
-                  - ssm:GetCommandInvocation
-                  - ssm:GetParameters
-                Resource: '*'
               - Sid: ServiciosSinArnPropio
                 Effect: Allow
                 Action:
