@@ -22,11 +22,11 @@ Parameters:
   DomainName:
     Type: String
     Default: ''
-    Description: (Opcional) Dominio propio, por ejemplo www.ejemplo.org. Requiere CertificateArn.
+    Description: (Opcional) Dominio propio sin www, por ejemplo ejemplo.org. También atiende www.ejemplo.org y lo redirige. Requiere CertificateArn.
   CertificateArn:
     Type: String
     Default: ''
-    Description: (Opcional) Certificado de ACM en us-east-1 para DomainName.
+    Description: (Opcional) Certificado de ACM en us-east-1 que cubra DomainName y www.DomainName.
 
 Conditions:
   CreateIdentity: !Equals [!Ref CreateEmailIdentity, 'true']
@@ -73,12 +73,17 @@ Resources:
       Name: !Sub '${AWS::StackName}-index'
       AutoPublish: true
       FunctionConfig:
-        Comment: Agrega index.html a las rutas de carpeta
+        Comment: Redirige www al dominio principal y agrega index.html a las rutas de carpeta
         Runtime: cloudfront-js-2.0
       FunctionCode: |
         function handler(event) {
           var request = event.request;
           var uri = request.uri;
+          var host = request.headers.host ? request.headers.host.value : '';
+          if (host.indexOf('www.') === 0) {
+            return { statusCode: 301, statusDescription: 'Moved Permanently',
+              headers: { location: { value: 'https://' + host.substring(4) + uri } } };
+          }
           if (uri.endsWith('/')) {
             request.uri += 'index.html';
           } else if (uri.split('/').pop().indexOf('.') === -1) {
@@ -97,7 +102,7 @@ Resources:
         HttpVersion: http2and3
         IPV6Enabled: true
         PriceClass: PriceClass_100
-        Aliases: !If [HasDomain, [!Ref DomainName], !Ref AWS::NoValue]
+        Aliases: !If [HasDomain, [!Ref DomainName, !Sub 'www.${DomainName}'], !Ref AWS::NoValue]
         ViewerCertificate: !If
           - HasDomain
           - AcmCertificateArn: !Ref CertificateArn
