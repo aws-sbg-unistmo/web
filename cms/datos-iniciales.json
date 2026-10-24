@@ -76,37 +76,6 @@
       ]
     },
     {
-      "nombre": "Joan Garfias",
-      "rol": "Core Team",
-      "descripcion": "Desarrollador backend y cofundador de Nexis Oaxaca Tech. Hoy está aprendiendo cloud computing.",
-      "ficha": [
-        {
-          "titulo": "Especialidad",
-          "items": [
-            "Backend",
-            "Cloud computing"
-          ]
-        }
-      ],
-      "fotos": [
-        "datos-iniciales/joan.webp"
-      ],
-      "redes": [
-        {
-          "tipo": "linkedin",
-          "url": "https://www.linkedin.com/in/joangarfias/"
-        },
-        {
-          "tipo": "github",
-          "url": "https://github.com/JoanGarfias"
-        },
-        {
-          "tipo": "instagram",
-          "url": "https://www.instagram.com/joangarfias_/"
-        }
-      ]
-    },
-    {
       "nombre": "Gerónimo",
       "rol": "Core Team"
     }
