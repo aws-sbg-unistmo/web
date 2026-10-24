@@ -107,6 +107,7 @@ const equipoLocal: Integrante[] = [
   {
     nombre: 'Emiliano Hernández Ricardez',
     rol: 'Core Team',
+    carrera: 'Ingeniería en Computación',
     fotos: ['/img/equipo/emiliano.webp'],
     redes: [
       { tipo: 'linkedin', url: 'https://www.linkedin.com/in/hern%C3%A1ndez-ricardez-emiliano-900564446/' },
@@ -116,14 +117,16 @@ const equipoLocal: Integrante[] = [
   {
     nombre: 'Abril Estefanía Pérez Hernández',
     rol: 'Core Team',
+    carrera: 'Ingeniería en Computación',
     redes: [{ tipo: 'linkedin', url: 'https://www.linkedin.com/in/abril-estefan%C3%ADa-p%C3%A9rez-hern%C3%A1ndez-78a15a446/' }],
   },
   {
     nombre: 'Braulio Felipe Díaz',
     rol: 'Core Team',
+    carrera: 'Ingeniería en Computación',
     redes: [{ tipo: 'linkedin', url: 'https://www.linkedin.com/in/braulio-felipe-diaz-82b987440/' }],
   },
-  { nombre: 'Gerónimo', rol: 'Core Team' },
+  { nombre: 'Gerónimo', rol: 'Core Team', carrera: 'Ingeniería en Computación' },
 ];
 
 // Voluntarios: ayudan con su tiempo y conocimiento. Es un rol sin beneficios (ver Nosotros → Voluntariado).

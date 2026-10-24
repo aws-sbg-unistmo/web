@@ -45,6 +45,7 @@
     {
       "nombre": "Emiliano Hernández Ricardez",
       "rol": "Core Team",
+      "carrera": "Ingeniería en Computación",
       "fotos": [
         "datos-iniciales/emiliano.webp"
       ],
@@ -62,6 +63,7 @@
     {
       "nombre": "Abril Estefanía Pérez Hernández",
       "rol": "Core Team",
+      "carrera": "Ingeniería en Computación",
       "redes": [
         {
           "tipo": "linkedin",
@@ -72,6 +74,7 @@
     {
       "nombre": "Braulio Felipe Díaz",
       "rol": "Core Team",
+      "carrera": "Ingeniería en Computación",
       "redes": [
         {
           "tipo": "linkedin",
@@ -81,7 +84,8 @@
     },
     {
       "nombre": "Gerónimo",
-      "rol": "Core Team"
+      "rol": "Core Team",
+      "carrera": "Ingeniería en Computación"
     }
   ],
   "alianzas": [
