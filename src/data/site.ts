@@ -105,8 +105,27 @@ const equipoLocal: Integrante[] = [
     ],
   },
   {
+    nombre: 'Guadalupe Toledo Toledo',
+    rol: 'Profesora asesora',
+    carrera: 'Profesora de Ingeniería en Computación',
+    fotos: ['/img/equipo/guadalupe.webp'],
+  },
+  {
+    nombre: 'Gerónimo Sabas Hernández González',
+    rol: 'Core Team · Marketing',
+    carrera: 'Ingeniería en Computación',
+    fotos: ['/img/equipo/geronimo.webp'],
+  },
+  {
+    nombre: 'Abril Estefanía Pérez Hernández',
+    rol: 'Core Team · Marketing',
+    carrera: 'Ingeniería en Computación',
+    fotos: ['/img/equipo/abril.webp'],
+    redes: [{ tipo: 'linkedin', url: 'https://www.linkedin.com/in/abril-estefan%C3%ADa-p%C3%A9rez-hern%C3%A1ndez-78a15a446/' }],
+  },
+  {
     nombre: 'Emiliano Hernández Ricardez',
-    rol: 'Core Team',
+    rol: 'Core Team · Sociales',
     carrera: 'Ingeniería en Computación',
     fotos: ['/img/equipo/emiliano.webp'],
     redes: [
@@ -115,18 +134,12 @@ const equipoLocal: Integrante[] = [
     ],
   },
   {
-    nombre: 'Abril Estefanía Pérez Hernández',
-    rol: 'Core Team',
-    carrera: 'Ingeniería en Computación',
-    redes: [{ tipo: 'linkedin', url: 'https://www.linkedin.com/in/abril-estefan%C3%ADa-p%C3%A9rez-hern%C3%A1ndez-78a15a446/' }],
-  },
-  {
     nombre: 'Braulio Felipe Díaz',
-    rol: 'Core Team',
+    rol: 'Core Team · Sociales',
     carrera: 'Ingeniería en Computación',
+    fotos: ['/img/equipo/braulio.webp'],
     redes: [{ tipo: 'linkedin', url: 'https://www.linkedin.com/in/braulio-felipe-diaz-82b987440/' }],
   },
-  { nombre: 'Gerónimo', rol: 'Core Team', carrera: 'Ingeniería en Computación' },
 ];
 
 // Voluntarios: ayudan con su tiempo y conocimiento. Es un rol sin beneficios (ver Nosotros → Voluntariado).

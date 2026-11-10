@@ -1,0 +1,437 @@
+---
+// Página de enlaces (estilo Linktree) para la biografía de Instagram, TikTok y los QR impresos.
+// Está escondida: no aparece en el menú ni en el pie, no va en el sitemap y lleva "noindex"; solo se llega con el enlace
+// (awsunistmo.org/enlaces). Toma los enlaces de src/data/site.ts: si cambia una red o la invitación de WhatsApp,
+// se actualiza aquí sola. El próximo evento sale del calendario de Meetup (o de Strapi) al compilar.
+import '../styles/global.css';
+import QRCode from 'qrcode';
+import LogoRed from '../components/LogoRed.astro';
+import Icono from '../components/Icono.astro';
+import { site, redes } from '../data/site';
+import { proximos, diaYMes, hora, fechaLarga } from '../lib/eventos';
+
+// Sin SITE_URL (en local) se usa el dominio del grupo para el QR y la imagen al compartir
+const base = Astro.site ? new URL(Astro.site.href.replace(/\/?$/, '/')) : new URL('https://awsunistmo.org/');
+const urlPagina = new URL('enlaces/', base).href;
+const dominio = base.host;
+const imagenSocial = new URL('img/og.jpg', base).href;
+const titulo = `Enlaces · ${site.corto}`;
+const descripcion = 'Comunidad de WhatsApp, eventos en Meetup y todas las redes del AWS Student Builder Group UNISTMO.';
+const qr = await QRCode.toString(urlPagina, { type: 'svg', errorCorrectionLevel: 'Q', margin: 0, color: { dark: '#161d26', light: '#ffffff' } });
+const proximo = proximos[0];
+const fecha = proximo ? diaYMes(proximo.inicio) : null;
+const anio = new Date().getFullYear();
+
+// Lo más importante va primero y más grande
+const principales = [
+  {
+    red: 'whatsapp' as const,
+    titulo: 'Comunidad de WhatsApp',
+    texto: 'Avisos, dudas y oportunidades. Todo llega primero aquí.',
+    url: site.whatsapp,
+    etiqueta: 'Empieza aquí',
+    color: '#25d366',
+  },
+  {
+    red: 'meetup' as const,
+    titulo: 'Eventos en Meetup',
+    texto: 'Regístrate a los talleres y charlas. Son gratis.',
+    url: site.meetup,
+    etiqueta: '',
+    color: '#ff4d6d',
+  },
+];
+// Pausa entre la entrada de cada bloque (segundos)
+const paso = 0.06;
+---
+<!doctype html>
+<html lang="es-MX">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{titulo}</title>
+    <meta name="description" content={descripcion} />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#161D26" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" href="/img/logo-192.png" type="image/png" />
+    <link rel="apple-touch-icon" href="/img/logo-192.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_MX" />
+    <meta property="og:title" content={titulo} />
+    <meta property="og:description" content={descripcion} />
+    <meta property="og:url" content={urlPagina} />
+    <meta property="og:image" content={imagenSocial} />
+    <meta name="twitter:card" content="summary_large_image" />
+  </head>
+  <body class="enlaces min-h-dvh overflow-x-clip font-sans antialiased selection:bg-magenta selection:text-marino">
+    <!-- Fondo: franja bordada del Istmo, rejilla y luces que se mueven despacio -->
+    <div class="fondo" aria-hidden="true">
+      <div class="franja"></div>
+      <div class="rejilla rejilla-fondo"></div>
+      <span class="luz luz-1"></span>
+      <span class="luz luz-2"></span>
+      <span class="luz luz-3"></span>
+    </div>
+
+    <div class="barra">
+      <a href="/" class="barra-marca" aria-label={`Ir a la página de ${site.corto}`}>
+        <img src="/img/logo-192.png" alt="" width="32" height="32" class="size-8 rounded-lg ring-1 ring-white/15" />
+        <span>{dominio}</span>
+      </a>
+      <div class="flex gap-2">
+        <button type="button" class="boton-icono" data-abrir-qr aria-haspopup="dialog" aria-label="Mostrar el código QR de esta página">
+          <svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg>
+        </button>
+        <button type="button" class="boton-icono" data-compartir aria-label="Compartir esta página">
+          <svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <main class="contenedor" id="contenido">
+      <!-- Presentación -->
+      <header class="perfil entrada" style="--d:0s">
+        <div class="avatar">
+          <span class="aro" aria-hidden="true"></span>
+          <img src="/img/logo-512.png" alt={`Logo de ${site.corto}`} width="112" height="112" class="avatar-img" />
+        </div>
+        <h1 class="titulo mt-6 text-[1.7rem] font-bold leading-tight sm:text-3xl">
+          AWS Student Builder Group <span class="degradado">UNISTMO</span>
+        </h1>
+        <p class="mt-2 text-[0.95rem] text-suave/90">{site.lema}</p>
+        <p class="ubicacion mt-3">
+          <Icono nombre="lugar" class="size-4" />
+          Campus Tehuantepec, Oaxaca
+        </p>
+
+        <!-- Atajos a cada red -->
+        <ul class="atajos mt-5" aria-label="Redes del grupo">
+          {redes.map((r) => (
+            <li>
+              <a href={r.url} target="_blank" rel="noopener" class="atajo" aria-label={`${r.nombre} (se abre en otra pestaña)`}>
+                <LogoRed red={r.tipo} class="size-10" />
+              </a>
+            </li>
+          ))}
+        </ul>
+      </header>
+
+      <!-- Lo principal: comunidad y eventos -->
+      <section class="mt-8" aria-labelledby="t-unete">
+        <h2 id="t-unete" class="seccion entrada" style={`--d:${paso * 2}s`}>Únete</h2>
+        <ul class="lista">
+          {principales.map((e, i) => (
+            <li class="entrada" style={`--d:${paso * (3 + i)}s`}>
+              <a href={e.url} target="_blank" rel="noopener" class:list={['enlace enlace-grande', e.etiqueta && 'destacado']} style={`--c:${e.color}`}>
+                <LogoRed red={e.red} class="size-12" />
+                <span class="enlace-texto">
+                  <span class="enlace-titulo">
+                    {e.titulo}
+                    {e.etiqueta && <span class="pildora">{e.etiqueta}</span>}
+                  </span>
+                  <span class="enlace-desc">{e.texto}</span>
+                </span>
+                <Icono nombre="externo" class="flecha size-5" />
+                <span class="sr-only">(se abre en otra pestaña)</span>
+              </a>
+            </li>
+          ))}
+
+          {proximo && fecha && (
+            <li class="entrada" style={`--d:${paso * 5}s`}>
+              <a href={proximo.url ?? '/eventos/'} target={proximo.url ? '_blank' : undefined} rel={proximo.url ? 'noopener' : undefined} class="enlace evento" style="--c:#42b4ff">
+                <span class="fecha" aria-hidden="true">
+                  <span class="fecha-mes">{fecha.mes}</span>
+                  <span class="fecha-dia">{fecha.dia}</span>
+                </span>
+                <span class="enlace-texto">
+                  <span class="enlace-titulo">
+                    <span class="pildora pildora-azul">Próximo evento</span>
+                  </span>
+                  <span class="enlace-titulo mt-1">{proximo.titulo}</span>
+                  <span class="enlace-desc">
+                    <span class="sr-only">{fechaLarga(proximo.inicio)}, </span>{hora(proximo.inicio)} h{proximo.lugar ? ` · ${proximo.lugar}` : ''}
+                  </span>
+                </span>
+                <Icono nombre="flecha" class="flecha size-5" />
+              </a>
+            </li>
+          )}
+
+          <li class="entrada" style={`--d:${paso * 6}s`}>
+            <a href="/" class="enlace" style="--c:#ff57e9">
+              <img src="/img/logo-192.png" alt="" width="48" height="48" class="size-12 shrink-0 rounded-full ring-1 ring-white/15" />
+              <span class="enlace-texto">
+                <span class="enlace-titulo">Página del grupo</span>
+                <span class="enlace-desc">Talleres, ruta de aprendizaje, equipo y contacto · {dominio}</span>
+              </span>
+              <Icono nombre="flecha" class="flecha size-5" />
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Todas las redes, con su usuario -->
+      <section class="mt-8" aria-labelledby="t-redes">
+        <h2 id="t-redes" class="seccion entrada" style={`--d:${paso * 7}s`}>Síguenos</h2>
+        <ul class="lista">
+          {redes.map((r, i) => (
+            <li class="entrada" style={`--d:${paso * (8 + i)}s`}>
+              <a href={r.url} target="_blank" rel="noopener" class="enlace">
+                <LogoRed red={r.tipo} class="size-11" />
+                <span class="enlace-texto">
+                  <span class="enlace-titulo">{r.nombre}</span>
+                  <span class="enlace-desc">{r.usuario}</span>
+                </span>
+                <Icono nombre="externo" class="flecha size-5" />
+                <span class="sr-only">(se abre en otra pestaña)</span>
+              </a>
+            </li>
+          ))}
+          <li class="entrada" style={`--d:${paso * (8 + redes.length)}s`}>
+            <a href={`mailto:${site.correo}`} class="enlace" style="--c:#ad5cff">
+              <span class="icono-correo"><Icono nombre="correo" class="size-6" /></span>
+              <span class="enlace-texto">
+                <span class="enlace-titulo">Correo</span>
+                <span class="enlace-desc">{site.correo}</span>
+              </span>
+              <Icono nombre="flecha" class="flecha size-5" />
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <footer class="pie entrada" style={`--d:${paso * (9 + redes.length)}s`}>
+        <p>© {anio} {site.nombre}</p>
+        <p class="mt-2">Comunidad dirigida por estudiantes. No es un sitio oficial de Amazon Web Services.</p>
+      </footer>
+    </main>
+
+    <!-- Código QR de esta página, para mostrarlo en el celular y que otros lo escaneen -->
+    <dialog id="dialogo-qr" class="dialogo" aria-labelledby="t-qr">
+      <div class="dialogo-caja">
+        <button type="button" class="boton-icono cerrar" data-cerrar-qr aria-label="Cerrar">
+          <Icono nombre="cerrar" class="size-5" />
+        </button>
+        <h2 id="t-qr" class="titulo px-8 text-xl font-bold">Escanea para ver los enlaces</h2>
+        <p class="mt-1 text-sm text-suave/80">Muéstralo a quien quiera unirse.</p>
+        <div class="qr" role="img" aria-label={`Código QR que lleva a ${urlPagina}`}>
+          <Fragment set:html={qr} />
+          <img src="/img/logo-192.png" alt="" width="40" height="40" class="qr-logo" />
+        </div>
+        <p class="qr-url">{urlPagina.replace(/^https?:\/\//, '').replace(/\/$/, '')}</p>
+        <button type="button" class="boton boton-primario mt-5 w-full justify-center" data-copiar>Copiar enlace</button>
+      </div>
+    </dialog>
+
+    <p class="aviso" role="status" aria-live="polite" data-aviso></p>
+
+    <script is:inline>
+      // El enlace que se comparte es el de la página publicada (en la vista previa, la de la vista previa)
+      const enlace = location.origin + location.pathname;
+      const aviso = document.querySelector('[data-aviso]');
+      let reloj;
+      const avisar = (texto) => {
+        aviso.textContent = texto;
+        aviso.classList.add('visible');
+        clearTimeout(reloj);
+        reloj = setTimeout(() => aviso.classList.remove('visible'), 2200);
+      };
+      const copiar = async () => {
+        try {
+          await navigator.clipboard.writeText(enlace);
+          avisar('Enlace copiado');
+        } catch {
+          avisar(enlace);
+        }
+      };
+      document.querySelector('[data-compartir]').addEventListener('click', async () => {
+        if (navigator.share) {
+          try {
+            await navigator.share({ title: document.title, text: 'Únete al AWS Student Builder Group UNISTMO', url: enlace });
+          } catch (e) {
+            if (e?.name !== 'AbortError') copiar();
+          }
+        } else {
+          copiar();
+        }
+      });
+      const dialogo = document.getElementById('dialogo-qr');
+      document.querySelector('[data-abrir-qr]').addEventListener('click', () => dialogo.showModal());
+      document.querySelector('[data-cerrar-qr]').addEventListener('click', () => dialogo.close());
+      document.querySelector('[data-copiar]').addEventListener('click', copiar);
+      // Tocar fuera de la caja cierra el QR
+      dialogo.addEventListener('click', (e) => { if (e.target === dialogo) dialogo.close(); });
+    </script>
+  </body>
+</html>
+
+<style>
+  .enlaces { background: var(--color-marino); }
+
+  /* ---------- Fondo ---------- */
+  .fondo { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+  .franja {
+    position: absolute; inset: 0 0 auto; height: 22px;
+    background: url('/img/istmo/bordado-franja.webp') repeat-x center / auto 22px;
+    opacity: 0.55;
+    mask-image: linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent);
+  }
+  .rejilla-fondo {
+    position: absolute; inset: 0; opacity: 0.35;
+    mask-image: radial-gradient(ellipse 70% 55% at 50% 18%, #000, transparent 75%);
+  }
+  .luz { position: absolute; border-radius: 999px; filter: blur(70px); opacity: 0.32; will-change: transform; }
+  .luz-1 { width: 360px; height: 360px; left: -120px; top: 60px; background: var(--color-magenta); animation: flotar 16s ease-in-out infinite alternate; }
+  .luz-2 { width: 320px; height: 320px; right: -110px; top: 280px; background: var(--color-morado); animation: flotar 19s ease-in-out -6s infinite alternate-reverse; }
+  .luz-3 { width: 300px; height: 300px; left: 20%; bottom: -140px; background: var(--color-azul); opacity: 0.2; animation: flotar 22s ease-in-out -3s infinite alternate; }
+  @keyframes flotar {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(40px, -30px) scale(1.1); }
+    100% { transform: translate(-30px, 40px) scale(0.95); }
+  }
+
+  /* ---------- Barra de arriba ---------- */
+  .barra {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    max-width: 34rem; margin: 0 auto;
+    padding: calc(1.1rem + env(safe-area-inset-top)) 1.1rem 0.6rem;
+  }
+  .barra-marca { display: inline-flex; align-items: center; gap: 0.6rem; font-size: 0.85rem; font-weight: 600; color: #fff; opacity: 0.85; transition: opacity 0.3s; }
+  .barra-marca:hover { opacity: 1; }
+  .boton-icono {
+    display: grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: 999px;
+    color: #fff; background: color-mix(in srgb, var(--color-marino-2) 70%, transparent);
+    border: 1px solid var(--color-linea); backdrop-filter: blur(10px);
+    transition: transform 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
+  }
+  .boton-icono:hover { transform: translateY(-2px); border-color: var(--color-magenta); }
+  .boton-icono:active { transform: scale(0.94); }
+
+  /* ---------- Contenido ---------- */
+  .contenedor { max-width: 34rem; margin: 0 auto; padding: 0.5rem 1.1rem calc(2.5rem + env(safe-area-inset-bottom)); }
+  .perfil { text-align: center; padding-top: 1rem; }
+
+  .avatar { position: relative; width: 112px; height: 112px; margin: 0 auto; }
+  .avatar-img { position: relative; z-index: 1; width: 112px; height: 112px; border-radius: 28px; box-shadow: 0 18px 50px -12px color-mix(in srgb, var(--color-magenta) 55%, transparent); }
+  /* Aro de color alrededor del logo: el degradado gira, el marco se queda quieto */
+  @property --giro { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+  .aro {
+    position: absolute; inset: -5px; border-radius: 32px;
+    background: conic-gradient(from var(--giro), var(--color-magenta), var(--color-morado), var(--color-azul), var(--color-menta), var(--color-magenta));
+    animation: girar 5s linear infinite;
+  }
+  .aro::after { content: ''; position: absolute; inset: 3px; border-radius: 29px; background: var(--color-marino); }
+  @keyframes girar { to { --giro: 1turn; } }
+
+  .ubicacion {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.3rem 0.8rem; border-radius: 999px; font-size: 0.8rem;
+    border: 1px solid var(--color-linea); background: color-mix(in srgb, var(--color-marino-2) 60%, transparent);
+  }
+
+  .atajos { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; }
+  .atajo { display: block; border-radius: 999px; transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.3s; }
+  .atajo:hover { transform: translateY(-4px) scale(1.06); }
+  .atajo:focus-visible, .enlace:focus-visible, .boton-icono:focus-visible, .barra-marca:focus-visible {
+    outline: 2px solid var(--color-magenta); outline-offset: 3px;
+  }
+
+  .seccion {
+    display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.72rem;
+    letter-spacing: 0.22em; text-transform: uppercase; color: color-mix(in srgb, var(--color-suave) 75%, transparent);
+  }
+  .seccion::before { content: '//'; color: var(--color-magenta); }
+  .seccion::after { content: ''; flex: 1; height: 1px; background: var(--color-linea); }
+
+  .lista { display: grid; gap: 0.7rem; }
+
+  /* Cada enlace: tarjeta con el color de su marca en el borde y una luz que cruza al pasar el cursor */
+  .enlace {
+    --c: var(--color-magenta);
+    position: relative; isolation: isolate; overflow: hidden;
+    display: flex; align-items: center; gap: 0.9rem;
+    min-height: 4.25rem; padding: 0.75rem 1rem 0.75rem 0.8rem; border-radius: 1.25rem;
+    color: #fff; text-decoration: none;
+    background: color-mix(in srgb, var(--color-marino-2) 82%, transparent);
+    border: 1px solid var(--color-linea);
+    backdrop-filter: blur(8px);
+    transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .enlace::after {
+    content: ''; position: absolute; inset: 0; z-index: -1;
+    background: linear-gradient(110deg, transparent 30%, color-mix(in srgb, var(--c) 22%, transparent) 50%, transparent 70%);
+    transform: translateX(-120%);
+  }
+  .enlace:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--c) 70%, transparent); box-shadow: 0 16px 40px -18px var(--c); }
+  .enlace:hover::after { transform: translateX(120%); transition: transform 0.8s ease; }
+  .enlace:active { transform: scale(0.985); }
+  .enlace-grande { min-height: 5.25rem; padding-block: 1rem; }
+  .destacado {
+    border-color: color-mix(in srgb, var(--c) 55%, transparent);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--c) 16%, var(--color-marino-2)), color-mix(in srgb, var(--color-marino-2) 85%, transparent));
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--c) 45%, transparent);
+    animation: latido 2.8s ease-out 1.2s infinite;
+  }
+  @keyframes latido {
+    0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--c) 45%, transparent); }
+    70%, 100% { box-shadow: 0 0 0 12px color-mix(in srgb, var(--c) 0%, transparent); }
+  }
+  .enlace-texto { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 0.15rem; text-align: left; }
+  .enlace-titulo { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; font-family: var(--font-display); font-weight: 600; font-size: 1.02rem; line-height: 1.25; }
+  .enlace-grande .enlace-titulo { font-size: 1.12rem; }
+  .enlace-desc { font-size: 0.84rem; line-height: 1.35; color: color-mix(in srgb, var(--color-suave) 85%, transparent); overflow-wrap: anywhere; }
+  .flecha { flex-shrink: 0; opacity: 0.55; transition: transform 0.3s ease, opacity 0.3s ease; }
+  .enlace:hover .flecha { opacity: 1; transform: translateX(3px); }
+  .pildora {
+    display: inline-block; padding: 0.12rem 0.55rem; border-radius: 999px;
+    font-family: var(--font-sans); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--color-marino); background: var(--c);
+  }
+  .pildora-azul { background: var(--color-azul); }
+
+  .fecha {
+    display: grid; flex-shrink: 0; place-items: center; width: 3rem; height: 3.25rem; border-radius: 0.8rem; overflow: hidden;
+    background: #fff; color: var(--color-marino); line-height: 1;
+  }
+  .fecha-mes { width: 100%; padding: 0.22rem 0; text-align: center; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.08em; color: #fff; background: var(--color-azul); }
+  .fecha-dia { padding-bottom: 0.2rem; font-family: var(--font-display); font-size: 1.35rem; font-weight: 700; }
+
+  .icono-correo { display: grid; flex-shrink: 0; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 999px; color: var(--color-marino); background: var(--color-morado); }
+
+  .pie { margin-top: 2.5rem; text-align: center; font-size: 0.72rem; line-height: 1.5; color: color-mix(in srgb, var(--color-suave) 60%, transparent); }
+
+  /* ---------- QR ---------- */
+  .dialogo { margin: auto; padding: 0; border: 0; background: transparent; color: var(--color-suave); max-width: min(22rem, calc(100vw - 2rem)); }
+  .dialogo::backdrop { background: rgb(10 14 19 / 0.75); backdrop-filter: blur(6px); }
+  .dialogo[open] .dialogo-caja { animation: aparecer 0.35s cubic-bezier(0.2, 0.7, 0.2, 1); }
+  @keyframes aparecer { from { opacity: 0; transform: translateY(14px) scale(0.97); } }
+  .dialogo-caja { position: relative; padding: 1.5rem; border-radius: 1.5rem; text-align: center; background: var(--color-marino-2); border: 1px solid var(--color-linea); }
+  .cerrar { position: absolute; top: 0.75rem; right: 0.75rem; width: 2.2rem; height: 2.2rem; }
+  .qr { position: relative; margin: 1.25rem auto 0; width: min(15rem, 100%); padding: 0.9rem; border-radius: 1rem; background: #fff; }
+  .qr :global(svg) { display: block; width: 100%; height: auto; }
+  .qr-logo { position: absolute; left: 50%; top: 50%; width: 2.6rem; height: 2.6rem; transform: translate(-50%, -50%); border-radius: 0.6rem; box-shadow: 0 0 0 4px #fff; }
+  .qr-url { margin-top: 0.75rem; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8rem; color: #fff; }
+
+  /* Aviso de "Enlace copiado" */
+  .aviso {
+    position: fixed; left: 50%; bottom: calc(1.5rem + env(safe-area-inset-bottom)); z-index: 70;
+    max-width: calc(100vw - 2rem); padding: 0.6rem 1.1rem; border-radius: 999px;
+    font-size: 0.85rem; font-weight: 600; color: var(--color-marino); background: var(--color-menta);
+    opacity: 0; transform: translate(-50%, 12px); pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  .aviso:empty { display: none; }
+  .aviso:global(.visible) { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (min-width: 640px) {
+    .contenedor { padding-top: 1.5rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .luz, .aro, .destacado { animation: none !important; }
+  }
+</style>
