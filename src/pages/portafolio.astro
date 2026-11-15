@@ -1,0 +1,25 @@
+---
+// Enlace corto para talleres: /portafolio lleva al repositorio del taller «Mi primer portafolio con Kiro».
+// Es más fácil de teclear en una sala de cómputo que la dirección completa de GitHub.
+import { site } from '../data/site';
+
+const destino = 'https://github.com/aws-sbg-unistmo/portafolio-kiro';
+---
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <meta http-equiv="refresh" content={`0; url=${destino}`} />
+    <title>Mi primer portafolio con Kiro · {site.corto}</title>
+    <style>
+      body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #161d26; color: #c9ccd1; font: 16px system-ui, sans-serif; text-align: center; }
+      a { color: #00e482; font-weight: 600; }
+    </style>
+  </head>
+  <body>
+    <p>Te estamos llevando al material del taller del {site.nombre}.<br /><a href={destino}>Toca aquí si no se abre</a>.</p>
+    <script is:inline define:vars={{ destino }}>location.replace(destino);</script>
+  </body>
+</html>

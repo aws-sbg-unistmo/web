@@ -12,7 +12,7 @@ export default defineConfig({
   // El sitemap solo se genera cuando se conoce la URL pública (SITE_URL)
   // /enlaces es la página tipo Linktree: solo se entra con el enlace, así que tampoco va en el sitemap
   integrations: process.env.SITE_URL
-    ? [sitemap({ filter: (pagina) => !['/404', '/whatsapp', '/enlaces'].some((ruta) => pagina.includes(ruta)) })]
+    ? [sitemap({ filter: (pagina) => !['/404', '/whatsapp', '/enlaces', '/portafolio'].some((ruta) => pagina.includes(ruta)) })]
     : [],
   vite: {
     plugins: [tailwindcss()],
